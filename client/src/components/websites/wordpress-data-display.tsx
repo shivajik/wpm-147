@@ -741,12 +741,41 @@ export function WordPressDataDisplay({ websiteId }: WordPressDataDisplayProps) {
                   <Separator />
                   <div className="flex justify-between">
                     <span>Database:</span>
-                    <span>{wpData.systemInfo?.mysql_version ? `MySQL ${wpData.systemInfo.mysql_version}` : 'N/A'}</span>
+                    <span>
+                      {(() => {
+                        const version = wpData.systemInfo?.mysql_version;
+                        if (version) {
+                          // Extract just the major.minor version (e.g., "8.0" from "8.0.42-0ubuntu0.24.04.2")
+                          const cleanVersion = version.match(/^(\d+\.\d+)/)?.[1] || version;
+                          if (version.toLowerCase().includes('mariadb')) {
+                            return `MariaDB ${cleanVersion}`;
+                          }
+                          return `MySQL ${cleanVersion}`;
+                        }
+                        return 'N/A';
+                      })()}
+                    </span>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
-                    <span>Server Software:</span>
-                    <span>{wpData.systemInfo?.server_software || 'N/A'}</span>
+                    <span>Server:</span>
+                    <span>
+                      {(() => {
+                        const server = wpData.systemInfo?.server_software;
+                        if (!server || server === 'Unknown') {
+                          return 'N/A';
+                        }
+                        // Clean up server string to show just the main server name
+                        if (server.toLowerCase().includes('apache')) {
+                          return 'Apache';
+                        } else if (server.toLowerCase().includes('nginx')) {
+                          return 'Nginx';
+                        } else if (server.toLowerCase().includes('litespeed')) {
+                          return 'LiteSpeed';
+                        }
+                        return server;
+                      })()}
+                    </span>
                   </div>
                 </CardContent>
               </Card>

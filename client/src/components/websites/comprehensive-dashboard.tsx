@@ -231,17 +231,41 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
                     <div>
                       <p className="text-sm text-gray-600">Database</p>
                       <p className="font-medium">
-                        {(wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version 
-                          ? `MySQL ${(wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version}`
-                          : (wpData as any)?.systemInfo?.database_type || (status as any)?.database_type || 'N/A'
-                        }
+                        {(() => {
+                          const version = (wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version;
+                          if (version) {
+                            // Extract just the major.minor version (e.g., "8.0" from "8.0.42-0ubuntu0.24.04.2")
+                            const cleanVersion = version.match(/^(\d+\.\d+)/)?.[1] || version;
+                            if (version.toLowerCase().includes('mariadb')) {
+                              return `MariaDB ${cleanVersion}`;
+                            }
+                            return `MySQL ${cleanVersion}`;
+                          }
+                          return (wpData as any)?.systemInfo?.database_type || (status as any)?.database_type || 'N/A';
+                        })()}
                       </p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div>
                       <p className="text-sm text-gray-600">Server</p>
-                      <p className="font-medium">{(wpData as any)?.systemInfo?.server_software || (status as any)?.server_info || 'Apache'}</p>
+                      <p className="font-medium">
+                        {(() => {
+                          const server = (wpData as any)?.systemInfo?.server_software || (status as any)?.server_info;
+                          if (!server || server === 'Unknown') {
+                            return 'N/A';
+                          }
+                          // Clean up server string to show just the main server name
+                          if (server.toLowerCase().includes('apache')) {
+                            return 'Apache';
+                          } else if (server.toLowerCase().includes('nginx')) {
+                            return 'Nginx';
+                          } else if (server.toLowerCase().includes('litespeed')) {
+                            return 'LiteSpeed';
+                          }
+                          return server;
+                        })()}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">SSL Status</p>
