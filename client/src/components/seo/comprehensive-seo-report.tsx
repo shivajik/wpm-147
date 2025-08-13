@@ -47,7 +47,6 @@ interface ComprehensiveSeoReportProps {
 
 export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: ComprehensiveSeoReportProps) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
-  const [activeTab, setActiveTab] = useState('overview');
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -281,71 +280,17 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
         </CardContent>
       </Card>
 
-      {/* Single Page Navigation - phpRank Style */}
-      <div className="w-full">
-        {/* Enhanced Navigation Bar */}
-        <Card className="mb-6">
-          <CardContent className="p-0">
-            <nav className="flex flex-wrap bg-gray-50 dark:bg-gray-800 rounded-lg">
-              {[
-                { id: 'overview', label: 'Overview', icon: BarChart3, count: 4 },
-                { id: 'seo', label: 'SEO', icon: Search, count: 3 },
-                { id: 'performance', label: 'Performance', icon: Zap, count: 1 },
-                { id: 'security', label: 'Security', icon: Shield, count: 1 },
-                { id: 'miscellaneous', label: 'Miscellaneous', icon: Settings, count: 2 }
-              ].map((tab, index) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 px-4 py-4 flex items-center justify-center gap-2 font-medium text-sm transition-all duration-200 ${
-                    index === 0 ? 'rounded-l-lg' : ''
-                  } ${
-                    index === 4 ? 'rounded-r-lg' : ''
-                  } ${
-                    activeTab === tab.id
-                      ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm border-2 border-blue-200 dark:border-blue-600'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-gray-700/50'
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                  <Badge variant="secondary" className="ml-1 text-xs">
-                    {tab.count}
-                  </Badge>
-                </button>
-              ))}
-            </nav>
-          </CardContent>
-        </Card>
-
-        {/* Content Area with Animation */}
-        <div className="min-h-[500px] transition-all duration-300 ease-in-out">
-          {/* Current Section Indicator */}
-          <div className="mb-4 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                Current Section: {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-              </span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded">
-                {activeTab === 'overview' && '4 Components'}
-                {activeTab === 'seo' && '3 Analysis Tools'}
-                {activeTab === 'performance' && '1 HTTP Analysis'}
-                {activeTab === 'security' && '1 Security Check'}
-                {activeTab === 'miscellaneous' && '2 Summary Reports'}
-              </span>
-            </div>
+      {/* Single Page Content - All Sections */}
+      <div className="w-full space-y-8">
+        {/* Overview Section */}
+        <div className="space-y-6">
+          <div className="border-l-4 border-blue-500 pl-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <BarChart3 className="h-6 w-6 text-blue-500" />
+              Overview Analysis
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Comprehensive overview of your website's SEO performance</p>
           </div>
-
-          {/* Overview Section */}
-          {activeTab === 'overview' && (
-            <div className="space-y-6 animate-in slide-in-from-right duration-300">
-            <div className="border-l-4 border-blue-500 pl-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-blue-500" />
-                Overview Analysis
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">Comprehensive overview of your website's SEO performance</p>
-            </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
               <CardHeader className="pb-2">
@@ -385,19 +330,18 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           </div>
-          </div>
-        )}
+        </div>
 
         {/* SEO Section */}
-        {activeTab === 'seo' && (
-          <div className="space-y-6">
-            <div className="border-l-4 border-green-500 pl-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Search className="h-6 w-6 text-green-500" />
-                SEO Technical Analysis
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">Detailed technical SEO analysis and content optimization</p>
-            </div>
+        <div className="space-y-6">
+          <div className="border-l-4 border-green-500 pl-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Search className="h-6 w-6 text-green-500" />
+              SEO Technical Analysis
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Detailed technical SEO analysis and content optimization</p>
+          </div>
+          
           {/* Heading Structure Analysis */}
           {technicalData.headingAnalysis && (
             <Card>
@@ -606,19 +550,18 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-          </div>
-        )}
+        </div>
 
         {/* Performance Section */}
-        {activeTab === 'performance' && (
-          <div className="space-y-6">
-            <div className="border-l-4 border-orange-500 pl-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Zap className="h-6 w-6 text-orange-500" />
-                Performance Analysis
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">HTTP requests optimization and resource loading analysis</p>
-            </div>
+        <div className="space-y-6">
+          <div className="border-l-4 border-orange-500 pl-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Zap className="h-6 w-6 text-orange-500" />
+              Performance Analysis
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">HTTP requests optimization and resource loading analysis</p>
+          </div>
+          
           {/* HTTP Requests Analysis */}
           {technicalData.httpRequests && (
             <Card>
@@ -724,19 +667,18 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-          </div>
-        )}
+        </div>
 
         {/* Security Section */}
-        {activeTab === 'security' && (
-          <div className="space-y-6">
-            <div className="border-l-4 border-red-500 pl-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Shield className="h-6 w-6 text-red-500" />
-                Security Analysis
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">Security headers and protocol analysis for website protection</p>
-            </div>
+        <div className="space-y-6">
+          <div className="border-l-4 border-red-500 pl-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Shield className="h-6 w-6 text-red-500" />
+              Security Analysis
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Security headers and protocol analysis for website protection</p>
+          </div>
+          
           {/* Security Headers Analysis */}
           {technicalData.securityHeaders && (
             <Card>
@@ -799,19 +741,18 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-          </div>
-        )}
+        </div>
 
         {/* Miscellaneous Section */}
-        {activeTab === 'miscellaneous' && (
-          <div className="space-y-6">
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Settings className="h-6 w-6 text-purple-500" />
-                Additional Findings
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">Technical summary and detailed recommendations for improvement</p>
-            </div>
+        <div className="space-y-6">
+          <div className="border-l-4 border-purple-500 pl-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Settings className="h-6 w-6 text-purple-500" />
+              Additional Findings
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Technical summary and detailed recommendations for improvement</p>
+          </div>
+          
           {/* Technical Summary */}
           <Card>
             <CardHeader>
@@ -933,8 +874,6 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </Accordion>
             </CardContent>
           </Card>
-          </div>
-        )}
         </div>
       </div>
     </div>
