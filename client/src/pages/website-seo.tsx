@@ -102,7 +102,17 @@ export default function WebsiteSEO() {
   };
 
   const openReportInNewWindow = (reportId: string) => {
-    const reportUrl = `${window.location.origin}/seo-report/${reportId}`;
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      toast({
+        title: "Authentication Required",
+        description: "Please refresh the page and log in again to view reports.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const reportUrl = `${window.location.origin}/seo-report/${reportId}?token=${encodeURIComponent(token)}`;
     window.open(reportUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
 

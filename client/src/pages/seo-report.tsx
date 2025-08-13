@@ -21,6 +21,21 @@ export default function SeoReportPage() {
   // Wait for authentication to be ready before making the query
   useEffect(() => {
     const checkAuth = () => {
+      // Check for token in URL parameters (for new windows)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token');
+      
+      if (urlToken) {
+        // Store the token from URL in localStorage
+        localStorage.setItem("auth_token", urlToken);
+        // Clean up the URL to remove the token
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+        setAuthReady(true);
+        return;
+      }
+      
+      // Check localStorage for existing token
       const token = localStorage.getItem("auth_token");
       if (token) {
         setAuthReady(true);
