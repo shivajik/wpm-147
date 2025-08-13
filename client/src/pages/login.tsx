@@ -132,7 +132,7 @@ export default function Login() {
               </div>
             </div>
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-              WP ProCare
+              AIO Webcare
             </h1>
             <p className="text-xl text-slate-300">Professional WordPress Management Platform</p>
           </div>
