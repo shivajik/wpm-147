@@ -367,9 +367,10 @@ export default function WebsiteThemes() {
                   </div>
                   
                   {activeTheme.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      {activeTheme.description}
-                    </p>
+                    <p 
+                      className="text-sm text-gray-600 dark:text-gray-400 mb-3"
+                      dangerouslySetInnerHTML={{ __html: activeTheme.description }}
+                    />
                   )}
                   
                   <div className="flex items-center space-x-4 text-xs text-gray-500">
@@ -623,9 +624,10 @@ export default function WebsiteThemes() {
                         </div>
                         
                         {theme.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                            {theme.description}
-                          </p>
+                          <p 
+                            className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: theme.description }}
+                          />
                         )}
                         
                         {theme.author && (

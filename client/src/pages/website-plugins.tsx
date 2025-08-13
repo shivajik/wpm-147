@@ -686,9 +686,12 @@ export default function WebsitePlugins() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                      {plugin.description || 'No description available'}
-                    </p>
+                    <p 
+                      className="text-xs text-muted-foreground line-clamp-2 mt-1"
+                      dangerouslySetInnerHTML={{ 
+                        __html: plugin.description || 'No description available' 
+                      }}
+                    />
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       <span>Version {plugin.version}</span>
                       {plugin.author && <span>By {plugin.author}</span>}
