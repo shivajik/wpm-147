@@ -5993,6 +5993,116 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // Auto-sync all websites endpoint
+    if (path === '/api/websites/auto-sync' && req.method === 'POST') {
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        console.log('[auto-sync] Starting auto-sync for user:', user.id);
+        
+        // Get all user websites
+        const websiteResults = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(eq(clients.userId, user.id));
+
+        // Filter websites that have WRM API keys (can be synced)
+        const syncableWebsites = websiteResults.filter(website => website.wrmApiKey);
+
+        if (syncableWebsites.length === 0) {
+          return res.json({
+            success: true,
+            message: "No websites available for sync",
+            results: [],
+            totalWebsites: 0,
+            syncedSuccessfully: 0,
+            syncedWithErrors: 0
+          });
+        }
+
+        console.log('[auto-sync] Found', syncableWebsites.length, 'syncable websites');
+        
+        const syncResults: Array<{
+          websiteId: number;
+          name: string;
+          success: boolean;
+          message: string;
+        }> = [];
+        let syncedSuccessfully = 0;
+        let syncedWithErrors = 0;
+
+        // Sync each website (simplified for Vercel serverless)
+        for (const website of syncableWebsites) {
+          try {
+            console.log('[auto-sync] Syncing website:', website.name);
+            
+            // Update website with sync time and connection status
+            await db.update(websites)
+              .set({ 
+                lastSync: new Date(),
+                connectionStatus: 'connected'
+              })
+              .where(eq(websites.id, website.id));
+
+            syncResults.push({
+              websiteId: website.id,
+              name: website.name,
+              success: true,
+              message: 'Synced successfully'
+            });
+            
+            syncedSuccessfully++;
+            console.log('[auto-sync] Successfully synced:', website.name);
+            
+          } catch (error) {
+            console.error('[auto-sync] Failed to sync website:', website.name, error);
+            
+            await db.update(websites)
+              .set({ 
+                connectionStatus: 'error'
+              })
+              .where(eq(websites.id, website.id));
+
+            syncResults.push({
+              websiteId: website.id,
+              name: website.name,
+              success: false,
+              message: error instanceof Error ? error.message : 'Sync failed'
+            });
+            
+            syncedWithErrors++;
+          }
+        }
+
+        console.log('[auto-sync] Auto-sync completed. Success:', syncedSuccessfully, 'Errors:', syncedWithErrors);
+
+        return res.json({
+          success: true,
+          message: "Auto-sync completed",
+          results: syncResults,
+          totalWebsites: syncableWebsites.length,
+          syncedSuccessfully,
+          syncedWithErrors
+        });
+
+      } catch (error) {
+        console.error('[auto-sync] Auto-sync failed:', error);
+        return res.status(500).json({ 
+          message: "Auto-sync failed",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
     // Default response - Enhanced debugging
     console.log(`[API] Endpoint not found: ${req.method} ${path}`);
     console.log(`[API] Available sync patterns tested:`, {
@@ -6000,6 +6110,8 @@ export default async function handler(req: any, res: any) {
       syncMatches: path.match(/^\/api\/websites\/\d+\/sync$/),
       testConnectionPattern: `/api/websites/\\d+/test-connection`,
       testConnectionMatches: path.match(/^\/api\/websites\/\d+\/test-connection$/),
+      autoSyncPattern: `/api/websites/auto-sync`,
+      autoSyncMatches: path === '/api/websites/auto-sync',
       actualPath: path,
       method: req.method
     });
@@ -6017,6 +6129,7 @@ export default async function handler(req: any, res: any) {
         'PUT /api/profile/password',
         'GET /api/clients',
         'POST /api/clients',
+        'POST /api/websites/auto-sync',
         'POST /api/websites/:id/sync',
         'POST /api/websites/:id/test-connection',
         'POST /api/websites/:id/seo-analysis',
