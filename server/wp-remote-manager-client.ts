@@ -411,6 +411,128 @@ export class WPRemoteManagerClient {
   }
 
   /**
+   * Detect server software with multiple fallback methods
+   */
+  private async detectServerSoftware(pluginProvidedServer?: string): Promise<string> {
+    // Method 1: Use plugin-provided server info if available
+    if (pluginProvidedServer && pluginProvidedServer !== 'Unknown') {
+      console.log(`[WRM] Server software from plugin: ${pluginProvidedServer}`);
+      return this.cleanServerString(pluginProvidedServer);
+    }
+
+    // Method 2: Try to detect from HTTP headers by making a HEAD request to the site
+    try {
+      console.log(`[WRM] Attempting server detection via HTTP headers for ${this.credentials.url}`);
+      const axios = require('axios');
+      const response = await axios.head(this.credentials.url, {
+        timeout: 5000,
+        validateStatus: () => true, // Accept any status code
+        maxRedirects: 3
+      });
+
+      const serverHeader = response.headers['server'] || response.headers['Server'];
+      if (serverHeader) {
+        console.log(`[WRM] Server detected from HTTP headers: ${serverHeader}`);
+        return this.cleanServerString(serverHeader);
+      }
+
+      // Check for other server-specific headers
+      const poweredBy = response.headers['x-powered-by'] || response.headers['X-Powered-By'];
+      if (poweredBy && poweredBy.toLowerCase().includes('php')) {
+        // If we see PHP in X-Powered-By, we can make educated guesses
+        if (response.headers['server']) {
+          return this.cleanServerString(response.headers['server']);
+        }
+        // Common PHP hosting configurations
+        return 'Apache'; // Most common for PHP hosting
+      }
+
+    } catch (error: any) {
+      console.log(`[WRM] Could not detect server via HTTP headers: ${error.message}`);
+    }
+
+    // Method 3: Use hosting provider detection if available
+    try {
+      const hostname = new URL(this.credentials.url).hostname;
+      const hostingProvider = this.detectHostingProvider(hostname);
+      if (hostingProvider) {
+        console.log(`[WRM] Server guessed from hosting provider: ${hostingProvider}`);
+        return hostingProvider;
+      }
+    } catch (error) {
+      console.log(`[WRM] Could not parse URL for hosting detection`);
+    }
+
+    console.log(`[WRM] Server software could not be determined, defaulting to Unknown`);
+    return 'Unknown';
+  }
+
+  /**
+   * Clean up server string to show readable server name
+   */
+  private cleanServerString(serverString: string): string {
+    if (!serverString) return 'Unknown';
+    
+    const server = serverString.toLowerCase();
+    
+    // Apache variants
+    if (server.includes('apache')) {
+      const version = serverString.match(/apache\/([0-9.]+)/i);
+      return version ? `Apache ${version[1]}` : 'Apache';
+    }
+    
+    // Nginx variants
+    if (server.includes('nginx')) {
+      const version = serverString.match(/nginx\/([0-9.]+)/i);
+      return version ? `Nginx ${version[1]}` : 'Nginx';
+    }
+    
+    // LiteSpeed variants
+    if (server.includes('litespeed')) {
+      return 'LiteSpeed';
+    }
+    
+    // Microsoft IIS
+    if (server.includes('iis') || server.includes('microsoft')) {
+      const version = serverString.match(/iis\/([0-9.]+)/i);
+      return version ? `IIS ${version[1]}` : 'IIS';
+    }
+    
+    // Cloudflare
+    if (server.includes('cloudflare')) {
+      return 'Cloudflare';
+    }
+    
+    // Return cleaned up original string if no pattern matches
+    return serverString.split('/')[0] || serverString;
+  }
+
+  /**
+   * Detect hosting provider from hostname and guess likely server software
+   */
+  private detectHostingProvider(hostname: string): string | null {
+    const host = hostname.toLowerCase();
+    
+    // Popular hosting providers and their typical server setups
+    if (host.includes('godaddy') || host.includes('secureserver')) return 'Apache';
+    if (host.includes('bluehost')) return 'Apache';
+    if (host.includes('hostgator')) return 'Apache';
+    if (host.includes('siteground')) return 'Nginx';
+    if (host.includes('wpengine')) return 'Nginx';
+    if (host.includes('kinsta')) return 'Nginx';
+    if (host.includes('cloudflare')) return 'Cloudflare';
+    if (host.includes('amazonaws') || host.includes('aws')) return 'AWS';
+    if (host.includes('googleusercontent') || host.includes('appspot')) return 'Google Cloud';
+    if (host.includes('azurewebsites') || host.includes('azure')) return 'Azure';
+    if (host.includes('herokuapp')) return 'Heroku';
+    if (host.includes('netlify')) return 'Netlify';
+    if (host.includes('vercel')) return 'Vercel';
+    if (host.includes('digitalocean')) return 'Nginx';
+    
+    return null;
+  }
+
+  /**
    * Get basic site status and information
    */
   async getStatus(): Promise<WPRMStatus> {
@@ -449,6 +571,7 @@ export class WPRemoteManagerClient {
         wordpress_version: siteInfo.wordpress_version,
         php_version: siteInfo.php_version,
         mysql_version: siteInfo.mysql_version,
+        server_software: siteInfo.server_software,
         memory_limit: siteInfo.memory_limit,
         ssl_enabled: siteInfo.ssl_enabled
       });
@@ -458,7 +581,7 @@ export class WPRemoteManagerClient {
         wordpress_version: siteInfo.wordpress_version,
         php_version: siteInfo.php_version,
         mysql_version: siteInfo.mysql_version,
-        server_software: siteInfo.server_software || 'Unknown',
+        server_software: await this.detectServerSoftware(siteInfo.server_software),
         memory_limit: siteInfo.memory_limit || '512M',
         memory_usage: siteInfo.memory_usage || '0 MB',
         max_execution_time: siteInfo.max_execution_time || '30',
