@@ -416,6 +416,33 @@ export default function Dashboard() {
                   window.location.href = `/websites/${websiteId}`;
                 };
 
+                // Check if this website has pending updates
+                const hasPendingUpdates = (websiteId: number) => {
+                  if (!updatesData || !Array.isArray(updatesData)) return false;
+                  
+                  const websiteUpdates = updatesData.find((ud: any) => 
+                    ud.website_id === websiteId || ud.websiteId === websiteId
+                  );
+                  
+                  if (!websiteUpdates) return false;
+                  
+                  // Check for pending updates in different formats
+                  if (websiteUpdates.count && websiteUpdates.count.total > 0) {
+                    return true;
+                  }
+                  
+                  if (websiteUpdates.updates) {
+                    const updates = websiteUpdates.updates;
+                    const hasPluginUpdates = updates.plugins && Array.isArray(updates.plugins) && updates.plugins.length > 0;
+                    const hasThemeUpdates = updates.themes && Array.isArray(updates.themes) && updates.themes.length > 0;
+                    const hasCoreUpdates = updates.core && updates.core.needs_update;
+                    
+                    return hasPluginUpdates || hasThemeUpdates || hasCoreUpdates;
+                  }
+                  
+                  return false;
+                };
+
                 return (
                   <Card 
                     key={website.id}
@@ -448,12 +475,14 @@ export default function Dashboard() {
                         <div className={cn("w-3 h-3 rounded-full border-2 border-white shadow-sm", getHealthStatusColor(website.healthStatus))} />
                       </div>
 
-                      {/* Warning Icon for sites needing attention */}
-                      <div className="absolute top-3 right-3">
-                        <div className="w-6 h-6 bg-amber-500 rounded-md flex items-center justify-center">
-                          <AlertTriangle className="h-4 w-4 text-white" />
+                      {/* Warning Icon for sites with pending updates */}
+                      {hasPendingUpdates(website.id) && (
+                        <div className="absolute top-3 right-3">
+                          <div className="w-6 h-6 bg-amber-500 rounded-md flex items-center justify-center">
+                            <AlertTriangle className="h-4 w-4 text-white" />
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Website Info */}
