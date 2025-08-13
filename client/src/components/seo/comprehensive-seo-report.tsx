@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
@@ -47,6 +47,7 @@ interface ComprehensiveSeoReportProps {
 
 export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: ComprehensiveSeoReportProps) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
+  const [activeTab, setActiveTab] = useState('overview');
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -280,32 +281,37 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
         </CardContent>
       </Card>
 
-      {/* Major Report Sections - phpRank Style */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="seo" className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            SEO
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Security
-          </TabsTrigger>
-          <TabsTrigger value="miscellaneous" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Miscellaneous
-          </TabsTrigger>
-        </TabsList>
+      {/* Single Page Navigation - phpRank Style */}
+      <div className="w-full">
+        {/* Navigation Bar */}
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+          <nav className="flex space-x-0">
+            {[
+              { id: 'overview', label: 'Overview', icon: BarChart3 },
+              { id: 'seo', label: 'SEO', icon: Search },
+              { id: 'performance', label: 'Performance', icon: Zap },
+              { id: 'security', label: 'Security', icon: Shield },
+              { id: 'miscellaneous', label: 'Miscellaneous', icon: Settings }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-6 py-3 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-        <TabsContent value="overview" className="space-y-4">
+        {/* Overview Section */}
+        {activeTab === 'overview' && (
+          <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
               <CardHeader className="pb-2">
@@ -345,9 +351,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="seo" className="space-y-4">
+        {/* SEO Section */}
+        {activeTab === 'seo' && (
+          <div className="space-y-4">
           {/* Heading Structure Analysis */}
           {technicalData.headingAnalysis && (
             <Card>
@@ -556,9 +565,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="performance" className="space-y-4">
+        {/* Performance Section */}
+        {activeTab === 'performance' && (
+          <div className="space-y-4">
           {/* HTTP Requests Analysis */}
           {technicalData.httpRequests && (
             <Card>
@@ -664,9 +676,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="security" className="space-y-4">
+        {/* Security Section */}
+        {activeTab === 'security' && (
+          <div className="space-y-4">
           {/* Security Headers Analysis */}
           {technicalData.securityHeaders && (
             <Card>
@@ -729,9 +744,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
-        </TabsContent>
+          </div>
+        )}
 
-        <TabsContent value="miscellaneous" className="space-y-4">
+        {/* Miscellaneous Section */}
+        {activeTab === 'miscellaneous' && (
+          <div className="space-y-4">
           {/* Technical Summary */}
           <Card>
             <CardHeader>
@@ -853,8 +871,9 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </Accordion>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
