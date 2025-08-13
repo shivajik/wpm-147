@@ -363,12 +363,16 @@ export default function WebsiteSEO() {
       </div>
 
       {/* Progress Modal */}
-      {showProgressModal && (
+      {showProgressModal && websiteId && (
         <SeoAnalysisProgress 
           isOpen={showProgressModal}
           onClose={() => setShowProgressModal(false)}
+          websiteId={websiteId}
           websiteName={website.name}
-          websiteUrl={website.url}
+          onComplete={(report) => {
+            refetchReports();
+            setShowProgressModal(false);
+          }}
         />
       )}
     </AppLayout>
