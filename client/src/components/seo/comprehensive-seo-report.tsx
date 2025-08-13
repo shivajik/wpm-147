@@ -715,15 +715,23 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </div>
 
               <div>
-                <h4 className="font-semibold mb-3">Image Formats</h4>
-                <div className="space-y-1">
-                  {Object.entries(technicalData.imageKeywords.imageFormats || {}).map(([format, count]: [string, any]) => (
-                    <div key={format} className="text-sm flex justify-between">
-                      <span className="uppercase">{format}:</span>
-                      <Badge variant="outline">{count}</Badge>
-                    </div>
-                  ))}
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="image-formats">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Image Formats ({Object.keys(technicalData.imageKeywords.imageFormats || {}).length})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {Object.entries(technicalData.imageKeywords.imageFormats || {}).map(([format, count]: [string, any]) => (
+                          <div key={format} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                            <span className="uppercase font-medium break-all">{format}</span>
+                            <Badge variant="outline">{count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
 
               <div>
