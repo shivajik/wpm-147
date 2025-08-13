@@ -116,7 +116,6 @@ function Router() {
           <Route path="/websites/:id/performance" component={WebsitePerformance} />
           <Route path="/websites/:id/backup" component={() => <Suspense fallback={<PageSkeleton />}><LazyWebsiteBackup /></Suspense>} />
           <Route path="/websites/:id/seo" component={() => <Suspense fallback={<PageSkeleton />}><LazyWebsiteSEO /></Suspense>} />
-          <Route path="/seo-report/:id" component={SeoReportPage} />
           <Route path="/websites/:id/link-monitor" component={() => <Suspense fallback={<PageSkeleton />}><LazyLinkMonitor /></Suspense>} />
           <Route path="/tasks" component={Tasks} />
           <Route path="/reports" component={() => <Suspense fallback={<PageSkeleton />}><LazyClientReports /></Suspense>} />
@@ -128,6 +127,8 @@ function Router() {
           <Route path="/subscription" component={Subscription} />
         </>
       )}
+      {/* SEO reports should be accessible in both authenticated and unauthenticated modes */}
+      <Route path="/seo-report/:id" component={SeoReportPage} />
       <Route component={NotFound} />
     </Switch>
   );

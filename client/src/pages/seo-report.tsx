@@ -2,9 +2,10 @@ import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer, AlertTriangle } from "lucide-react";
 import { ComprehensiveSeoReport } from "@/components/seo/comprehensive-seo-report";
 import type { SeoReport, SeoMetrics, SeoPageAnalysis, SeoKeywords } from "@shared/schema";
+import { useEffect, useState } from "react";
 
 type SeoReportWithDetails = SeoReport & {
   metrics?: SeoMetrics;
@@ -15,10 +16,41 @@ type SeoReportWithDetails = SeoReport & {
 export default function SeoReportPage() {
   const params = useParams();
   const reportId = params.id;
+  const [authReady, setAuthReady] = useState(false);
+
+  // Wait for authentication to be ready before making the query
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        setAuthReady(true);
+      } else {
+        // If no token, try again after a short delay (for new windows)
+        setTimeout(() => {
+          const retryToken = localStorage.getItem("auth_token");
+          if (retryToken) {
+            setAuthReady(true);
+          } else {
+            // Show auth error after reasonable wait time
+            setAuthReady(true);
+          }
+        }, 1000);
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   const { data: report, isLoading, error } = useQuery<SeoReportWithDetails>({
     queryKey: ['/api/seo-reports', reportId],
-    enabled: !!reportId,
+    enabled: !!reportId && authReady,
+    retry: (failureCount, error: any) => {
+      // Don't retry on authentication errors
+      if (error?.message?.includes('401') || error?.message?.includes('Access token required')) {
+        return false;
+      }
+      return failureCount < 2;
+    }
   });
 
   const handlePrint = () => {
@@ -47,20 +79,40 @@ export default function SeoReportPage() {
   }
 
   if (error || !report) {
+    const isAuthError = error?.message?.includes('401') || error?.message?.includes('Access token required');
+    
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <Card className="max-w-md w-full">
           <CardContent className="text-center py-8">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Report Not Found
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The requested SEO report could not be found or has been deleted.
-            </p>
-            <Button onClick={handleClose} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Close Window
-            </Button>
+            {isAuthError ? (
+              <>
+                <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Authentication Required
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  You need to be logged in to view this SEO report. Please close this window and make sure you're logged in to your account.
+                </p>
+                <Button onClick={handleClose} variant="outline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Close Window
+                </Button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Report Not Found
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  The requested SEO report could not be found or has been deleted.
+                </p>
+                <Button onClick={handleClose} variant="outline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Close Window
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
