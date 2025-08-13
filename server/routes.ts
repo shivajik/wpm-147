@@ -2072,7 +2072,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             },
             databasePerformance: {
               size: optimizationData.databaseSize?.total || "Unknown",
-              optimizationNeeded: optimizationData.databaseSize?.overhead !== "0 B",
+              optimizationNeeded: optimizationData.databaseSize?.overhead !== "0 MB" && optimizationData.databaseSize?.overhead !== "0 B",
               lastOptimization: optimizationData.lastOptimized,
               tables: optimizationData.databaseSize?.tables || 0
             },
