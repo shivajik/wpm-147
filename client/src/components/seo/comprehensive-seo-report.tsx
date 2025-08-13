@@ -1608,61 +1608,6 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </div>
             </CardContent>
           </Card>
-          
-          {/* Additional Security Information */}
-          {technicalData.securityHeaders && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security Headers Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Overall Security Score</h4>
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className={`text-3xl font-bold ${getScoreColor(technicalData.securityHeaders.securityScore || 70)}`}>
-                        {technicalData.securityHeaders.securityScore || 70}/100
-                      </div>
-                      <Progress value={technicalData.securityHeaders.securityScore || 70} className="flex-1 h-3" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-3">Security Headers Status</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Content Security Policy:</span>
-                        {technicalData.securityHeaders.hasCSP ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">X-Frame-Options:</span>
-                        {technicalData.securityHeaders.hasXFrameOptions ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">X-Content-Type-Options:</span>
-                        {technicalData.securityHeaders.hasXContentTypeOptions ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         {/* Miscellaneous Section */}
@@ -2514,55 +2459,6 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                       There are no deprecated HTML tags on the webpage.
                     </span>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Technical Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Technical Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-sm">Security & Protocol</span>
-                  </div>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>SSL: {technicalData.technicalSeo?.hasSSL ? '✓ Enabled' : '✗ Disabled'}</p>
-                    <p>Protocol: {technicalData.technicalSeo?.hasSSL ? 'HTTPS' : 'HTTP'}</p>
-                    <p>Status: {technicalData.technicalSeo?.statusCode || 'Unknown'}</p>
-                  </div>
-                </div>
-
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Search className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-sm">Crawlability</span>
-                  </div>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>Robots.txt: {technicalData.technicalSeo?.hasRobotsTxt ? '✓ Found' : '✗ Missing'}</p>
-                    <p>Sitemap: {technicalData.technicalSeo?.hasSitemap ? '✓ Found' : '✗ Missing'}</p>
-                    <p>Mobile: {technicalData.technicalSeo?.isResponsive ? '✓ Responsive' : '✗ Not Responsive'}</p>
-                  </div>
-                </div>
-
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="h-4 w-4 text-orange-600" />
-                    <span className="font-medium text-sm">Performance</span>
-                  </div>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>Response: {technicalData.technicalSeo?.responseTime || 0}ms</p>
-                    <p>Size: {technicalData.performance?.pageSize || 0}KB</p>
-                    <p>Requests: {technicalData.performance?.requests || 0}</p>
                   </div>
                 </div>
               </div>
