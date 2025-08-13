@@ -6061,9 +6061,17 @@ export default async function handler(req: any, res: any) {
       console.log('[VERCEL-OPTIMIZATION] User authenticated:', user.email);
 
       try {
-        const website = await db.select().from(websites).where(
-          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
-        ).limit(1);
+        const website = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(and(eq(websites.id, websiteId), eq(clients.userId, user.id)))
+        .limit(1);
 
         if (website.length === 0) {
           return res.status(404).json({ message: "Website not found" });
@@ -6133,9 +6141,17 @@ export default async function handler(req: any, res: any) {
       }
 
       try {
-        const website = await db.select().from(websites).where(
-          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
-        ).limit(1);
+        const website = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(and(eq(websites.id, websiteId), eq(clients.userId, user.id)))
+        .limit(1);
 
         if (website.length === 0) {
           return res.status(404).json({ message: "Website not found" });
@@ -6162,9 +6178,17 @@ export default async function handler(req: any, res: any) {
       }
 
       try {
-        const website = await db.select().from(websites).where(
-          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
-        ).limit(1);
+        const website = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(and(eq(websites.id, websiteId), eq(clients.userId, user.id)))
+        .limit(1);
 
         if (website.length === 0) {
           return res.status(404).json({ message: "Website not found" });
@@ -6195,9 +6219,17 @@ export default async function handler(req: any, res: any) {
       }
 
       try {
-        const website = await db.select().from(websites).where(
-          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
-        ).limit(1);
+        const website = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(and(eq(websites.id, websiteId), eq(clients.userId, user.id)))
+        .limit(1);
 
         if (website.length === 0) {
           return res.status(404).json({ message: "Website not found" });
@@ -6228,9 +6260,17 @@ export default async function handler(req: any, res: any) {
       }
 
       try {
-        const website = await db.select().from(websites).where(
-          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
-        ).limit(1);
+        const website = await db.select({
+          id: websites.id,
+          name: websites.name,
+          url: websites.url,
+          wrmApiKey: websites.wrmApiKey,
+          clientId: websites.clientId
+        })
+        .from(websites)
+        .innerJoin(clients, eq(websites.clientId, clients.id))
+        .where(and(eq(websites.id, websiteId), eq(clients.userId, user.id)))
+        .limit(1);
 
         if (website.length === 0) {
           return res.status(404).json({ message: "Website not found" });
