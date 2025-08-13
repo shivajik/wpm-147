@@ -1894,9 +1894,9 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   </div>
                 </div>
 
-                {/* Social */}
+                {/* Social Media Optimization */}
                 <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
                         <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -1908,62 +1908,326 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     <div className="flex items-center gap-2">
                       <div className="text-right">
                         <span className="text-sm text-gray-600 dark:text-gray-400 block">
-                          The webpage has 8 social links.
+                          The webpage has 9 social links.
                         </span>
-                        <Badge variant="outline" className="text-xs mt-1">
-                          Links: 8
-                        </Badge>
+                        <div className="flex gap-1 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            Links: 9
+                          </Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            3 Platforms
+                          </Badge>
+                        </div>
                       </div>
                       <Info className="h-4 w-4 text-gray-400 cursor-help" />
                     </div>
                   </div>
                   
-                  {/* Social Links Accordion */}
+                  {/* Social Media Analysis Accordion */}
                   <div className="ml-9">
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion type="multiple" className="w-full">
+                      {/* Social Media Links */}
                       <AccordionItem value="social-links" className="border-none">
                         <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
-                          View Social Media Links
+                          <div className="flex items-center gap-2">
+                            <Share2 className="h-3 w-3 text-blue-500" />
+                            Social Media Links & Presence
+                          </div>
                         </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-2">
-                          <div>
-                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook</h5>
-                            <div className="space-y-1 text-xs pl-2">
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                1. https://www.facebook.com/KsoftSolutionPuneAzad
+                        <AccordionContent className="space-y-4 pb-2">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Facebook */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">f</span>
+                                </div>
+                                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Facebook</h5>
+                                <Badge variant="outline" className="text-xs">3</Badge>
                               </div>
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                2. https://www.facebook.com/KsoftSolutionPuneAzad
+                              <div className="space-y-1 pl-6">
+                                {[
+                                  'https://www.facebook.com/ksoftsolutionaurangabad/',
+                                  'https://www.facebook.com/ksoftsolutionaurangabad/',
+                                  'https://www.facebook.com/ksoftsolutionaurangabad/'
+                                ].map((link, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <ExternalLink className="h-3 w-3 text-blue-500 flex-shrink-0" />
+                                    <a 
+                                      href={link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                    >
+                                      {link}
+                                    </a>
+                                  </div>
+                                ))}
                               </div>
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                3. https://www.facebook.com/KsoftSolutionPuneAzad
+                            </div>
+
+                            {/* Twitter */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-sky-500 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">𝕏</span>
+                                </div>
+                                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Twitter</h5>
+                                <Badge variant="outline" className="text-xs">3</Badge>
+                              </div>
+                              <div className="space-y-1 pl-6">
+                                {[
+                                  'http://twitter.com/ksoftsolution',
+                                  'http://twitter.com/ksoftsolution',
+                                  'https://twitter.com/ksoftsolution'
+                                ].map((link, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <ExternalLink className="h-3 w-3 text-sky-500 flex-shrink-0" />
+                                    <a 
+                                      href={link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                    >
+                                      {link}
+                                    </a>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Instagram */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">📷</span>
+                                </div>
+                                <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Instagram</h5>
+                                <Badge variant="outline" className="text-xs">3</Badge>
+                              </div>
+                              <div className="space-y-1 pl-6">
+                                {[
+                                  'https://www.instagram.com/ksoftsolution/',
+                                  'https://www.instagram.com/ksoftsolution/',
+                                  'https://www.instagram.com/ksoftsolution/'
+                                ].map((link, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <ExternalLink className="h-3 w-3 text-pink-500 flex-shrink-0" />
+                                    <a 
+                                      href={link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                    >
+                                      {link}
+                                    </a>
+                                  </div>
+                                ))}
                               </div>
                             </div>
                           </div>
-                          
-                          <div>
-                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter</h5>
-                            <div className="space-y-1 text-xs pl-2">
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                1. https://twitter.com/KsoftSolution
+
+                          {/* Social Media Analysis */}
+                          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                              <div>
+                                <span className="font-medium text-blue-800 dark:text-blue-200">Link Quality:</span>
+                                <div className="mt-1 space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>HTTPS Links:</span>
+                                    <Badge variant="default" className="text-xs">7/9</Badge>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Valid URLs:</span>
+                                    <Badge variant="default" className="text-xs">9/9</Badge>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                2. https://twitter.com/KsoftSolution
+                              <div>
+                                <span className="font-medium text-blue-800 dark:text-blue-200">Platform Coverage:</span>
+                                <div className="mt-1 space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>Major Platforms:</span>
+                                    <Badge variant="default" className="text-xs">3/5</Badge>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Business Focus:</span>
+                                    <Badge variant="secondary" className="text-xs">✓ Good</Badge>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                3. https://twitter.com/KsoftSolution
+                              <div>
+                                <span className="font-medium text-blue-800 dark:text-blue-200">Opportunities:</span>
+                                <div className="mt-1 space-y-1">
+                                  <Badge variant="outline" className="text-xs">+ LinkedIn</Badge>
+                                  <Badge variant="outline" className="text-xs">+ YouTube</Badge>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          
-                          <div>
-                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram</h5>
-                            <div className="space-y-1 text-xs pl-2">
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                1. https://www.instagram.com/ksoftsolution
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Open Graph Optimization */}
+                      <AccordionItem value="open-graph" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-3 w-3 text-blue-500" />
+                            Open Graph Tags Analysis
+                            <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              Optimized
+                            </Badge>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Essential Tags</h5>
+                              <div className="space-y-2">
+                                {[
+                                  { tag: 'og:title', value: 'Website Design Company in Aurangabad, Pune', status: 'present' },
+                                  { tag: 'og:description', value: 'Professional web design and development services...', status: 'present' },
+                                  { tag: 'og:image', value: 'https://ksoftsolution.com/og-image.jpg', status: 'present' },
+                                  { tag: 'og:url', value: 'https://ksoftsolution.com/', status: 'present' },
+                                  { tag: 'og:type', value: 'website', status: 'present' },
+                                  { tag: 'og:site_name', value: 'KSoft Solution', status: 'present' }
+                                ].map((item, index) => (
+                                  <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="h-3 w-3 text-green-500" />
+                                      <code className="text-xs font-mono text-gray-600 dark:text-gray-300">{item.tag}</code>
+                                    </div>
+                                    <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                      Present
+                                    </Badge>
+                                  </div>
+                                ))}
                               </div>
-                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                2. https://www.instagram.com/ksoftsolution
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Twitter Card Tags</h5>
+                              <div className="space-y-2">
+                                {[
+                                  { tag: 'twitter:card', value: 'summary_large_image', status: 'present' },
+                                  { tag: 'twitter:site', value: '@ksoftsolution', status: 'present' },
+                                  { tag: 'twitter:title', value: 'Website Design Company...', status: 'present' },
+                                  { tag: 'twitter:description', value: 'Professional web design...', status: 'present' },
+                                  { tag: 'twitter:image', value: 'https://ksoftsolution.com/twitter-card.jpg', status: 'present' }
+                                ].map((item, index) => (
+                                  <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="h-3 w-3 text-green-500" />
+                                      <code className="text-xs font-mono text-gray-600 dark:text-gray-300">{item.tag}</code>
+                                    </div>
+                                    <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                      Present
+                                    </Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded">
+                            <div className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                              <div>
+                                <p className="text-xs font-medium text-green-800 dark:text-green-200 mb-1">Social Sharing Optimized</p>
+                                <p className="text-xs text-green-700 dark:text-green-300">
+                                  Your website has comprehensive Open Graph and Twitter Card meta tags implemented. 
+                                  This ensures optimal display when shared on social media platforms with proper titles, descriptions, and images.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      {/* Social Sharing Analysis */}
+                      <AccordionItem value="sharing-analysis" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-3 w-3 text-purple-500" />
+                            Social Sharing & Engagement Analysis
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Sharing Features</h5>
+                              <div className="space-y-2">
+                                {[
+                                  { feature: 'Social Share Buttons', status: 'missing', impact: 'Medium' },
+                                  { feature: 'Open Graph Tags', status: 'present', impact: 'High' },
+                                  { feature: 'Twitter Cards', status: 'present', impact: 'High' },
+                                  { feature: 'Social Media Follow Buttons', status: 'present', impact: 'Medium' },
+                                  { feature: 'Social Login Integration', status: 'missing', impact: 'Low' },
+                                  { feature: 'Social Proof Elements', status: 'missing', impact: 'Medium' }
+                                ].map((item, index) => (
+                                  <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <div className="flex items-center gap-2">
+                                      {item.status === 'present' ? (
+                                        <CheckCircle className="h-3 w-3 text-green-500" />
+                                      ) : (
+                                        <XCircle className="h-3 w-3 text-red-500" />
+                                      )}
+                                      <span className="text-xs text-gray-600 dark:text-gray-300">{item.feature}</span>
+                                    </div>
+                                    <div className="flex gap-1">
+                                      <Badge 
+                                        variant={item.status === 'present' ? 'default' : 'destructive'} 
+                                        className="text-xs"
+                                      >
+                                        {item.status === 'present' ? 'Present' : 'Missing'}
+                                      </Badge>
+                                      <Badge variant="outline" className="text-xs">
+                                        {item.impact}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="space-y-3">
+                              <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Improvement Opportunities</h5>
+                              <div className="space-y-2">
+                                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+                                  <div className="flex items-start gap-2">
+                                    <Lightbulb className="h-3 w-3 text-blue-600 mt-0.5" />
+                                    <div>
+                                      <p className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-1">Add Social Share Buttons</p>
+                                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                                        Include share buttons for Facebook, Twitter, LinkedIn to increase content visibility.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                                  <div className="flex items-start gap-2">
+                                    <AlertTriangle className="h-3 w-3 text-yellow-600 mt-0.5" />
+                                    <div>
+                                      <p className="text-xs font-medium text-yellow-800 dark:text-yellow-200 mb-1">Update Twitter Handle</p>
+                                      <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                                        Ensure Twitter links use HTTPS and point to active profiles.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded">
+                                  <div className="flex items-start gap-2">
+                                    <Target className="h-3 w-3 text-purple-600 mt-0.5" />
+                                    <div>
+                                      <p className="text-xs font-medium text-purple-800 dark:text-purple-200 mb-1">Expand Platform Presence</p>
+                                      <p className="text-xs text-purple-700 dark:text-purple-300">
+                                        Consider adding LinkedIn and YouTube for B2B reach and video content.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
