@@ -1001,49 +1001,58 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                   </div>
                   
-                  {/* Social Links Details */}
-                  <div className="ml-9 space-y-2">
-                    <div>
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook</h5>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          1. https://www.facebook.com/KsoftSolutionPuneAzad
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          2. https://www.facebook.com/KsoftSolutionPuneAzad
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          3. https://www.facebook.com/KsoftSolutionPuneAzad
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter</h5>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          1. https://twitter.com/KsoftSolution
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          2. https://twitter.com/KsoftSolution
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          3. https://twitter.com/KsoftSolution
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram</h5>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          1. https://www.instagram.com/ksoftsolution
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                          2. https://www.instagram.com/ksoftsolution
-                        </div>
-                      </div>
-                    </div>
+                  {/* Social Links Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="social-links" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Social Media Links
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-2 pb-2">
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook</h5>
+                            <div className="space-y-1 text-xs pl-2">
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                1. https://www.facebook.com/KsoftSolutionPuneAzad
+                              </div>
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                2. https://www.facebook.com/KsoftSolutionPuneAzad
+                              </div>
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                3. https://www.facebook.com/KsoftSolutionPuneAzad
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter</h5>
+                            <div className="space-y-1 text-xs pl-2">
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                1. https://twitter.com/KsoftSolution
+                              </div>
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                2. https://twitter.com/KsoftSolution
+                              </div>
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                3. https://twitter.com/KsoftSolution
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram</h5>
+                            <div className="space-y-1 text-xs pl-2">
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                1. https://www.instagram.com/ksoftsolution
+                              </div>
+                              <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                                2. https://www.instagram.com/ksoftsolution
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 </div>
 
@@ -1112,26 +1121,55 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                   </div>
                   
-                  {/* Inline CSS Elements */}
-                  <div className="ml-9 space-y-1 text-xs text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto">
-                    <div>1. .navbar-nav .nav-link:hover (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
-                    <div>2. .dropdown-menu .nav-link (color: #333; background: transparent)</div>
-                    <div>3. .navbar-css .dropdown (color: #333; display: table-cell)</div>
-                    <div>4. .navbar-nav .nav-link (color: #333; font-weight:500; background: transparent)</div>
-                    <div>5. .navbar-css .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
-                    <div>6. .navbar-nav .nav-link:active (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
-                    <div>7. .navbar-css .nav-item (color: #333; display: table-cell)</div>
-                    <div>8. .navbar-nav .nav-link:focus (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
-                    <div>9. .navbar-css .navbar-brand (color: #4ad91b; font-weight:bold)</div>
-                    <div>10. .navbar-nav .dropdown-menu (color: #333; background: rgba(255, 255, 255, 0.95))</div>
-                    <div>11. .navbar-css .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
-                    <div>12. .navbar-nav .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
-                    <div>13. .navbar-css .nav-link (color: #333; background: transparent)</div>
-                    <div>14. .navbar-nav .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
-                    <div>15. .navbar-css .navbar-toggler (color: #4ad91b; background: transparent)</div>
-                    <div>16. .navbar-nav .navbar-brand (color: #4ad91b; font-weight:bold)</div>
-                    <div>17. .navbar-css .dropdown-toggle (color: #333; background: transparent)</div>
-                    <div>18. .navbar-nav .navbar-toggler (color: #4ad91b; background: transparent)</div>
+                  {/* Inline CSS Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="inline-css" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Inline CSS Elements
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-1 text-xs text-gray-600 dark:text-gray-400 pb-2">
+                          <div>1. .navbar-nav .nav-link:hover (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                          <div>2. .dropdown-menu .nav-link (color: #333; background: transparent)</div>
+                          <div>3. .navbar-css .dropdown (color: #333; display: table-cell)</div>
+                          <div>4. .navbar-nav .nav-link (color: #333; font-weight:500; background: transparent)</div>
+                          <div>5. .navbar-css .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
+                          <div>6. .navbar-nav .nav-link:active (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                          <div>7. .navbar-css .nav-item (color: #333; display: table-cell)</div>
+                          <div>8. .navbar-nav .nav-link:focus (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                          <div>9. .navbar-css .navbar-brand (color: #4ad91b; font-weight:bold)</div>
+                          <div>10. .navbar-nav .dropdown-menu (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                          <div>11. .navbar-css .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                          <div>12. .navbar-nav .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
+                          <div>13. .navbar-css .nav-link (color: #333; background: transparent)</div>
+                          <div>14. .navbar-nav .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                          <div>15. .navbar-css .navbar-toggler (color: #4ad91b; background: transparent)</div>
+                          <div>16. .navbar-nav .navbar-brand (color: #4ad91b; font-weight:bold)</div>
+                          <div>17. .navbar-css .dropdown-toggle (color: #333; background: transparent)</div>
+                          <div>18. .navbar-nav .navbar-toggler (color: #4ad91b; background: transparent)</div>
+                          <div>19. .navbar-css .btn-primary (color: white; background: #4ad91b)</div>
+                          <div>20. .navbar-nav .btn-outline (color: #4ad91b; border: 1px solid #4ad91b)</div>
+                          <div>21. .navbar-css .container-fluid (color: #333; padding: 0 15px)</div>
+                          <div>22. .navbar-nav .nav-pills (color: #333; background: rgba(255, 255, 255, 0.8))</div>
+                          <div>23. .navbar-css .navbar-collapse (color: #333; background: transparent)</div>
+                          <div>24. .navbar-nav .nav-justified (color: #333; display: flex)</div>
+                          <div>25. .navbar-css .navbar-light (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                          <div>26. .navbar-nav .nav-tabs (color: #333; border-bottom: 1px solid #dee2e6)</div>
+                          <div>27. .navbar-css .navbar-expand (color: #333; flex-wrap: nowrap)</div>
+                          <div>28. .navbar-nav .dropdown-divider (color: #333; border-top: 1px solid #e9ecef)</div>
+                          <div>29. .navbar-css .navbar-text (color: #333; padding: 8px 16px)</div>
+                          <div>30. .navbar-nav .nav-item.active (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                          <div>31. .navbar-css .container (color: #333; max-width: 1140px)</div>
+                          <div>32. .navbar-nav .dropdown-item (color: #333; padding: 4px 16px)</div>
+                          <div>33. .navbar-css .navbar-brand img (color: #333; height: 40px)</div>
+                          <div>34. .navbar-nav .nav-link.disabled (color: #6c757d; background: transparent)</div>
+                          <div>35. .navbar-css .btn-group (color: #333; display: inline-flex)</div>
+                          <div>36. .navbar-nav .dropdown-menu.show (color: #333; display: block)</div>
+                          <div>37. .navbar-css .navbar-dark (color: #fff; background: rgba(0, 0, 0, 0.8))</div>
+                          <div>38. .navbar-nav .nav-link.show (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 </div>
 
