@@ -406,22 +406,29 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                   </div>
                   
-                  {/* Headings Details Box */}
-                  <div className="ml-9 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">h1</span>
-                        <Badge variant="outline" className="text-xs">2</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">h4</span>
-                        <Badge variant="outline" className="text-xs">8</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">h5</span>
-                        <Badge variant="outline" className="text-xs">14</Badge>
-                      </div>
-                    </div>
+                  {/* Headings Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="headings-breakdown" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Heading Structure
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-2 pb-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">h1</span>
+                            <Badge variant="outline" className="text-xs">2</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">h4</span>
+                            <Badge variant="outline" className="text-xs">8</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">h5</span>
+                            <Badge variant="outline" className="text-xs">14</Badge>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 </div>
 
@@ -474,12 +481,21 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                   </div>
                   
-                  {/* Images Details Box */}
-                  <div className="ml-9 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Images</span>
-                      <Badge variant="outline" className="text-xs">16</Badge>
-                    </div>
+                  {/* Images Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="images-breakdown" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Images Without Alt Text
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-2 pb-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Images</span>
+                            <Badge variant="outline" className="text-xs">16</Badge>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 </div>
 
@@ -584,18 +600,25 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                   </div>
                   
-                  {/* Links Details Box */}
-                  <div className="ml-9 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Externals</span>
-                        <Badge variant="outline" className="text-xs">13</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Internals</span>
-                        <Badge variant="outline" className="text-xs">39</Badge>
-                      </div>
-                    </div>
+                  {/* Links Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="links-breakdown" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Link Breakdown
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-2 pb-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Externals</span>
+                            <Badge variant="outline" className="text-xs">13</Badge>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Internals</span>
+                            <Badge variant="outline" className="text-xs">39</Badge>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 </div>
 
