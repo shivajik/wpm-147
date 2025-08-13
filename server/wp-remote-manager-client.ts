@@ -2200,12 +2200,15 @@ export class WPRemoteManagerClient {
   async getOptimizationData(): Promise<{
     postRevisions: { count: number; size: string };
     databaseSize: { total: string; tables: number; overhead: string };
+    trashedContent: { posts: number; comments: number; size: string };
+    spam: { comments: number; size: string };
     lastOptimized: string | null;
   } | null> {
     try {
       console.log('[WRM] Fetching optimization data...');
       
       const response = await this.api.get('/optimization/info');
+      console.log('[WRM] Optimization data received:', response.data);
       return response.data;
     } catch (error) {
       console.log('[WRM] Optimization endpoint not available');

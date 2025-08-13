@@ -24,13 +24,23 @@ interface OptimizationData {
   postRevisions: {
     count: number;
     size: string;
+    lastCleanup?: string;
   };
-  databaseSize: {
-    total: string;
+  databasePerformance: {
+    size: string;
+    optimizationNeeded: boolean;
+    lastOptimization?: string;
     tables: number;
-    overhead: string;
   };
-  lastOptimized: string | null;
+  trashedContent: {
+    posts: number;
+    comments: number;
+    size: string;
+  };
+  spam: {
+    comments: number;
+    size: string;
+  };
 }
 
 export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
@@ -40,7 +50,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
 
   // Fetch optimization data
   const { data: optimizationData, isLoading } = useQuery<OptimizationData | null>({
-    queryKey: [`/api/websites/${websiteId}/optimization`],
+    queryKey: [`/api/websites/${websiteId}/optimization-data`],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -55,7 +65,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
         title: 'Post Revisions Optimized',
         description: `Cleaned up ${data.removedCount || 0} revisions, freed ${data.sizeFreed || '0 MB'} of space.`,
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization-data`] });
     },
     onError: (error: any) => {
       toast({
@@ -80,7 +90,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
         title: 'Database Optimized',
         description: `Optimized ${data.tablesOptimized || 0} tables, freed ${data.sizeFreed || '0 MB'} of space.`,
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization-data`] });
     },
     onError: (error: any) => {
       toast({
@@ -105,7 +115,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
         title: 'Complete Optimization Finished',
         description: `Cleaned up ${data.totalItemsRemoved || 0} items, freed ${data.totalSizeFreed || '0 MB'} of space.`,
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/websites/${websiteId}/optimization-data`] });
     },
     onError: (error: any) => {
       toast({
@@ -236,15 +246,15 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">Database Performance</p>
               <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                {optimizationData?.databaseSize ? (
+                {optimizationData?.databasePerformance ? (
                   <>
                     <span className="text-blue-600 dark:text-blue-400 font-medium">
-                      {optimizationData.databaseSize.total}
+                      {optimizationData.databasePerformance.size}
                     </span>
-                    <span>{optimizationData.databaseSize.tables} tables</span>
-                    {optimizationData.databaseSize.overhead !== '0 B' && (
+                    <span>{optimizationData.databasePerformance.tables} tables</span>
+                    {optimizationData.databasePerformance.optimizationNeeded && (
                       <Badge variant="secondary" className="text-xs">
-                        {optimizationData.databaseSize.overhead} overhead
+                        Needs optimization
                       </Badge>
                     )}
                   </>
@@ -272,11 +282,11 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
         </div>
 
         {/* Last Optimized Info */}
-        {optimizationData?.lastOptimized && (
+        {optimizationData?.databasePerformance?.lastOptimization && (
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 px-2">
             <Clock className="h-4 w-4" />
             <span>
-              Last optimized: {new Date(optimizationData.lastOptimized).toLocaleDateString()}
+              Last optimized: {new Date(optimizationData.databasePerformance.lastOptimization).toLocaleDateString()}
             </span>
           </div>
         )}
