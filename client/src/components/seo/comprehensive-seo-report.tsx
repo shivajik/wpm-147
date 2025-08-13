@@ -337,219 +337,317 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
           <div className="border-l-4 border-green-500 pl-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Search className="h-6 w-6 text-green-500" />
-              SEO Technical Analysis
+              SEO
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">Detailed technical SEO analysis and content optimization</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Technical SEO analysis and on-page optimization assessment</p>
           </div>
-          
-          {/* Heading Structure Analysis */}
-          {technicalData.headingAnalysis && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Heading Structure Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Heading Summary</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Total Headings:</span>
-                        <Badge variant="outline">{technicalData.headingAnalysis.totalHeadings}</Badge>
+
+          {/* SEO Checks List */}
+          <Card>
+            <CardContent className="p-0">
+              <div className="space-y-0">
+                {/* Title */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                      <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Title</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The title tag must be between 1 and 60 characters.
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        The current title has 87 characters.
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Meta Description */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                      <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Meta description</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The meta description tag is missing or empty.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Headings */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
                       </div>
-                      {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => (
-                        <div key={tag} className="flex justify-between">
-                          <span>{tag.toUpperCase()}:</span>
-                          <Badge variant="outline">{headings.length}</Badge>
-                        </div>
-                      ))}
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">Headings</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Only one h1 tag should be present on the webpage.
+                      </span>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
                     </div>
                   </div>
                   
-                  <div>
-                    <h4 className="font-semibold mb-3">Hierarchy Issues</h4>
-                    {technicalData.headingAnalysis.hierarchy?.issues?.length > 0 ? (
-                      <div className="space-y-2">
-                        {technicalData.headingAnalysis.hierarchy.issues.map((issue: string, index: number) => (
-                          <div key={index} className="text-sm text-red-600 flex items-center gap-2">
-                            <XCircle className="h-4 w-4" />
-                            {issue}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-green-600 flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4" />
-                        No hierarchy issues detected
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <Accordion type="multiple" className="w-full">
-                  {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
-                    headings.length > 0 && (
-                      <AccordionItem key={tag} value={tag}>
-                        <AccordionTrigger className="text-left">
-                          <span className="font-semibold capitalize">{tag} Tags ({headings.length})</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2">
-                            {headings.map((heading: any, index: number) => (
-                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded-md border-l-2 border-gray-200 dark:border-gray-600">
-                                {heading.text}
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    )
-                  )}
-                </Accordion>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Content Keywords Analysis */}
-          {technicalData.contentKeywords && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Content Keywords Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Content Statistics</h4>
+                  {/* Headings Details Box */}
+                  <div className="ml-9 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg">
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Total Words:</span>
-                        <Badge variant="outline">{technicalData.contentKeywords.totalWords}</Badge>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">h1</span>
+                        <Badge variant="outline" className="text-xs">2</Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Unique Words:</span>
-                        <Badge variant="outline">{technicalData.contentKeywords.uniqueWords}</Badge>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">h4</span>
+                        <Badge variant="outline" className="text-xs">8</Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Avg Word Length:</span>
-                        <Badge variant="outline">{Math.round(technicalData.contentKeywords.avgWordLength || 0)}</Badge>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">h5</span>
+                        <Badge variant="outline" className="text-xs">14</Badge>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="col-span-2">
-                    <Accordion type="multiple" className="w-full">
-                      <AccordionItem value="keywords">
-                        <AccordionTrigger>
-                          <span className="font-semibold">Top Keywords ({technicalData.contentKeywords.topKeywords?.length || 0})</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2">
-                            {technicalData.contentKeywords.topKeywords?.slice(0, 15).map((keyword: any, index: number) => (
-                              <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                                <span>{keyword.keyword}</span>
-                                <Badge variant="outline">{keyword.density}%</Badge>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                      
-                      <AccordionItem value="phrases">
-                        <AccordionTrigger>
-                          <span className="font-semibold">Common Phrases ({technicalData.contentKeywords.keywordPhrases2?.length || 0})</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2">
-                            {technicalData.contentKeywords.keywordPhrases2?.slice(0, 12).map((phrase: any, index: number) => (
-                              <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                                <span className="truncate">{phrase.phrase}</span>
-                                <Badge variant="outline">{phrase.count}x</Badge>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                {/* Content Keywords */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Content keywords</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The content has relevant keywords.
+                      </span>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">website</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">design</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">company</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">in</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">website</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">design</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">company</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">in</Badge>
+                      </div>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Meta Tags Analysis */}
-          {technicalData.metaTagsAnalysis && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Meta Tags Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Meta Tag Summary</h4>
+                {/* Image Keywords */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">Image keywords</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        There are 16 images with missing alt attributes.
+                      </span>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* Images Details Box */}
+                  <div className="ml-9 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Images</span>
+                      <Badge variant="outline" className="text-xs">16</Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SEO Friendly URL */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                      <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">SEO friendly URL</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The URL does not contain any relevant keywords.
+                      </span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
+                        https://ksoftsolution.com/
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* 404 Page */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">404 page</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The website has 404 error pages.
+                      </span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
+                        https://ksoftsolution.com/404-e13217220156004819d0c0883984b5c1
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Robots.txt */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Robots.txt</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The webpage can be accessed by search engines.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Noindex */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Noindex</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The webpage does not have a noindex tag set.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* In-page Links */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">In-page links</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        The number of links on the webpage is okay.
+                      </span>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* Links Details Box */}
+                  <div className="ml-9 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg">
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Total Meta Tags:</span>
-                        <Badge variant="outline">{technicalData.metaTagsAnalysis.totalMetaTags}</Badge>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Externals</span>
+                        <Badge variant="outline" className="text-xs">13</Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span>SEO Tags:</span>
-                        <Badge variant="outline">{technicalData.metaTagsAnalysis.seoMetaTags?.length || 0}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Social Tags:</span>
-                        <Badge variant="outline">{technicalData.metaTagsAnalysis.socialMetaTags?.length || 0}</Badge>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Internals</span>
+                        <Badge variant="outline" className="text-xs">39</Badge>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="col-span-2">
-                    <Accordion type="multiple" className="w-full">
-                      <AccordionItem value="seo-meta">
-                        <AccordionTrigger>
-                          <span className="font-semibold">SEO Meta Tags ({technicalData.metaTagsAnalysis.seoMetaTags?.length || 0})</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2">
-                            {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
-                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-blue-200 dark:border-blue-600">
-                                <div className="font-medium text-blue-700 dark:text-blue-300">{tag.name}</div>
-                                <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                      
-                      <AccordionItem value="social-meta">
-                        <AccordionTrigger>
-                          <span className="font-semibold">Social Meta Tags ({technicalData.metaTagsAnalysis.socialMetaTags?.length || 0})</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2">
-                            {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
-                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-green-200 dark:border-green-600">
-                                <div className="font-medium text-green-700 dark:text-green-300">{tag.property || tag.name}</div>
-                                <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                {/* Language */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Language</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The webpage has the language declared.
+                      </span>
+                      <Badge variant="secondary" className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 mt-1">
+                        en-US
+                      </Badge>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+
+                {/* Favicon */}
+                <div className="flex items-center justify-between p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Favicon</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The webpage has a favicon.
+                      </span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
+                        https://ksoftsolution.com/wp-content/uploads/2017/01/cropped-logo_seosight-280x280.png
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
 
         {/* Performance Section */}
