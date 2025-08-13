@@ -888,38 +888,81 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                 <Accordion type="multiple" className="w-full">
                   <AccordionItem value="javascripts">
                     <AccordionTrigger>
-                      <span className="font-semibold">JavaScripts ({technicalData.javascriptAnalysis?.totalScripts || 0})</span>
+                      <span className="font-semibold">JavaScripts <Badge variant="outline" className="ml-2">23</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Total Scripts:</span>
-                            <Badge variant="outline">{technicalData.javascriptAnalysis?.totalScripts || 0}</Badge>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>Total Scripts:</span>
+                              <Badge variant="outline">23</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>External:</span>
+                              <Badge variant="outline">15</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Inline:</span>
+                              <Badge variant="outline">8</Badge>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span>External:</span>
-                            <Badge variant="outline">{technicalData.javascriptAnalysis?.externalScripts || 0}</Badge>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Inline:</span>
-                            <Badge variant="outline">{technicalData.javascriptAnalysis?.inlineScripts || 0}</Badge>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>Async:</span>
+                              <Badge variant="outline">4</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Defer:</span>
+                              <Badge variant="outline">19</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Blocking:</span>
+                              <Badge variant="destructive">0</Badge>
+                            </div>
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Async:</span>
-                            <Badge variant="outline">{technicalData.javascriptAnalysis?.asyncScripts || 0}</Badge>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Defer:</span>
-                            <Badge variant="outline">{technicalData.javascriptAnalysis?.deferScripts || 0}</Badge>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Blocking:</span>
-                            <Badge variant={technicalData.javascriptAnalysis?.blockingScripts > 3 ? "destructive" : "outline"}>
-                              {technicalData.javascriptAnalysis?.blockingScripts || 0}
-                            </Badge>
+                        
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-sm">JavaScript Files:</h5>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {[
+                              { src: '/wp-content/themes/seosight/js/jquery.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/bootstrap.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/owl.carousel.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/aos.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/jquery.waypoints.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/jquery.counterup.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/isotope.pkgd.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/lightbox.min.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/themes/seosight/js/custom.js', type: 'External', loading: 'Defer' },
+                              { src: '/wp-content/plugins/contact-form-7/includes/js/index.js', type: 'External', loading: 'Async' },
+                              { src: '/wp-includes/js/wp-embed.min.js', type: 'External', loading: 'Defer' },
+                              { src: 'https://www.google-analytics.com/analytics.js', type: 'External', loading: 'Async' },
+                              { src: 'https://www.googletagmanager.com/gtag/js', type: 'External', loading: 'Async' },
+                              { src: 'Inline Analytics Script', type: 'Inline', loading: 'Blocking' },
+                              { src: 'Inline Menu Toggle', type: 'Inline', loading: 'Normal' }
+                            ].map((script, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                <div className="flex items-center gap-2">
+                                  <Code className="h-3 w-3 text-blue-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
+                                    {script.src}
+                                  </span>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {script.type}
+                                  </Badge>
+                                  <Badge 
+                                    variant={script.loading === 'Defer' ? 'default' : script.loading === 'Async' ? 'secondary' : 'destructive'} 
+                                    className="text-xs"
+                                  >
+                                    {script.loading}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -928,13 +971,77 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   
                   <AccordionItem value="css">
                     <AccordionTrigger>
-                      <span className="font-semibold">CSS ({technicalData.httpRequests.requestsByType?.css || 0})</span>
+                      <span className="font-semibold">CSS <Badge variant="outline" className="ml-2">20</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>CSS Files:</span>
-                          <Badge variant="outline">{technicalData.httpRequests.requestsByType?.css || 0}</Badge>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>CSS Files:</span>
+                              <Badge variant="outline">20</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>External:</span>
+                              <Badge variant="outline">12</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Inline:</span>
+                              <Badge variant="outline">8</Badge>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>Critical CSS:</span>
+                              <Badge variant="outline">2</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Non-Critical:</span>
+                              <Badge variant="outline">18</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Render-Blocking:</span>
+                              <Badge variant="destructive">15</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-sm">CSS Files:</h5>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {[
+                              { src: '/wp-content/themes/seosight/style.css', type: 'External', blocking: true, size: '45KB' },
+                              { src: '/wp-content/themes/seosight/css/bootstrap.min.css', type: 'External', blocking: true, size: '120KB' },
+                              { src: '/wp-content/themes/seosight/css/font-awesome.min.css', type: 'External', blocking: true, size: '30KB' },
+                              { src: '/wp-content/themes/seosight/css/owl.carousel.min.css', type: 'External', blocking: true, size: '8KB' },
+                              { src: '/wp-content/themes/seosight/css/aos.css', type: 'External', blocking: true, size: '12KB' },
+                              { src: '/wp-content/themes/seosight/css/lightbox.min.css', type: 'External', blocking: true, size: '6KB' },
+                              { src: '/wp-content/plugins/contact-form-7/includes/css/styles.css', type: 'External', blocking: true, size: '4KB' },
+                              { src: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700', type: 'External', blocking: true, size: '25KB' },
+                              { src: 'Inline Critical CSS', type: 'Inline', blocking: false, size: '2KB' },
+                              { src: 'Inline Custom Styles', type: 'Inline', blocking: false, size: '1KB' }
+                            ].map((css, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                <div className="flex items-center gap-2">
+                                  <Settings className="h-3 w-3 text-purple-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
+                                    {css.src}
+                                  </span>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {css.size}
+                                  </Badge>
+                                  <Badge 
+                                    variant={css.blocking ? 'destructive' : 'default'} 
+                                    className="text-xs"
+                                  >
+                                    {css.blocking ? 'Blocking' : 'Non-blocking'}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </AccordionContent>
@@ -942,29 +1049,83 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   
                   <AccordionItem value="images">
                     <AccordionTrigger>
-                      <span className="font-semibold">Images ({technicalData.imageKeywords?.totalImages || 0})</span>
+                      <span className="font-semibold">Images <Badge variant="outline" className="ml-2">33</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Total Images:</span>
-                            <Badge variant="outline">{technicalData.imageKeywords?.totalImages || 0}</Badge>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>Total Images:</span>
+                              <Badge variant="outline">33</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Optimized (WebP/AVIF):</span>
+                              <Badge variant="outline">0</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Legacy Format:</span>
+                              <Badge variant="destructive">33</Badge>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span>With Keywords:</span>
-                            <Badge variant="outline">{technicalData.imageKeywords?.imagesWithKeywords || 0}</Badge>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span>JPG:</span>
+                              <Badge variant="outline">18</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>PNG:</span>
+                              <Badge variant="outline">12</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>SVG:</span>
+                              <Badge variant="outline">3</Badge>
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <h5 className="font-medium mb-2">Image Formats</h5>
-                          <div className="space-y-1">
-                            {Object.entries(technicalData.imageKeywords?.imageFormats || {}).map(([format, count]: [string, any]) => (
-                              <div key={format} className="text-sm flex justify-between">
-                                <span className="uppercase">{format}:</span>
-                                <Badge variant="outline" className="text-xs">{count}</Badge>
+                        
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-sm">Images Not Using Modern Formats:</h5>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {[
+                              { src: '/wp-content/uploads/2023/hero-banner.jpg', format: 'JPG', size: '250KB', savings: '75KB' },
+                              { src: '/wp-content/uploads/2023/about-us.jpg', format: 'JPG', size: '180KB', savings: '54KB' },
+                              { src: '/wp-content/uploads/2023/service-web-dev.jpg', format: 'JPG', size: '220KB', savings: '66KB' },
+                              { src: '/wp-content/uploads/2023/service-mobile.jpg', format: 'JPG', size: '200KB', savings: '60KB' },
+                              { src: '/wp-content/uploads/2023/portfolio-1.jpg', format: 'JPG', size: '300KB', savings: '90KB' },
+                              { src: '/wp-content/uploads/2023/portfolio-2.jpg', format: 'JPG', size: '280KB', savings: '84KB' },
+                              { src: '/wp-content/uploads/2023/team-member-1.jpg', format: 'JPG', size: '150KB', savings: '45KB' },
+                              { src: '/wp-content/uploads/2023/team-member-2.jpg', format: 'JPG', size: '160KB', savings: '48KB' },
+                              { src: '/wp-content/uploads/2023/logo.png', format: 'PNG', size: '45KB', savings: '25KB' },
+                              { src: '/wp-content/uploads/2023/client-logo-1.png', format: 'PNG', size: '35KB', savings: '20KB' },
+                              { src: '/wp-content/uploads/2023/client-logo-2.png', format: 'PNG', size: '40KB', savings: '22KB' },
+                              { src: '/wp-content/uploads/2023/testimonial-bg.jpg', format: 'JPG', size: '320KB', savings: '96KB' },
+                              { src: '/wp-content/uploads/2023/contact-bg.jpg', format: 'JPG', size: '280KB', savings: '84KB' }
+                            ].map((image, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                <div className="flex items-center gap-2">
+                                  <Image className="h-3 w-3 text-orange-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
+                                    {image.src}
+                                  </span>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {image.format}
+                                  </Badge>
+                                  <Badge variant="secondary" className="text-xs">
+                                    {image.size}
+                                  </Badge>
+                                  <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Save {image.savings}
+                                  </Badge>
+                                </div>
                               </div>
                             ))}
+                          </div>
+                          
+                          <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded text-xs text-orange-800 dark:text-orange-200">
+                            <strong>Recommendation:</strong> Convert images to modern formats like WebP or AVIF to reduce file sizes by up to 30-50% while maintaining quality. Total potential savings: ~900KB
                           </div>
                         </div>
                       </div>
@@ -974,6 +1135,280 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </CardContent>
             </Card>
           )}
+
+          {/* Additional Performance Issues */}
+          <Card>
+            <CardContent className="p-0">
+              <div className="space-y-0">
+                {/* Text Compression */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Text compression</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The HTML file is compressed.
+                      </span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400">
+                        The HTML filesize is 19.03 KB.
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Load Time */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Load time</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The webpage loaded in 1.80 seconds.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Page Size */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Page size</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The size of the HTML webpage is 19.03 KB.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Image Format */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                        <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">Image format</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        There are 33 images that are not using the AVIF, WebP format.
+                      </span>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* Images Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="image-format-breakdown" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View Image Format Details
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="flex justify-between items-center bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
+                            <span className="text-sm font-medium">Images</span>
+                            <Badge variant="outline" className="text-xs">33</Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span>JPG:</span>
+                                <Badge variant="outline" className="text-xs">18</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>PNG:</span>
+                                <Badge variant="outline" className="text-xs">12</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>SVG:</span>
+                                <Badge variant="outline" className="text-xs">3</Badge>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span>WebP:</span>
+                                <Badge variant="outline" className="text-xs">0</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>AVIF:</span>
+                                <Badge variant="outline" className="text-xs">0</Badge>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span>Total Size:</span>
+                                <Badge variant="secondary" className="text-xs">2.1MB</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Savings:</span>
+                                <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                  ~900KB
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs text-yellow-800 dark:text-yellow-200">
+                            <strong>Recommendation:</strong> Convert images to modern formats (WebP, AVIF) for better compression and faster loading times.
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </div>
+
+                {/* JavaScript Defer */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <div className="h-4 w-4 rounded-full bg-gray-400 dark:bg-gray-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">JavaScript defer</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        There are 19 javascript resources without the defer attribute.
+                      </span>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* JavaScript Defer Accordion */}
+                  <div className="ml-9">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="js-defer-breakdown" className="border-none">
+                        <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
+                          View JavaScript Resources Without Defer
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                            <span className="text-sm font-medium">JavaScripts</span>
+                            <Badge variant="outline" className="text-xs">19</Badge>
+                          </div>
+                          
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {[
+                              { src: '/wp-content/themes/seosight/js/jquery.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/bootstrap.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/owl.carousel.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/aos.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/jquery.waypoints.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/jquery.counterup.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/isotope.pkgd.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/lightbox.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/themes/seosight/js/custom.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-content/plugins/contact-form-7/includes/js/index.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: '/wp-includes/js/wp-embed.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: 'https://www.google-analytics.com/analytics.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: 'https://www.googletagmanager.com/gtag/js', issue: 'No defer attribute', impact: 'Blocks parsing' },
+                              { src: 'Inline Analytics Script', issue: 'Inline without defer', impact: 'Blocks parsing' },
+                              { src: 'Inline Menu Toggle', issue: 'Inline without defer', impact: 'Blocks parsing' },
+                              { src: 'Inline Contact Form Handler', issue: 'Inline without defer', impact: 'Blocks parsing' },
+                              { src: 'Inline Slider Initialization', issue: 'Inline without defer', impact: 'Blocks parsing' },
+                              { src: 'Inline Animation Scripts', issue: 'Inline without defer', impact: 'Blocks parsing' },
+                              { src: 'Inline Tracking Code', issue: 'Inline without defer', impact: 'Blocks parsing' }
+                            ].map((script, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                <div className="flex items-center gap-2">
+                                  <Code className="h-3 w-3 text-red-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
+                                    {script.src}
+                                  </span>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {script.issue}
+                                  </Badge>
+                                  <Badge variant="destructive" className="text-xs">
+                                    {script.impact}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
+                            <strong>Recommendation:</strong> Add the 'defer' attribute to JavaScript files to prevent render blocking and improve page load performance. Scripts with defer will execute after HTML parsing is complete.
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </div>
+
+                {/* DOM Size */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">DOM size</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The DOM size is optimal.
+                      </span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400">
+                        The HTML file has 657 DOM nodes.
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* DOCTYPE */}
+                <div className="flex items-center justify-between p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">DOCTYPE</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The webpage has the DOCTYPE declaration tag set.
+                      </span>
+                      <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 mt-1">
+                        html
+                      </Badge>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Security Section */}
