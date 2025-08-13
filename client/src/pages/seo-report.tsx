@@ -4,12 +4,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Printer } from "lucide-react";
 import { ComprehensiveSeoReport } from "@/components/seo/comprehensive-seo-report";
+import type { SeoReport, SeoMetrics, SeoPageAnalysis, SeoKeywords } from "@shared/schema";
+
+type SeoReportWithDetails = SeoReport & {
+  metrics?: SeoMetrics;
+  pageAnalysis?: SeoPageAnalysis[];
+  keywords?: SeoKeywords[];
+};
 
 export default function SeoReportPage() {
   const params = useParams();
   const reportId = params.id;
 
-  const { data: report, isLoading, error } = useQuery({
+  const { data: report, isLoading, error } = useQuery<SeoReportWithDetails>({
     queryKey: ['/api/seo-reports', reportId],
     enabled: !!reportId,
   });
@@ -61,8 +68,9 @@ export default function SeoReportPage() {
   }
 
   // Get website info from report
-  const websiteName = report.websiteName || report.reportData?.url || 'Website';
-  const websiteUrl = report.reportData?.url || '#';
+  const reportData = report.reportData as any;
+  const websiteName = reportData?.websiteName || reportData?.url || 'Website';
+  const websiteUrl = reportData?.url || '#';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -74,7 +82,7 @@ export default function SeoReportPage() {
               SEO Analysis Report
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {websiteName} • Generated on {new Date(report.generatedAt).toLocaleDateString()}
+              {websiteName} • Generated on {new Date(report.generatedAt || report.createdAt || new Date()).toLocaleDateString()}
             </p>
           </div>
           <div className="flex gap-2">
@@ -104,7 +112,7 @@ export default function SeoReportPage() {
       </div>
 
       {/* Print styles */}
-      <style jsx global>{`
+      <style>{`
         @media print {
           .print\\:hidden {
             display: none !important;
