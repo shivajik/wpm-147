@@ -39,7 +39,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
   const [optimizingType, setOptimizingType] = useState<'revisions' | 'database' | 'all' | null>(null);
 
   // Fetch optimization data
-  const { data: optimizationData, isLoading } = useQuery<OptimizationData>({
+  const { data: optimizationData, isLoading } = useQuery<OptimizationData | null>({
     queryKey: [`/api/websites/${websiteId}/optimization`],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -150,6 +150,35 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
     );
   }
 
+  // If optimization data is null (endpoint not available), show unavailable message
+  if (optimizationData === null) {
+    return (
+      <Card data-testid="optimization-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Optimization
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full">
+              <Settings className="h-8 w-8 text-gray-400" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Optimization Features Unavailable
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Optimization features require an updated WordPress Remote Manager plugin
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card data-testid="optimization-card">
       <CardHeader>
@@ -185,7 +214,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
             variant="outline"
             size="sm"
             onClick={handleOptimizeRevisions}
-            disabled={optimizingType !== null}
+            disabled={optimizingType !== null || !optimizationData}
             className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/30"
             data-testid="optimize-revisions-button"
           >
@@ -229,7 +258,7 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
             variant="outline"
             size="sm"
             onClick={handleOptimizeDatabase}
-            disabled={optimizingType !== null}
+            disabled={optimizingType !== null || !optimizationData}
             className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/30"
             data-testid="optimize-database-button"
           >
@@ -256,8 +285,8 @@ export default function OptimizationCard({ websiteId }: OptimizationCardProps) {
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
           <Button
             onClick={handleOptimizeAll}
-            disabled={optimizingType !== null}
-            className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
+            disabled={optimizingType !== null || !optimizationData}
+            className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
             data-testid="optimize-all-button"
           >
             {optimizingType === 'all' ? (

@@ -2201,27 +2201,16 @@ export class WPRemoteManagerClient {
     postRevisions: { count: number; size: string };
     databaseSize: { total: string; tables: number; overhead: string };
     lastOptimized: string | null;
-  }> {
+  } | null> {
     try {
       console.log('[WRM] Fetching optimization data...');
       
       const response = await this.api.get('/optimization/info');
       return response.data;
     } catch (error) {
-      console.log('[WRM] Optimization endpoint not available, using simulated data');
-      // Return simulated data for now
-      return {
-        postRevisions: {
-          count: Math.floor(Math.random() * 200) + 50,
-          size: `${(Math.random() * 15 + 5).toFixed(1)} MB`
-        },
-        databaseSize: {
-          total: `${(Math.random() * 500 + 100).toFixed(1)} MB`,
-          tables: Math.floor(Math.random() * 50) + 20,
-          overhead: `${(Math.random() * 10 + 1).toFixed(1)} MB`
-        },
-        lastOptimized: null
-      };
+      console.log('[WRM] Optimization endpoint not available');
+      // Return null to indicate no data available instead of mock data
+      return null;
     }
   }
 
