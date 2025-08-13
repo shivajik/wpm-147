@@ -280,613 +280,581 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
         </CardContent>
       </Card>
 
-      {/* Detailed Findings */}
-      <Tabs defaultValue="critical" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="critical" className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            Critical ({detailedFindings.criticalIssues.length})
+      {/* Major Report Sections - phpRank Style */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Overview
           </TabsTrigger>
-          <TabsTrigger value="warnings" className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Warnings ({detailedFindings.warnings.length})
+          <TabsTrigger value="seo" className="flex items-center gap-2">
+            <Search className="h-4 w-4" />
+            SEO
           </TabsTrigger>
-          <TabsTrigger value="recommendations" className="flex items-center gap-2">
-            <Lightbulb className="h-4 w-4" />
-            Opportunities ({detailedFindings.recommendations.length})
+          <TabsTrigger value="performance" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Performance
           </TabsTrigger>
-          <TabsTrigger value="positive" className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4" />
-            Passed ({detailedFindings.positiveFindings.length})
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="miscellaneous" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Miscellaneous
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="critical" className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <AlertCircle className="h-5 w-5 text-red-500" />
-            <h3 className="text-lg font-semibold">Critical Issues Requiring Immediate Attention</h3>
-          </div>
-          {detailedFindings.criticalIssues.length > 0 ? (
-            <div className="space-y-4">
-              {detailedFindings.criticalIssues.map((finding: any, index: number) => 
-                renderFindingCard(finding, index)
-              )}
-            </div>
-          ) : (
-            <Card className="border-green-200 bg-green-50 dark:bg-green-900/20">
-              <CardContent className="flex items-center gap-2 p-6">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-800 dark:text-green-200">No critical issues found! Your website follows essential SEO best practices.</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="warnings" className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle className="h-5 w-5 text-orange-500" />
-            <h3 className="text-lg font-semibold">High Priority Issues</h3>
-          </div>
-          {detailedFindings.warnings.length > 0 ? (
-            <div className="space-y-4">
-              {detailedFindings.warnings.map((finding: any, index: number) => 
-                renderFindingCard(finding, index)
-              )}
-            </div>
-          ) : (
-            <Card className="border-green-200 bg-green-50 dark:bg-green-900/20">
-              <CardContent className="flex items-center gap-2 p-6">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <p className="text-green-800 dark:text-green-200">No high priority warnings found!</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="recommendations" className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="h-5 w-5 text-blue-500" />
-            <h3 className="text-lg font-semibold">Optimization Opportunities</h3>
-          </div>
-          {detailedFindings.recommendations.length > 0 ? (
-            <div className="space-y-4">
-              {detailedFindings.recommendations.map((finding: any, index: number) => 
-                renderFindingCard(finding, index)
-              )}
-            </div>
-          ) : (
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-              <CardContent className="flex items-center gap-2 p-6">
-                <Info className="h-5 w-5 text-blue-600" />
-                <p className="text-blue-800 dark:text-blue-200">All optimization opportunities have been addressed!</p>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-blue-800 dark:text-blue-200">SEO Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${getScoreColor(report.overallScore)}`}>
+                  {report.overallScore}/100
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-red-200 bg-red-50 dark:bg-red-900/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-red-800 dark:text-red-200">Critical Issues</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">{detailedFindings.criticalIssues.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-orange-200 bg-orange-50 dark:bg-orange-900/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-orange-800 dark:text-orange-200">Warnings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">{detailedFindings.warnings.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-green-200 bg-green-50 dark:bg-green-900/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-green-800 dark:text-green-200">Passed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">{detailedFindings.positiveFindings.length}</div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="seo" className="space-y-4">
+          {/* Heading Structure Analysis */}
+          {technicalData.headingAnalysis && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Heading Structure Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Heading Summary</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Total Headings:</span>
+                        <Badge variant="outline">{technicalData.headingAnalysis.totalHeadings}</Badge>
+                      </div>
+                      {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => (
+                        <div key={tag} className="flex justify-between">
+                          <span>{tag.toUpperCase()}:</span>
+                          <Badge variant="outline">{headings.length}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold mb-3">Hierarchy Issues</h4>
+                    {technicalData.headingAnalysis.hierarchy?.issues?.length > 0 ? (
+                      <div className="space-y-2">
+                        {technicalData.headingAnalysis.hierarchy.issues.map((issue: string, index: number) => (
+                          <div key={index} className="text-sm text-red-600 flex items-center gap-2">
+                            <XCircle className="h-4 w-4" />
+                            {issue}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-green-600 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        No hierarchy issues detected
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Accordion type="multiple" className="w-full">
+                  {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
+                    headings.length > 0 && (
+                      <AccordionItem key={tag} value={tag}>
+                        <AccordionTrigger className="text-left">
+                          <span className="font-semibold capitalize">{tag} Tags ({headings.length})</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {headings.map((heading: any, index: number) => (
+                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded-md border-l-2 border-gray-200 dark:border-gray-600">
+                                {heading.text}
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )
+                  )}
+                </Accordion>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Content Keywords Analysis */}
+          {technicalData.contentKeywords && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Content Keywords Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Content Statistics</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Total Words:</span>
+                        <Badge variant="outline">{technicalData.contentKeywords.totalWords}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Unique Words:</span>
+                        <Badge variant="outline">{technicalData.contentKeywords.uniqueWords}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Avg Word Length:</span>
+                        <Badge variant="outline">{Math.round(technicalData.contentKeywords.avgWordLength || 0)}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <Accordion type="multiple" className="w-full">
+                      <AccordionItem value="keywords">
+                        <AccordionTrigger>
+                          <span className="font-semibold">Top Keywords ({technicalData.contentKeywords.topKeywords?.length || 0})</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {technicalData.contentKeywords.topKeywords?.slice(0, 15).map((keyword: any, index: number) => (
+                              <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                                <span>{keyword.keyword}</span>
+                                <Badge variant="outline">{keyword.density}%</Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                      
+                      <AccordionItem value="phrases">
+                        <AccordionTrigger>
+                          <span className="font-semibold">Common Phrases ({technicalData.contentKeywords.keywordPhrases2?.length || 0})</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {technicalData.contentKeywords.keywordPhrases2?.slice(0, 12).map((phrase: any, index: number) => (
+                              <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                                <span className="truncate">{phrase.phrase}</span>
+                                <Badge variant="outline">{phrase.count}x</Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Meta Tags Analysis */}
+          {technicalData.metaTagsAnalysis && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Meta Tags Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Meta Tag Summary</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Total Meta Tags:</span>
+                        <Badge variant="outline">{technicalData.metaTagsAnalysis.totalMetaTags}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>SEO Tags:</span>
+                        <Badge variant="outline">{technicalData.metaTagsAnalysis.seoMetaTags?.length || 0}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Social Tags:</span>
+                        <Badge variant="outline">{technicalData.metaTagsAnalysis.socialMetaTags?.length || 0}</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <Accordion type="multiple" className="w-full">
+                      <AccordionItem value="seo-meta">
+                        <AccordionTrigger>
+                          <span className="font-semibold">SEO Meta Tags ({technicalData.metaTagsAnalysis.seoMetaTags?.length || 0})</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
+                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-blue-200 dark:border-blue-600">
+                                <div className="font-medium text-blue-700 dark:text-blue-300">{tag.name}</div>
+                                <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                      
+                      <AccordionItem value="social-meta">
+                        <AccordionTrigger>
+                          <span className="font-semibold">Social Meta Tags ({technicalData.metaTagsAnalysis.socialMetaTags?.length || 0})</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2">
+                            {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
+                              <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-green-200 dark:border-green-600">
+                                <div className="font-medium text-green-700 dark:text-green-300">{tag.property || tag.name}</div>
+                                <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
-        <TabsContent value="positive" className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <h3 className="text-lg font-semibold">SEO Best Practices Implemented</h3>
-          </div>
-          {detailedFindings.positiveFindings.length > 0 ? (
-            <div className="space-y-4">
-              {detailedFindings.positiveFindings.map((finding: any, index: number) => 
-                renderFindingCard(finding, index)
-              )}
-            </div>
-          ) : (
-            <Card className="border-gray-200 bg-gray-50 dark:bg-gray-900/20">
-              <CardContent className="flex items-center gap-2 p-6">
-                <Info className="h-5 w-5 text-gray-600" />
-                <p className="text-gray-800 dark:text-gray-200">Complete the critical and high priority fixes to see positive findings here.</p>
+        <TabsContent value="performance" className="space-y-4">
+          {/* HTTP Requests Analysis */}
+          {technicalData.httpRequests && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  HTTP Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    The webpage makes more than 50 HTTP requests.
+                  </p>
+                </div>
+                
+                <Accordion type="multiple" className="w-full">
+                  <AccordionItem value="javascripts">
+                    <AccordionTrigger>
+                      <span className="font-semibold">JavaScripts ({technicalData.javascriptAnalysis?.totalScripts || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Total Scripts:</span>
+                            <Badge variant="outline">{technicalData.javascriptAnalysis?.totalScripts || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>External:</span>
+                            <Badge variant="outline">{technicalData.javascriptAnalysis?.externalScripts || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Inline:</span>
+                            <Badge variant="outline">{technicalData.javascriptAnalysis?.inlineScripts || 0}</Badge>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Async:</span>
+                            <Badge variant="outline">{technicalData.javascriptAnalysis?.asyncScripts || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Defer:</span>
+                            <Badge variant="outline">{technicalData.javascriptAnalysis?.deferScripts || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Blocking:</span>
+                            <Badge variant={technicalData.javascriptAnalysis?.blockingScripts > 3 ? "destructive" : "outline"}>
+                              {technicalData.javascriptAnalysis?.blockingScripts || 0}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="css">
+                    <AccordionTrigger>
+                      <span className="font-semibold">CSS ({technicalData.httpRequests.requestsByType?.css || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>CSS Files:</span>
+                          <Badge variant="outline">{technicalData.httpRequests.requestsByType?.css || 0}</Badge>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="images">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Images ({technicalData.imageKeywords?.totalImages || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Total Images:</span>
+                            <Badge variant="outline">{technicalData.imageKeywords?.totalImages || 0}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>With Keywords:</span>
+                            <Badge variant="outline">{technicalData.imageKeywords?.imagesWithKeywords || 0}</Badge>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="font-medium mb-2">Image Formats</h5>
+                          <div className="space-y-1">
+                            {Object.entries(technicalData.imageKeywords?.imageFormats || {}).map(([format, count]: [string, any]) => (
+                              <div key={format} className="text-sm flex justify-between">
+                                <span className="uppercase">{format}:</span>
+                                <Badge variant="outline" className="text-xs">{count}</Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          {/* Security Headers Analysis */}
+          {technicalData.securityHeaders && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Security Headers Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Security Score</h4>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className={`text-3xl font-bold ${getScoreColor(technicalData.securityHeaders.securityScore)}`}>
+                        {technicalData.securityHeaders.securityScore}/100
+                      </div>
+                      <Progress value={technicalData.securityHeaders.securityScore} className="flex-1 h-3" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-3">Security Headers</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span>HTTPS:</span>
+                        {technicalData.securityHeaders.hasHTTPS ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>HSTS:</span>
+                        {technicalData.securityHeaders.hasHSTS ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>CSP:</span>
+                        {technicalData.securityHeaders.hasCSP ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>X-Frame-Options:</span>
+                        {technicalData.securityHeaders.hasXFrameOptions ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="miscellaneous" className="space-y-4">
+          {/* Technical Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Technical Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-sm">Security & Protocol</span>
+                  </div>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>SSL: {technicalData.technicalSeo?.hasSSL ? '✓ Enabled' : '✗ Disabled'}</p>
+                    <p>Protocol: {technicalData.technicalSeo?.hasSSL ? 'HTTPS' : 'HTTP'}</p>
+                    <p>Status: {technicalData.technicalSeo?.statusCode || 'Unknown'}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Search className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-sm">Crawlability</span>
+                  </div>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>Robots.txt: {technicalData.technicalSeo?.hasRobotsTxt ? '✓ Found' : '✗ Missing'}</p>
+                    <p>Sitemap: {technicalData.technicalSeo?.hasSitemap ? '✓ Found' : '✗ Missing'}</p>
+                    <p>Mobile: {technicalData.technicalSeo?.isResponsive ? '✓ Responsive' : '✗ Not Responsive'}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="h-4 w-4 text-orange-600" />
+                    <span className="font-medium text-sm">Performance</span>
+                  </div>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>Response: {technicalData.technicalSeo?.responseTime || 0}ms</p>
+                    <p>Size: {technicalData.performance?.pageSize || 0}KB</p>
+                    <p>Requests: {technicalData.performance?.requests || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Critical Issues & Recommendations */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Issues & Recommendations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="multiple" className="w-full">
+                <AccordionItem value="critical">
+                  <AccordionTrigger>
+                    <span className="font-semibold">Critical Issues ({detailedFindings.criticalIssues.length})</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {detailedFindings.criticalIssues.length > 0 ? (
+                      <div className="space-y-3">
+                        {detailedFindings.criticalIssues.map((finding: any, index: number) => 
+                          renderFindingCard(finding, index)
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-green-600 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        No critical issues found
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="warnings">
+                  <AccordionTrigger>
+                    <span className="font-semibold">Warnings ({detailedFindings.warnings.length})</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {detailedFindings.warnings.length > 0 ? (
+                      <div className="space-y-3">
+                        {detailedFindings.warnings.map((finding: any, index: number) => 
+                          renderFindingCard(finding, index)
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-gray-600 flex items-center gap-2">
+                        <Info className="h-4 w-4" />
+                        No warnings detected
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="recommendations">
+                  <AccordionTrigger>
+                    <span className="font-semibold">Recommendations ({detailedFindings.recommendations.length})</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {detailedFindings.recommendations.length > 0 ? (
+                      <div className="space-y-3">
+                        {detailedFindings.recommendations.map((finding: any, index: number) => 
+                          renderFindingCard(finding, index)
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-gray-600 flex items-center gap-2">
+                        <Info className="h-4 w-4" />
+                        No specific recommendations
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Technical Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            Technical Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-sm">Security & Protocol</span>
-              </div>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p>SSL: {technicalData.technicalSeo?.hasSSL ? '✓ Enabled' : '✗ Disabled'}</p>
-                <p>Protocol: {technicalData.technicalSeo?.hasSSL ? 'HTTPS' : 'HTTP'}</p>
-                <p>Status: {technicalData.technicalSeo?.statusCode || 'Unknown'}</p>
-              </div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Search className="h-4 w-4 text-green-600" />
-                <span className="font-medium text-sm">Crawlability</span>
-              </div>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p>Robots.txt: {technicalData.technicalSeo?.hasRobotsTxt ? '✓ Found' : '✗ Missing'}</p>
-                <p>Sitemap: {technicalData.technicalSeo?.hasSitemap ? '✓ Found' : '✗ Missing'}</p>
-                <p>Mobile: {technicalData.technicalSeo?.isResponsive ? '✓ Responsive' : '✗ Not Responsive'}</p>
-              </div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-orange-600" />
-                <span className="font-medium text-sm">Performance</span>
-              </div>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p>Response: {technicalData.technicalSeo?.responseTime || 0}ms</p>
-                <p>Size: {technicalData.performance?.pageSize || 0}KB</p>
-                <p>Requests: {technicalData.performance?.requests || 0}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Detailed Analysis Sections */}
-      {technicalData.headingAnalysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Heading Structure Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Heading Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Headings:</span>
-                    <Badge variant="outline">{technicalData.headingAnalysis.totalHeadings}</Badge>
-                  </div>
-                  {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => (
-                    <div key={tag} className="flex justify-between">
-                      <span>{tag.toUpperCase()}:</span>
-                      <Badge variant="outline">{headings.length}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold mb-3">Hierarchy Issues</h4>
-                {technicalData.headingAnalysis.hierarchy?.issues?.length > 0 ? (
-                  <div className="space-y-2">
-                    {technicalData.headingAnalysis.hierarchy.issues.map((issue: string, index: number) => (
-                      <div key={index} className="text-sm text-red-600 flex items-center gap-2">
-                        <XCircle className="h-4 w-4" />
-                        {issue}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-green-600 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4" />
-                    No hierarchy issues detected
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Detailed Heading List with Accordion */}
-            <Accordion type="multiple" className="mt-6">
-              {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
-                headings.length > 0 && (
-                  <AccordionItem key={tag} value={tag}>
-                    <AccordionTrigger className="text-left">
-                      <span className="font-semibold capitalize">{tag} Tags ({headings.length})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {headings.map((heading: any, index: number) => (
-                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded-md border-l-2 border-gray-200 dark:border-gray-600">
-                            {heading.text}
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              )}
-            </Accordion>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.contentKeywords && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Content Keywords Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Content Statistics</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Words:</span>
-                    <Badge variant="outline">{technicalData.contentKeywords.totalWords}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Unique Words:</span>
-                    <Badge variant="outline">{technicalData.contentKeywords.uniqueWords}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Avg Word Length:</span>
-                    <Badge variant="outline">{Math.round(technicalData.contentKeywords.avgWordLength || 0)}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-span-2">
-                <Accordion type="multiple" className="w-full">
-                  <AccordionItem value="keywords">
-                    <AccordionTrigger>
-                      <span className="font-semibold">Top Keywords ({technicalData.contentKeywords.topKeywords?.length || 0})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {technicalData.contentKeywords.topKeywords?.slice(0, 15).map((keyword: any, index: number) => (
-                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                            <span>{keyword.keyword}</span>
-                            <Badge variant="outline">{keyword.density}%</Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="phrases">
-                    <AccordionTrigger>
-                      <span className="font-semibold">Common Phrases ({technicalData.contentKeywords.keywordPhrases2?.length || 0})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {technicalData.contentKeywords.keywordPhrases2?.slice(0, 12).map((phrase: any, index: number) => (
-                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                            <span className="truncate">{phrase.phrase}</span>
-                            <Badge variant="outline">{phrase.count}x</Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.httpRequests && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              HTTP Requests Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Request Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Requests:</span>
-                    <Badge variant="outline">{technicalData.httpRequests.totalRequests}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>External:</span>
-                    <Badge variant="outline">{technicalData.httpRequests.externalRequests}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Internal:</span>
-                    <Badge variant="outline">{technicalData.httpRequests.internalRequests}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Request Types</h4>
-                <div className="space-y-2">
-                  {Object.entries(technicalData.httpRequests.requestsByType || {}).map(([type, count]: [string, any]) => (
-                    <div key={type} className="flex justify-between">
-                      <span className="capitalize">{type}:</span>
-                      <Badge variant="outline">{count}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.javascriptAnalysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Code className="h-5 w-5" />
-              JavaScript Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Script Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Scripts:</span>
-                    <Badge variant="outline">{technicalData.javascriptAnalysis.totalScripts}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>External:</span>
-                    <Badge variant="outline">{technicalData.javascriptAnalysis.externalScripts}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Inline:</span>
-                    <Badge variant="outline">{technicalData.javascriptAnalysis.inlineScripts}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Loading Optimization</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Async:</span>
-                    <Badge variant="outline">{technicalData.javascriptAnalysis.asyncScripts}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Defer:</span>
-                    <Badge variant="outline">{technicalData.javascriptAnalysis.deferScripts}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Blocking:</span>
-                    <Badge variant={technicalData.javascriptAnalysis.blockingScripts > 3 ? "destructive" : "outline"}>
-                      {technicalData.javascriptAnalysis.blockingScripts}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Issues</h4>
-                {technicalData.javascriptAnalysis.optimizationIssues?.length > 0 ? (
-                  <div className="space-y-1">
-                    {technicalData.javascriptAnalysis.optimizationIssues.map((issue: string, index: number) => (
-                      <div key={index} className="text-sm text-orange-600 flex items-center gap-2">
-                        <AlertTriangle className="h-3 w-3" />
-                        {issue}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-green-600 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4" />
-                    No optimization issues
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.imageKeywords && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Image className="h-5 w-5" />
-              Image Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Image Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Images:</span>
-                    <Badge variant="outline">{technicalData.imageKeywords.totalImages}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>With Keywords:</span>
-                    <Badge variant="outline">{technicalData.imageKeywords.imagesWithKeywords}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="image-formats">
-                    <AccordionTrigger>
-                      <span className="font-semibold">Image Formats ({Object.keys(technicalData.imageKeywords.imageFormats || {}).length})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {Object.entries(technicalData.imageKeywords.imageFormats || {}).map(([format, count]: [string, any]) => (
-                          <div key={format} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                            <span className="uppercase font-medium break-all">{format}</span>
-                            <Badge variant="outline">{count}</Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-
-              <div>
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="image-keywords">
-                    <AccordionTrigger>
-                      <span className="font-semibold">Top Image Keywords ({technicalData.imageKeywords.topImageKeywords?.length || 0})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {technicalData.imageKeywords.topImageKeywords?.slice(0, 12).map((keyword: any, index: number) => (
-                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                            <span>{keyword.keyword}</span>
-                            <Badge variant="outline">{keyword.count}x</Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.metaTagsAnalysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Meta Tags Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Meta Tag Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Total Meta Tags:</span>
-                    <Badge variant="outline">{technicalData.metaTagsAnalysis.totalMetaTags}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>SEO Tags:</span>
-                    <Badge variant="outline">{technicalData.metaTagsAnalysis.seoMetaTags?.length || 0}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Social Tags:</span>
-                    <Badge variant="outline">{technicalData.metaTagsAnalysis.socialMetaTags?.length || 0}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-span-2">
-                <Accordion type="multiple" className="w-full">
-                  <AccordionItem value="seo-meta">
-                    <AccordionTrigger>
-                      <span className="font-semibold">SEO Meta Tags ({technicalData.metaTagsAnalysis.seoMetaTags?.length || 0})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
-                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-blue-200 dark:border-blue-600">
-                            <div className="font-medium text-blue-700 dark:text-blue-300">{tag.name}</div>
-                            <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="social-meta">
-                    <AccordionTrigger>
-                      <span className="font-semibold">Social Meta Tags ({technicalData.metaTagsAnalysis.socialMetaTags?.length || 0})</span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
-                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-green-200 dark:border-green-600">
-                            <div className="font-medium text-green-700 dark:text-green-300">{tag.property || tag.name}</div>
-                            <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {technicalData.securityHeaders && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Headers Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Security Score</h4>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`text-3xl font-bold ${getScoreColor(technicalData.securityHeaders.securityScore)}`}>
-                    {technicalData.securityHeaders.securityScore}/100
-                  </div>
-                  <Progress value={technicalData.securityHeaders.securityScore} className="flex-1 h-3" />
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Security Headers</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span>HTTPS:</span>
-                    {technicalData.securityHeaders.hasHTTPS ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>HSTS:</span>
-                    {technicalData.securityHeaders.hasHSTS ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>CSP:</span>
-                    {technicalData.securityHeaders.hasCSP ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>X-Frame-Options:</span>
-                    {technicalData.securityHeaders.hasXFrameOptions ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
