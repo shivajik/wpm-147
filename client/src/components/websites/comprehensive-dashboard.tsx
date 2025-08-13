@@ -230,7 +230,12 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Database</p>
-                      <p className="font-medium">{(wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version || 'N/A'}</p>
+                      <p className="font-medium">
+                        {(wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version 
+                          ? `MySQL ${(wpData as any)?.systemInfo?.mysql_version || (status as any)?.mysql_version}`
+                          : (wpData as any)?.systemInfo?.database_type || (status as any)?.database_type || 'N/A'
+                        }
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-3">

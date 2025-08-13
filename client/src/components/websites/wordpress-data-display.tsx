@@ -740,8 +740,8 @@ export function WordPressDataDisplay({ websiteId }: WordPressDataDisplayProps) {
                   </div>
                   <Separator />
                   <div className="flex justify-between">
-                    <span>MySQL Version:</span>
-                    <span>{wpData.systemInfo?.mysql_version || 'N/A'}</span>
+                    <span>Database:</span>
+                    <span>{wpData.systemInfo?.mysql_version ? `MySQL ${wpData.systemInfo.mysql_version}` : 'N/A'}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
