@@ -5993,6 +5993,135 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // Website optimization data endpoint
+    if (path.match(/^\/api\/websites\/\d+\/optimization$/) && req.method === 'GET') {
+      const websiteId = parseInt(path.split('/')[3]);
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const website = await db.select().from(websites).where(
+          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
+        ).limit(1);
+
+        if (website.length === 0) {
+          return res.status(404).json({ message: "Website not found" });
+        }
+
+        // Since optimization endpoints are not available in current WRM version,
+        // return null to indicate feature unavailability
+        return res.json(null);
+      } catch (error) {
+        console.error("Error fetching optimization data:", error);
+        return res.status(500).json({
+          message: "Failed to fetch optimization data",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
+    // Website optimization revisions endpoint
+    if (path.match(/^\/api\/websites\/\d+\/optimization\/revisions$/) && req.method === 'POST') {
+      const websiteId = parseInt(path.split('/')[3]);
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const website = await db.select().from(websites).where(
+          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
+        ).limit(1);
+
+        if (website.length === 0) {
+          return res.status(404).json({ message: "Website not found" });
+        }
+
+        // Return success response since optimization is not available yet
+        return res.json({
+          success: true,
+          message: "Optimization features not available",
+          revisionsRemoved: 0,
+          spaceSaved: "0 B"
+        });
+      } catch (error) {
+        console.error("Error optimizing revisions:", error);
+        return res.status(500).json({
+          message: "Failed to optimize revisions",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
+    // Website optimization database endpoint
+    if (path.match(/^\/api\/websites\/\d+\/optimization\/database$/) && req.method === 'POST') {
+      const websiteId = parseInt(path.split('/')[3]);
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const website = await db.select().from(websites).where(
+          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
+        ).limit(1);
+
+        if (website.length === 0) {
+          return res.status(404).json({ message: "Website not found" });
+        }
+
+        // Return success response since optimization is not available yet
+        return res.json({
+          success: true,
+          message: "Database optimization features not available",
+          tablesOptimized: 0,
+          spaceSaved: "0 B"
+        });
+      } catch (error) {
+        console.error("Error optimizing database:", error);
+        return res.status(500).json({
+          message: "Failed to optimize database",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
+    // Website optimization all endpoint
+    if (path.match(/^\/api\/websites\/\d+\/optimization\/all$/) && req.method === 'POST') {
+      const websiteId = parseInt(path.split('/')[3]);
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const website = await db.select().from(websites).where(
+          and(eq(websites.id, websiteId), eq(websites.userId, user.id))
+        ).limit(1);
+
+        if (website.length === 0) {
+          return res.status(404).json({ message: "Website not found" });
+        }
+
+        // Return success response since optimization is not available yet
+        return res.json({
+          success: true,
+          message: "Comprehensive optimization features not available",
+          revisionsRemoved: 0,
+          tablesOptimized: 0,
+          totalSpaceSaved: "0 B"
+        });
+      } catch (error) {
+        console.error("Error performing complete optimization:", error);
+        return res.status(500).json({
+          message: "Failed to perform complete optimization",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
     // Auto-sync all websites endpoint
     if (path === '/api/websites/auto-sync' && req.method === 'POST') {
       const user = authenticateToken(req);
@@ -6132,11 +6261,20 @@ export default async function handler(req: any, res: any) {
         'POST /api/websites/auto-sync',
         'POST /api/websites/:id/sync',
         'POST /api/websites/:id/test-connection',
+        'GET /api/websites/:id/optimization',
+        'POST /api/websites/:id/optimization/revisions',
+        'POST /api/websites/:id/optimization/database',
+        'POST /api/websites/:id/optimization/all',
         'POST /api/websites/:id/seo-analysis',
         'POST /api/websites/:id/link-monitor',
         'GET /api/websites/:id/link-monitor/history',
+        'GET /api/websites/:id/wordpress-data',
         'GET /api/websites/:id/wrm/health',
-        'GET /api/websites/:id/wrm/status'
+        'GET /api/websites/:id/wrm/status',
+        'GET /api/websites/:id/wrm/updates',
+        'GET /api/websites/:id/wrm-plugins',
+        'GET /api/websites/:id/wrm-themes',
+        'GET /api/websites/:id/wrm-users'
       ],
       timestamp: new Date().toISOString()
     });

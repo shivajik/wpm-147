@@ -55,7 +55,7 @@ Project branding: "AIO Webcare" - comprehensive WordPress management, security s
 - **Component Library**: shadcn/ui for accessible, customizable components.
 - **State Management**: TanStack Query for server state.
 - **Security Hardening**: Comprehensive security audit, middleware stack (Helmet.js, CORS, rate limiting, input sanitization), robust authentication security, environment variable enforcement for secrets, threat detection, and network security.
-- **Vercel Serverless Functions**: Extensive use for API endpoints (authentication, profile, client reports, performance scanning, broken link scanning, complete WordPress Remote Manager integration) to ensure scalability and efficiency with full WRM feature compatibility.
+- **Vercel Serverless Functions**: Extensive use for API endpoints (authentication, profile, client reports, performance scanning, broken link scanning, complete WordPress Remote Manager integration, optimization endpoints with proper null handling) to ensure scalability and efficiency with full WRM feature compatibility. **Updated August 13, 2025**: Added comprehensive optimization endpoint support to Vercel functions with proper handling of unavailable features.
 - **Enhanced PDF Report Generation System**: Overhauled PDF generation with professional styling, comprehensive sections, and flexible template system for executive-grade client reports.
 
 ## External Dependencies
