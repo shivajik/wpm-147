@@ -413,18 +413,92 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
                           View Heading Structure
                         </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">h1</span>
-                            <Badge variant="outline" className="text-xs">2</Badge>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                              <span className="text-sm font-medium">h1</span>
+                              <Badge variant="destructive" className="text-xs">2 (Should be 1)</Badge>
+                            </div>
+                            <div className="space-y-1 text-xs">
+                              <div className="p-2 bg-white dark:bg-gray-700 rounded border">
+                                <span className="font-mono text-blue-600 dark:text-blue-400">Website Design Company in Aurangabad Pune</span>
+                              </div>
+                              <div className="p-2 bg-white dark:bg-gray-700 rounded border">
+                                <span className="font-mono text-blue-600 dark:text-blue-400">Best Web Development Services</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">h4</span>
-                            <Badge variant="outline" className="text-xs">8</Badge>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                              <span className="text-sm font-medium">h2</span>
+                              <Badge variant="outline" className="text-xs">0</Badge>
+                            </div>
+                            <div className="text-xs text-gray-500 p-2">No h2 headings found</div>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">h5</span>
-                            <Badge variant="outline" className="text-xs">14</Badge>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                              <span className="text-sm font-medium">h3</span>
+                              <Badge variant="outline" className="text-xs">0</Badge>
+                            </div>
+                            <div className="text-xs text-gray-500 p-2">No h3 headings found</div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
+                              <span className="text-sm font-medium">h4</span>
+                              <Badge variant="outline" className="text-xs">8</Badge>
+                            </div>
+                            <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
+                              {[
+                                'Our Services',
+                                'Web Development',
+                                'Mobile App Development',
+                                'UI/UX Design',
+                                'Digital Marketing',
+                                'E-commerce Solutions',
+                                'Why Choose Us?',
+                                'Get Started Today'
+                              ].map((heading, index) => (
+                                <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
+                                  <span className="font-mono text-yellow-700 dark:text-yellow-300">{heading}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <span className="text-sm font-medium">h5</span>
+                              <Badge variant="outline" className="text-xs">14</Badge>
+                            </div>
+                            <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
+                              {[
+                                'Custom Website Development',
+                                'E-commerce Development',
+                                'CMS Development',
+                                'Responsive Web Design',
+                                'iOS App Development',
+                                'Android App Development',
+                                'Cross-Platform Apps',
+                                'User Experience Design',
+                                'User Interface Design',
+                                'Wireframing & Prototyping',
+                                'SEO Services',
+                                'Social Media Marketing',
+                                'Content Marketing',
+                                'PPC Advertising'
+                              ].map((heading, index) => (
+                                <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
+                                  <span className="font-mono text-blue-700 dark:text-blue-300">{heading}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-200">
+                            <strong>Issue:</strong> Multiple h1 tags found (2). There should be only one h1 tag per page. Consider using h2-h6 for subheadings to create a proper heading hierarchy.
                           </div>
                         </AccordionContent>
                       </AccordionItem>
@@ -488,10 +562,47 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
                           View Images Without Alt Text
                         </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-2">
-                          <div className="flex justify-between items-center">
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
                             <span className="text-sm font-medium">Images</span>
                             <Badge variant="outline" className="text-xs">16</Badge>
+                          </div>
+                          
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {[
+                              { src: '/images/logo.png', reason: 'Missing alt attribute' },
+                              { src: '/images/hero-banner.jpg', reason: 'Empty alt attribute' },
+                              { src: '/images/service-1.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/service-2.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/team-member-1.jpg', reason: 'Empty alt attribute' },
+                              { src: '/images/team-member-2.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/portfolio-1.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/portfolio-2.jpg', reason: 'Empty alt attribute' },
+                              { src: '/images/testimonial-bg.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/contact-bg.jpg', reason: 'Missing alt attribute' },
+                              { src: '/images/about-us.jpg', reason: 'Empty alt attribute' },
+                              { src: '/images/tech-stack.png', reason: 'Missing alt attribute' },
+                              { src: '/images/process-step-1.svg', reason: 'Missing alt attribute' },
+                              { src: '/images/process-step-2.svg', reason: 'Empty alt attribute' },
+                              { src: '/images/footer-logo.png', reason: 'Missing alt attribute' },
+                              { src: '/images/client-logo-1.png', reason: 'Missing alt attribute' }
+                            ].map((image, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                <div className="flex items-center gap-2">
+                                  <Image className="h-4 w-4 text-gray-500" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-48">
+                                    {image.src}
+                                  </span>
+                                </div>
+                                <Badge variant="destructive" className="text-xs">
+                                  {image.reason}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
+                            <strong>Recommendation:</strong> Add descriptive alt text to all images for better accessibility and SEO.
                           </div>
                         </AccordionContent>
                       </AccordionItem>
@@ -607,14 +718,89 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <AccordionTrigger className="text-xs font-medium py-2 hover:no-underline">
                           View Link Breakdown
                         </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">Externals</span>
-                            <Badge variant="outline" className="text-xs">13</Badge>
+                        <AccordionContent className="space-y-3 pb-2">
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* External Links */}
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                                <span className="text-sm font-medium">Externals</span>
+                                <Badge variant="outline" className="text-xs">13</Badge>
+                              </div>
+                              
+                              <div className="space-y-1 max-h-48 overflow-y-auto">
+                                {[
+                                  { url: 'https://facebook.com/ksoftsolution', text: 'Facebook' },
+                                  { url: 'https://twitter.com/ksoftsolution', text: 'Twitter' },
+                                  { url: 'https://linkedin.com/company/ksoftsolution', text: 'LinkedIn' },
+                                  { url: 'https://instagram.com/ksoftsolution', text: 'Instagram' },
+                                  { url: 'https://youtube.com/ksoftsolution', text: 'YouTube' },
+                                  { url: 'https://github.com/ksoftsolution', text: 'GitHub' },
+                                  { url: 'https://dribbble.com/ksoftsolution', text: 'Dribbble' },
+                                  { url: 'https://behance.net/ksoftsolution', text: 'Behance' },
+                                  { url: 'https://wordpress.org', text: 'WordPress.org' },
+                                  { url: 'https://google.com', text: 'Google' },
+                                  { url: 'https://mozilla.org', text: 'Mozilla' },
+                                  { url: 'https://w3.org', text: 'W3C' },
+                                  { url: 'https://stackoverflow.com', text: 'Stack Overflow' }
+                                ].map((link, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
+                                    <ExternalLink className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                    <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text}</span>
+                                    <span className="text-blue-600 dark:text-blue-400 truncate text-xs">
+                                      {link.url.replace('https://', '')}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Internal Links */}
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-2 rounded">
+                                <span className="text-sm font-medium">Internals</span>
+                                <Badge variant="outline" className="text-xs">39</Badge>
+                              </div>
+                              
+                              <div className="space-y-1 max-h-48 overflow-y-auto">
+                                {[
+                                  { url: '/', text: 'Home' },
+                                  { url: '/about', text: 'About Us' },
+                                  { url: '/services', text: 'Services' },
+                                  { url: '/services/web-development', text: 'Web Development' },
+                                  { url: '/services/mobile-development', text: 'Mobile Development' },
+                                  { url: '/services/ui-ux-design', text: 'UI/UX Design' },
+                                  { url: '/services/digital-marketing', text: 'Digital Marketing' },
+                                  { url: '/portfolio', text: 'Portfolio' },
+                                  { url: '/portfolio/web-projects', text: 'Web Projects' },
+                                  { url: '/portfolio/mobile-apps', text: 'Mobile Apps' },
+                                  { url: '/blog', text: 'Blog' },
+                                  { url: '/blog/latest-trends', text: 'Latest Trends' },
+                                  { url: '/blog/tutorials', text: 'Tutorials' },
+                                  { url: '/contact', text: 'Contact' },
+                                  { url: '/contact/get-quote', text: 'Get Quote' },
+                                  { url: '/careers', text: 'Careers' },
+                                  { url: '/careers/open-positions', text: 'Open Positions' },
+                                  { url: '/privacy-policy', text: 'Privacy Policy' },
+                                  { url: '/terms-of-service', text: 'Terms of Service' },
+                                  { url: '/sitemap', text: 'Sitemap' }
+                                ].slice(0, 20).map((link, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
+                                    <Link2 className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                    <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text}</span>
+                                    <span className="text-green-600 dark:text-green-400 truncate text-xs">
+                                      {link.url}
+                                    </span>
+                                  </div>
+                                ))}
+                                <div className="text-center p-1">
+                                  <span className="text-xs text-gray-500">... and 19 more</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium">Internals</span>
-                            <Badge variant="outline" className="text-xs">39</Badge>
+                          
+                          <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs text-green-800 dark:text-green-200">
+                            <strong>Analysis:</strong> Good balance of internal (39) and external (13) links. Internal linking helps with site navigation and SEO.
                           </div>
                         </AccordionContent>
                       </AccordionItem>
