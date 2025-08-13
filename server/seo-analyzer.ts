@@ -1,55 +1,10 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { SeoAnalysisResult, DetailedFinding } from '@shared/schema';
 import { URL } from 'url';
 
-export interface SeoAnalysisResult {
-  url: string;
-  domain: string;
-  title: string;
-  metaDescription: string;
-  h1Tags: string[];
-  h2Tags: string[];
-  h3Tags: string[];
-  pageContent: {
-    wordCount: number;
-    readabilityScore: number;
-    keywordDensity: { [key: string]: number };
-  };
-  technicalSeo: {
-    hasRobotsTxt: boolean;
-    hasSitemap: boolean;
-    hasSSL: boolean;
-    responseTime: number;
-    statusCode: number;
-    isResponsive: boolean;
-    hasValidStructuredData: boolean;
-  };
-  images: {
-    total: number;
-    withAlt: number;
-    missingAlt: number;
-    oversized: number;
-  };
-  links: {
-    internal: number;
-    external: number;
-    broken: number;
-  };
-  performance: {
-    loadTime: number;
-    pageSize: number;
-    requests: number;
-  };
-  socialMeta: {
-    hasOpenGraph: boolean;
-    hasTwitterCards: boolean;
-    hasFacebookMeta: boolean;
-  };
-  accessibility: {
-    score: number;
-    issues: string[];
-  };
-}
+
+
 
 export class SeoAnalyzer {
   private userAgent = 'Mozilla/5.0 (compatible; SEO-Analyzer/1.0)';
@@ -83,6 +38,14 @@ export class SeoAnalyzer {
     const parsedUrl = new URL(url);
     
     // Analyze page structure and content
+    const pageContent = await this.analyzeContent($, html);
+    const technicalSeo = await this.analyzeTechnicalSeo($, url, statusCode, responseTime);
+    const images = this.analyzeImages($);
+    const links = await this.analyzeLinks($, url);
+    const performance = this.analyzePerformance(html, responseTime);
+    const socialMeta = this.analyzeSocialMeta($);
+    const accessibility = this.analyzeAccessibility($);
+    
     const result: SeoAnalysisResult = {
       url,
       domain: parsedUrl.hostname,
@@ -92,13 +55,25 @@ export class SeoAnalyzer {
       h2Tags: this.extractHeadings($, 'h2'),
       h3Tags: this.extractHeadings($, 'h3'),
       
-      pageContent: await this.analyzeContent($, html),
-      technicalSeo: await this.analyzeTechnicalSeo($, url, statusCode, responseTime),
-      images: this.analyzeImages($),
-      links: await this.analyzeLinks($, url),
-      performance: this.analyzePerformance(html, responseTime),
-      socialMeta: this.analyzeSocialMeta($),
-      accessibility: this.analyzeAccessibility($)
+      pageContent,
+      technicalSeo,
+      images,
+      links,
+      performance,
+      socialMeta,
+      accessibility,
+      detailedFindings: this.generateDetailedFindings($, {
+        title: $('title').first().text().trim() || '',
+        metaDescription: $('meta[name="description"]').attr('content') || '',
+        h1Tags: this.extractHeadings($, 'h1'),
+        pageContent,
+        technicalSeo,
+        images,
+        links,
+        performance,
+        socialMeta,
+        accessibility
+      })
     };
 
     console.log(`[SEO-ANALYZER] Analysis completed in ${Date.now() - startTime}ms`);
@@ -122,8 +97,10 @@ export class SeoAnalyzer {
     const words = textContent.split(/\s+/).filter(word => word.length > 2);
     const wordCount = words.length;
     
-    // Simple readability score (Flesch Reading Ease approximation)
-    const sentences = textContent.split(/[.!?]+/).length;
+    // Count sentences and paragraphs
+    const sentences = textContent.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+    const paragraphs = $('p').length;
+    
     const avgWordsPerSentence = sentences > 0 ? wordCount / sentences : 0;
     const avgSyllablesPerWord = this.estimateAverageSyllables(words);
     const readabilityScore = Math.max(0, Math.min(100, 
@@ -136,7 +113,10 @@ export class SeoAnalyzer {
     return {
       wordCount,
       readabilityScore: Math.round(readabilityScore),
-      keywordDensity
+      keywordDensity,
+      sentences,
+      paragraphs,
+      avgWordsPerSentence: Math.round(avgWordsPerSentence * 10) / 10
     };
   }
 
@@ -234,6 +214,20 @@ export class SeoAnalyzer {
                                   $('[itemscope]').length > 0 ||
                                   $('meta[property^="og:"]').length > 0;
 
+    // Extract detailed technical information
+    const canonicalTag = $('link[rel="canonical"]').attr('href') || '';
+    const metaViewport = $('meta[name="viewport"]').attr('content') || '';
+    const charset = $('meta[charset]').attr('charset') || $('meta[http-equiv="Content-Type"]').attr('content') || '';
+    const doctype = $('html').get(0)?.type === 'tag' ? '<!DOCTYPE html>' : '';
+    const lang = $('html').attr('lang') || '';
+    
+    // Extract hreflang attributes
+    const hreflang: string[] = [];
+    $('link[rel="alternate"][hreflang]').each((_, el) => {
+      const hreflangValue = $(el).attr('hreflang');
+      if (hreflangValue) hreflang.push(hreflangValue);
+    });
+
     return {
       hasRobotsTxt,
       hasSitemap,
@@ -241,7 +235,14 @@ export class SeoAnalyzer {
       responseTime,
       statusCode,
       isResponsive: $('meta[name="viewport"]').length > 0,
-      hasValidStructuredData
+      hasValidStructuredData,
+      canonicalTag,
+      metaViewport,
+      charset,
+      doctype,
+      lang,
+      hreflang,
+      httpHeaders: {} // Would need to be populated from response headers
     };
   }
 
@@ -249,6 +250,8 @@ export class SeoAnalyzer {
     const images = $('img');
     let withAlt = 0;
     let oversized = 0;
+    let lazyLoaded = 0;
+    const formats: { [key: string]: number } = {};
 
     images.each((_, img) => {
       const $img = $(img);
@@ -256,10 +259,23 @@ export class SeoAnalyzer {
         withAlt++;
       }
 
-      // Check for potentially oversized images (basic heuristic)
-      const src = $img.attr('src');
-      if (src && (src.includes('2048') || src.includes('1920') || src.includes('4k'))) {
-        oversized++;
+      // Check for lazy loading
+      if ($img.attr('loading') === 'lazy' || $img.attr('data-src')) {
+        lazyLoaded++;
+      }
+
+      // Check image formats
+      const src = $img.attr('src') || $img.attr('data-src') || '';
+      if (src) {
+        const extension = src.split('.').pop()?.toLowerCase();
+        if (extension) {
+          formats[extension] = (formats[extension] || 0) + 1;
+        }
+
+        // Check for potentially oversized images
+        if (src.includes('2048') || src.includes('1920') || src.includes('4k')) {
+          oversized++;
+        }
       }
     });
 
@@ -267,7 +283,9 @@ export class SeoAnalyzer {
       total: images.length,
       withAlt,
       missingAlt: images.length - withAlt,
-      oversized
+      oversized,
+      formats,
+      lazyLoaded
     };
   }
 
@@ -276,18 +294,29 @@ export class SeoAnalyzer {
     let internal = 0;
     let external = 0;
     let broken = 0;
+    let nofollow = 0;
+    let dofollow = 0;
+    let redirectChains = 0;
 
     const parsedBaseUrl = new URL(baseUrl);
-    const checkedUrls = new Set<string>();
 
     links.each((_, link) => {
-      const href = $(link).attr('href');
+      const $link = $(link);
+      const href = $link.attr('href');
       if (!href) return;
 
       try {
         // Skip anchor links, mailto, tel, etc.
         if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) {
           return;
+        }
+
+        // Check rel attribute
+        const rel = $link.attr('rel') || '';
+        if (rel.includes('nofollow')) {
+          nofollow++;
+        } else {
+          dofollow++;
         }
 
         let linkUrl: URL;
@@ -308,7 +337,14 @@ export class SeoAnalyzer {
       }
     });
 
-    return { internal, external, broken };
+    return { 
+      internal, 
+      external, 
+      broken,
+      nofollow,
+      dofollow,
+      redirectChains // Would need additional HTTP requests to detect actual redirects
+    };
   }
 
   private analyzePerformance(html: string, responseTime: number) {
@@ -321,10 +357,20 @@ export class SeoAnalyzer {
     
     const requests = 1 + scriptMatches.length + styleMatches.length + imageMatches.length;
 
+    // Check for compression and minification
+    const compression = html.includes('Content-Encoding: gzip') || html.includes('Content-Encoding: br');
+    const minifiedCSS = styleMatches.some(match => match.includes('.min.css'));
+    const minifiedJS = scriptMatches.some(match => match.includes('.min.js'));
+    const cacheHeaders = html.includes('Cache-Control') || html.includes('Expires');
+
     return {
       loadTime: responseTime,
       pageSize: Math.round(pageSize / 1024), // KB
-      requests
+      requests,
+      compression,
+      minifiedCSS,
+      minifiedJS,
+      cacheHeaders
     };
   }
 
@@ -333,10 +379,32 @@ export class SeoAnalyzer {
     const hasTwitterCards = $('meta[name^="twitter:"]').length > 0;
     const hasFacebookMeta = $('meta[property^="fb:"]').length > 0;
 
+    // Extract Open Graph data
+    const openGraphData: { [key: string]: string } = {};
+    $('meta[property^="og:"]').each((_, el) => {
+      const property = $(el).attr('property');
+      const content = $(el).attr('content');
+      if (property && content) {
+        openGraphData[property] = content;
+      }
+    });
+
+    // Extract Twitter Card data
+    const twitterCardData: { [key: string]: string } = {};
+    $('meta[name^="twitter:"]').each((_, el) => {
+      const name = $(el).attr('name');
+      const content = $(el).attr('content');
+      if (name && content) {
+        twitterCardData[name] = content;
+      }
+    });
+
     return {
       hasOpenGraph,
       hasTwitterCards,
-      hasFacebookMeta
+      hasFacebookMeta,
+      openGraphData,
+      twitterCardData
     };
   }
 
@@ -346,6 +414,11 @@ export class SeoAnalyzer {
 
     // Check for missing alt attributes
     const imagesWithoutAlt = $('img:not([alt])').length;
+    const contrastIssues = 0; // Would need color analysis library for real detection
+    let missingLabels = 0;
+    const missingHeadings = $('h1').length === 0;
+    const skipLinks = $('a[href^="#"]:contains("skip")').length > 0;
+
     if (imagesWithoutAlt > 0) {
       issues.push(`${imagesWithoutAlt} images missing alt attributes`);
       score -= Math.min(30, imagesWithoutAlt * 3);
@@ -353,6 +426,7 @@ export class SeoAnalyzer {
 
     // Check for missing form labels
     const inputsWithoutLabels = $('input:not([type="hidden"]):not([aria-label]):not([aria-labelledby])').length;
+    missingLabels = inputsWithoutLabels;
     if (inputsWithoutLabels > 0) {
       issues.push(`${inputsWithoutLabels} form inputs without proper labels`);
       score -= Math.min(20, inputsWithoutLabels * 5);
@@ -364,6 +438,12 @@ export class SeoAnalyzer {
       score -= 10;
     }
 
+    // Check for heading structure
+    if (missingHeadings) {
+      issues.push('Missing H1 heading for proper document structure');
+      score -= 15;
+    }
+
     // Check for low contrast (basic check for common patterns)
     const lowContrastElements = $('*[style*="color:#ccc"], *[style*="color:lightgray"]').length;
     if (lowContrastElements > 0) {
@@ -373,7 +453,11 @@ export class SeoAnalyzer {
 
     return {
       score: Math.max(0, score),
-      issues
+      issues,
+      contrastIssues,
+      missingLabels,
+      missingHeadings,
+      skipLinks
     };
   }
 
@@ -508,5 +592,239 @@ export class SeoAnalyzer {
     }
 
     return recommendations.slice(0, 12); // Return top 12 recommendations
+  }
+
+  private generateDetailedFindings($: cheerio.CheerioAPI, analysisData: any): {
+    criticalIssues: DetailedFinding[];
+    warnings: DetailedFinding[];
+    recommendations: DetailedFinding[];
+    positiveFindings: DetailedFinding[];
+  } {
+    const criticalIssues: DetailedFinding[] = [];
+    const warnings: DetailedFinding[] = [];
+    const recommendations: DetailedFinding[] = [];
+    const positiveFindings: DetailedFinding[] = [];
+
+    // Critical Issues
+    if (!analysisData.technicalSeo.hasSSL) {
+      criticalIssues.push({
+        category: 'Security',
+        title: 'SSL Certificate Missing',
+        description: 'Your website is not using HTTPS, which poses security risks and negatively impacts SEO rankings.',
+        impact: 'critical',
+        technicalDetails: 'Website accessed via HTTP instead of HTTPS protocol',
+        recommendation: 'Install and configure an SSL certificate immediately',
+        howToFix: 'Contact your hosting provider to install an SSL certificate, or use services like Let\'s Encrypt for free SSL',
+        resources: ['https://letsencrypt.org/', 'https://developers.google.com/web/fundamentals/security/encrypt-in-transit/why-https']
+      });
+    }
+
+    if (!analysisData.title) {
+      criticalIssues.push({
+        category: 'On-Page SEO',
+        title: 'Missing Title Tag',
+        description: 'No title tag found on this page, which is essential for SEO and user experience.',
+        impact: 'critical',
+        technicalDetails: 'HTML <title> element is missing from document head',
+        recommendation: 'Add a descriptive, keyword-rich title tag',
+        howToFix: 'Add <title>Your Page Title</title> within the <head> section of your HTML',
+        resources: ['https://developers.google.com/search/docs/appearance/title-link']
+      });
+    }
+
+    if (analysisData.h1Tags.length === 0) {
+      criticalIssues.push({
+        category: 'Content Structure',
+        title: 'Missing H1 Heading',
+        description: 'No H1 heading found. H1 tags are crucial for content hierarchy and SEO.',
+        impact: 'critical',
+        technicalDetails: 'No <h1> elements detected in page content',
+        recommendation: 'Add one H1 heading that describes the main topic of the page',
+        howToFix: 'Add <h1>Main Page Heading</h1> to describe your page\'s primary topic',
+        resources: ['https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements']
+      });
+    }
+
+    // Warnings
+    if (!analysisData.metaDescription) {
+      warnings.push({
+        category: 'On-Page SEO',
+        title: 'Missing Meta Description',
+        description: 'No meta description found. This affects how your page appears in search results.',
+        impact: 'high',
+        technicalDetails: 'HTML meta description tag is missing',
+        recommendation: 'Add a compelling meta description (150-160 characters)',
+        howToFix: 'Add <meta name="description" content="Your page description"> in the head section',
+        resources: ['https://developers.google.com/search/docs/appearance/snippet']
+      });
+    }
+
+    if (analysisData.title && (analysisData.title.length < 30 || analysisData.title.length > 60)) {
+      warnings.push({
+        category: 'On-Page SEO',
+        title: 'Title Tag Length Issues',
+        description: `Title tag is ${analysisData.title.length} characters. Optimal length is 30-60 characters.`,
+        impact: 'medium',
+        technicalDetails: `Current title: "${analysisData.title.substring(0, 100)}..."`,
+        recommendation: 'Optimize title length to 30-60 characters for better display in search results',
+        howToFix: 'Rewrite your title to be concise yet descriptive within the recommended length',
+        resources: ['https://moz.com/learn/seo/title-tag']
+      });
+    }
+
+    if (analysisData.images.missingAlt > 0) {
+      warnings.push({
+        category: 'Accessibility',
+        title: 'Images Missing Alt Text',
+        description: `${analysisData.images.missingAlt} images are missing alt attributes, affecting accessibility and SEO.`,
+        impact: 'medium',
+        technicalDetails: `${analysisData.images.missingAlt} out of ${analysisData.images.total} images lack alt attributes`,
+        recommendation: 'Add descriptive alt text to all images',
+        howToFix: 'Add alt="descriptive text" attribute to each img tag',
+        resources: ['https://www.w3.org/WAI/tutorials/images/', 'https://developers.google.com/search/docs/appearance/google-images']
+      });
+    }
+
+    if (!analysisData.technicalSeo.hasRobotsTxt) {
+      warnings.push({
+        category: 'Technical SEO',
+        title: 'Missing Robots.txt File',
+        description: 'No robots.txt file found to guide search engine crawlers.',
+        impact: 'medium',
+        technicalDetails: 'HTTP request to /robots.txt returned 404 error',
+        recommendation: 'Create a robots.txt file to guide search engines',
+        howToFix: 'Create a robots.txt file in your website root directory',
+        resources: ['https://developers.google.com/search/docs/crawling-indexing/robots/intro']
+      });
+    }
+
+    if (!analysisData.technicalSeo.hasSitemap) {
+      warnings.push({
+        category: 'Technical SEO',
+        title: 'XML Sitemap Not Found',
+        description: 'No XML sitemap detected, which helps search engines discover your content.',
+        impact: 'medium',
+        technicalDetails: 'Common sitemap locations (/sitemap.xml, /sitemap_index.xml) returned 404',
+        recommendation: 'Generate and submit an XML sitemap',
+        howToFix: 'Create an XML sitemap and submit it to Google Search Console',
+        resources: ['https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview']
+      });
+    }
+
+    // Recommendations
+    if (!analysisData.technicalSeo.isResponsive) {
+      recommendations.push({
+        category: 'Mobile Optimization',
+        title: 'Add Mobile Viewport Meta Tag',
+        description: 'No viewport meta tag found, which may affect mobile user experience.',
+        impact: 'medium',
+        technicalDetails: 'Missing <meta name="viewport"> tag in document head',
+        recommendation: 'Add viewport meta tag for responsive design',
+        howToFix: 'Add <meta name="viewport" content="width=device-width, initial-scale=1"> to head section',
+        resources: ['https://developers.google.com/web/fundamentals/design-and-ux/responsive/']
+      });
+    }
+
+    if (!analysisData.socialMeta.hasOpenGraph) {
+      recommendations.push({
+        category: 'Social Media',
+        title: 'Add Open Graph Meta Tags',
+        description: 'No Open Graph tags found, limiting social media sharing optimization.',
+        impact: 'low',
+        technicalDetails: 'No og: prefixed meta property tags detected',
+        recommendation: 'Add Open Graph tags for better social sharing',
+        howToFix: 'Add og:title, og:description, og:image, and og:url meta tags',
+        resources: ['https://ogp.me/', 'https://developers.facebook.com/docs/sharing/webmasters/']
+      });
+    }
+
+    if (!analysisData.socialMeta.hasTwitterCards) {
+      recommendations.push({
+        category: 'Social Media',
+        title: 'Add Twitter Card Meta Tags',
+        description: 'No Twitter Card tags found, missing enhanced Twitter sharing.',
+        impact: 'low',
+        technicalDetails: 'No twitter: prefixed meta name tags detected',
+        recommendation: 'Add Twitter Card meta tags',
+        howToFix: 'Add twitter:card, twitter:title, twitter:description meta tags',
+        resources: ['https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards']
+      });
+    }
+
+    if (analysisData.pageContent.wordCount < 300) {
+      recommendations.push({
+        category: 'Content Quality',
+        title: 'Increase Content Length',
+        description: `Page has only ${analysisData.pageContent.wordCount} words. More content may improve SEO.`,
+        impact: 'medium',
+        technicalDetails: `Current word count: ${analysisData.pageContent.wordCount} words`,
+        recommendation: 'Aim for at least 300 words of quality content',
+        howToFix: 'Add more relevant, valuable content that serves your users\' needs',
+        resources: ['https://backlinko.com/content-study', 'https://blog.hubspot.com/marketing/how-long-should-blog-posts-be']
+      });
+    }
+
+    // Positive Findings
+    if (analysisData.technicalSeo.hasSSL) {
+      positiveFindings.push({
+        category: 'Security',
+        title: 'SSL Certificate Active',
+        description: 'Website properly uses HTTPS encryption for secure communication.',
+        impact: 'high',
+        technicalDetails: 'HTTPS protocol detected with valid SSL certificate',
+        recommendation: 'Maintain SSL certificate and monitor expiration dates'
+      });
+    }
+
+    if (analysisData.title && analysisData.title.length >= 30 && analysisData.title.length <= 60) {
+      positiveFindings.push({
+        category: 'On-Page SEO',
+        title: 'Optimal Title Tag Length',
+        description: `Title tag length (${analysisData.title.length} characters) is within optimal range.`,
+        impact: 'medium',
+        technicalDetails: `Title: "${analysisData.title}"`,
+        recommendation: 'Continue using well-optimized title tags'
+      });
+    }
+
+    if (analysisData.h1Tags.length === 1) {
+      positiveFindings.push({
+        category: 'Content Structure',
+        title: 'Proper H1 Usage',
+        description: 'Page has exactly one H1 heading, following SEO best practices.',
+        impact: 'medium',
+        technicalDetails: `H1 heading: "${analysisData.h1Tags[0]}"`,
+        recommendation: 'Maintain proper heading hierarchy with one H1 per page'
+      });
+    }
+
+    if (analysisData.images.missingAlt === 0 && analysisData.images.total > 0) {
+      positiveFindings.push({
+        category: 'Accessibility',
+        title: 'All Images Have Alt Text',
+        description: 'All images include alt attributes for better accessibility and SEO.',
+        impact: 'medium',
+        technicalDetails: `${analysisData.images.total} images all have alt attributes`,
+        recommendation: 'Continue providing descriptive alt text for new images'
+      });
+    }
+
+    if (analysisData.technicalSeo.responseTime < 2000) {
+      positiveFindings.push({
+        category: 'Performance',
+        title: 'Fast Server Response',
+        description: `Server responds quickly (${analysisData.technicalSeo.responseTime}ms), providing good user experience.`,
+        impact: 'medium',
+        technicalDetails: `Response time: ${analysisData.technicalSeo.responseTime}ms`,
+        recommendation: 'Monitor and maintain fast response times'
+      });
+    }
+
+    return {
+      criticalIssues,
+      warnings,
+      recommendations,
+      positiveFindings
+    };
   }
 }

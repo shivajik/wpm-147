@@ -77,13 +77,30 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
   const [showReportModal, setShowReportModal] = useState(false);
   const [loadingPdf, setLoadingPdf] = useState<number | null>(null);
 
-  // Fetch report history
-  const { data: reportHistory = [], isLoading } = useQuery({
-    queryKey: ['/api/seo-reports', websiteId, 'history'],
-    enabled: !!websiteId
+  // Fetch report history from API
+  const { data: reportHistory = [], isLoading, error } = useQuery<SeoReport[]>({
+    queryKey: ['/api/websites', websiteId, 'seo-reports'],
+    enabled: !!websiteId,
   });
 
-  const finalReports = reports && reports.length > 0 ? reports : reportHistory;
+  // Debug logging
+  console.log('ReportHistoryTable Debug:', {
+    websiteId,
+    reports,
+    reportHistory,
+    isLoading,
+    error,
+    reportsIsArray: Array.isArray(reports),
+    reportHistoryIsArray: Array.isArray(reportHistory)
+  });
+
+  // Use reports from props if available, otherwise use API data
+  // Add safety check to ensure we always have an array
+  const finalReports = Array.isArray(reports) && reports.length > 0 
+    ? reports 
+    : Array.isArray(reportHistory) 
+      ? reportHistory 
+      : [];
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -93,26 +110,10 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
 
   const getScoreTrend = (currentScore: number, previousScore?: number) => {
     if (!previousScore) return null;
-    
-    if (currentScore > previousScore) {
-      return {
-        icon: TrendingUp,
-        text: `+${currentScore - previousScore}`,
-        color: "text-green-600"
-      };
-    } else if (currentScore < previousScore) {
-      return {
-        icon: TrendingDown,
-        text: `${currentScore - previousScore}`,
-        color: "text-red-600"
-      };
-    } else {
-      return {
-        icon: Minus,
-        text: "No change",
-        color: "text-gray-600"
-      };
-    }
+    const diff = currentScore - previousScore;
+    if (diff > 0) return { icon: TrendingUp, color: "text-green-600", text: `+${diff}` };
+    if (diff < 0) return { icon: TrendingDown, color: "text-red-600", text: `${diff}` };
+    return { icon: Minus, color: "text-gray-500", text: "0" };
   };
 
   const handleViewReport = (report: SeoReport) => {
@@ -121,31 +122,38 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
   };
 
   const handleDownloadPDF = async (report: SeoReport) => {
-    setLoadingPdf(report.id);
     try {
-      const response = await apiCall(`/api/seo-reports/${report.id}/pdf`, {
-        method: 'POST',
-        responseType: 'blob'
-      });
+      setLoadingPdf(report.id);
       
-      const blob = new Blob([response], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `seo-report-${websiteName}-${new Date(report.generatedAt).toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
       toast({
-        title: "PDF Downloaded",
-        description: "SEO report has been downloaded successfully.",
+        title: "PDF Generation Started",
+        description: `Generating PDF for report from ${new Date(report.generatedAt).toLocaleDateString()}`,
       });
+
+      const result = await apiCall(`/api/websites/${websiteId}/seo-reports/${report.id}/pdf`, {
+        method: 'POST',
+      });
+
+      if (result.success) {
+        // Create a download link
+        const link = document.createElement('a');
+        link.href = result.downloadUrl;
+        link.download = result.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "PDF Ready",
+          description: "Your SEO report has been downloaded successfully",
+        });
+      } else {
+        throw new Error(result.message || "PDF generation failed");
+      }
     } catch (error: any) {
       toast({
         title: "Download Failed",
-        description: error.message || "Failed to download PDF. Please try again.",
+        description: error.message || "Unable to generate PDF. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -155,16 +163,17 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
 
   const handleShareReport = async (report: SeoReport) => {
     try {
-      const response = await apiCall(`/api/seo-reports/${report.id}/share`, {
-        method: 'POST'
-      });
+      const result = await apiCall(`/api/websites/${websiteId}/seo-reports/${report.id}/share`);
       
-      if (response.shareUrl) {
-        await navigator.clipboard.writeText(response.shareUrl);
+      if (result.success) {
+        await navigator.clipboard.writeText(result.shareUrl);
+        
         toast({
-          title: "Share Link Copied",
-          description: "The report share link has been copied to your clipboard.",
+          title: "Link Copied",
+          description: "Shareable report link has been copied to clipboard",
         });
+      } else {
+        throw new Error(result.message || "Failed to generate share link");
       }
     } catch (error: any) {
       toast({
@@ -400,6 +409,121 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
                 />
               </TabsContent>
             </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+                  </p>
+                </div>
+                <div className={`text-4xl font-bold ${getScoreColor(selectedReport.overallScore)}`}>
+                  {selectedReport.overallScore}
+                </div>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {selectedReport.metrics.technicalSeo}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Technical SEO</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    {selectedReport.metrics.contentQuality}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Content Quality</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {selectedReport.metrics.userExperience}
+                  </div>
+                  <p className="text-sm text-muted-foreground">User Experience</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {selectedReport.metrics.mobileOptimization}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Mobile Optimization</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {selectedReport.metrics.siteSpeed}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Site Speed</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-red-600">
+                    {selectedReport.metrics.security}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Security</p>
+                </div>
+              </div>
+
+              {/* Issues Summary */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 border rounded-lg border-red-200 bg-red-50">
+                  <div className="text-2xl font-bold text-red-600">
+                    {selectedReport.issues.critical}
+                  </div>
+                  <p className="text-sm text-red-600">Critical Issues</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg border-yellow-200 bg-yellow-50">
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {selectedReport.issues.warnings}
+                  </div>
+                  <p className="text-sm text-yellow-600">Warnings</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg border-blue-200 bg-blue-50">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {selectedReport.issues.suggestions}
+                  </div>
+                  <p className="text-sm text-blue-600">Suggestions</p>
+                </div>
+              </div>
+
+              {/* Recommendations */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3">Key Recommendations</h4>
+                <div className="space-y-2">
+                  {Array.isArray(selectedReport.recommendations) && selectedReport.recommendations.length > 0 ? 
+                    selectedReport.recommendations.map((rec, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-slate-50 rounded">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">{rec}</span>
+                      </div>
+                    )) : (
+                      <div className="text-sm text-muted-foreground">No recommendations available</div>
+                    )
+                  }
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => handleDownloadPDF(selectedReport)}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleShareReport(selectedReport)}
+                  className="flex items-center gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share Report
+                </Button>
+                <Button onClick={() => setShowReportModal(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

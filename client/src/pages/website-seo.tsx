@@ -32,6 +32,7 @@ import { SeoAnalysisProgress } from "@/components/seo/seo-analysis-progress";
 import { ReportHistoryTable } from "@/components/seo/report-history-table";
 import { DetailedSeoReport } from "@/components/seo/detailed-seo-report";
 import { ProfessionalSeoReport } from "@/components/seo/professional-seo-report";
+import { ComprehensiveSeoReport } from "@/components/seo/comprehensive-seo-report";
 
 export default function WebsiteSEO() {
   const params = useParams();

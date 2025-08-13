@@ -982,3 +982,95 @@ export interface UpdateResponse {
   version?: string;
   error?: string;
 }
+
+// SEO Analysis Types
+export interface DetailedFinding {
+  category: string;
+  title: string;
+  description: string;
+  impact: 'critical' | 'high' | 'medium' | 'low';
+  technicalDetails: string;
+  recommendation: string;
+  howToFix?: string;
+  resources?: string[];
+}
+
+export interface SeoAnalysisResult {
+  url: string;
+  domain?: string;
+  title: string;
+  metaDescription: string;
+  h1Tags: string[];
+  h2Tags: string[];
+  h3Tags: string[];
+  pageContent: {
+    wordCount: number;
+    readabilityScore: number;
+    keywordDensity: { [keyword: string]: number };
+    sentences?: number;
+    paragraphs?: number;
+    avgWordsPerSentence?: number;
+  };
+  technicalSeo: {
+    hasSSL: boolean;
+    hasRobotsTxt: boolean;
+    hasSitemap: boolean;
+    isResponsive: boolean;
+    hasValidStructuredData: boolean;
+    statusCode: number;
+    responseTime: number;
+    canonicalTag?: string;
+    metaViewport?: string;
+    charset?: string;
+    doctype?: string;
+    lang?: string;
+    hreflang?: string[];
+    httpHeaders?: { [key: string]: string };
+  };
+  images: {
+    total: number;
+    withAlt: number;
+    missingAlt: number;
+    oversized: number;
+    formats: { [format: string]: number };
+    lazyLoaded: number;
+  };
+  links: {
+    internal: number;
+    external: number;
+    broken: number;
+    nofollow: number;
+    dofollow: number;
+    redirectChains: number;
+  };
+  performance: {
+    loadTime: number;
+    pageSize: number;
+    requests: number;
+    compression: boolean;
+    minifiedCSS: boolean;
+    minifiedJS: boolean;
+    cacheHeaders: boolean;
+  };
+  socialMeta: {
+    hasOpenGraph: boolean;
+    hasTwitterCards: boolean;
+    hasFacebookMeta: boolean;
+    openGraphData: { [key: string]: string };
+    twitterCardData: { [key: string]: string };
+  };
+  accessibility: {
+    score: number;
+    issues: string[];
+    contrastIssues: number;
+    missingLabels: number;
+    missingHeadings: boolean;
+    skipLinks: boolean;
+  };
+  detailedFindings?: {
+    criticalIssues: DetailedFinding[];
+    warnings: DetailedFinding[];
+    recommendations: DetailedFinding[];
+    positiveFindings: DetailedFinding[];
+  };
+}
