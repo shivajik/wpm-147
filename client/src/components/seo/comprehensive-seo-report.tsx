@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   CheckCircle,
   XCircle,
@@ -481,21 +482,27 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </div>
             </div>
 
-            {/* Detailed Heading List */}
-            {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
-              headings.length > 0 && (
-                <div key={tag} className="mt-6">
-                  <h4 className="font-semibold mb-2 capitalize">{tag} Tags ({headings.length})</h4>
-                  <div className="space-y-1 max-h-40 overflow-y-auto">
-                    {headings.map((heading: any, index: number) => (
-                      <div key={index} className="text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                        {heading.text}
+            {/* Detailed Heading List with Accordion */}
+            <Accordion type="multiple" className="mt-6">
+              {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
+                headings.length > 0 && (
+                  <AccordionItem key={tag} value={tag}>
+                    <AccordionTrigger className="text-left">
+                      <span className="font-semibold capitalize">{tag} Tags ({headings.length})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {headings.map((heading: any, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded-md border-l-2 border-gray-200 dark:border-gray-600">
+                            {heading.text}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )
-            )}
+                    </AccordionContent>
+                  </AccordionItem>
+                )
+              )}
+            </Accordion>
           </CardContent>
         </Card>
       )}
@@ -528,28 +535,40 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold mb-3">Top Keywords</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {technicalData.contentKeywords.topKeywords?.slice(0, 10).map((keyword: any, index: number) => (
-                    <div key={index} className="text-sm flex justify-between">
-                      <span>{keyword.keyword}</span>
-                      <span className="text-muted-foreground">{keyword.density}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Common Phrases</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {technicalData.contentKeywords.keywordPhrases2?.slice(0, 8).map((phrase: any, index: number) => (
-                    <div key={index} className="text-sm flex justify-between">
-                      <span className="truncate">{phrase.phrase}</span>
-                      <span className="text-muted-foreground">{phrase.count}x</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="col-span-2">
+                <Accordion type="multiple" className="w-full">
+                  <AccordionItem value="keywords">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Top Keywords ({technicalData.contentKeywords.topKeywords?.length || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {technicalData.contentKeywords.topKeywords?.slice(0, 15).map((keyword: any, index: number) => (
+                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                            <span>{keyword.keyword}</span>
+                            <Badge variant="outline">{keyword.density}%</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="phrases">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Common Phrases ({technicalData.contentKeywords.keywordPhrases2?.length || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {technicalData.contentKeywords.keywordPhrases2?.slice(0, 12).map((phrase: any, index: number) => (
+                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                            <span className="truncate">{phrase.phrase}</span>
+                            <Badge variant="outline">{phrase.count}x</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </div>
           </CardContent>
@@ -708,15 +727,23 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               </div>
 
               <div>
-                <h4 className="font-semibold mb-3">Top Image Keywords</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {technicalData.imageKeywords.topImageKeywords?.slice(0, 8).map((keyword: any, index: number) => (
-                    <div key={index} className="text-sm flex justify-between">
-                      <span>{keyword.keyword}</span>
-                      <span className="text-muted-foreground">{keyword.count}x</span>
-                    </div>
-                  ))}
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="image-keywords">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Top Image Keywords ({technicalData.imageKeywords.topImageKeywords?.length || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {technicalData.imageKeywords.topImageKeywords?.slice(0, 12).map((keyword: any, index: number) => (
+                          <div key={index} className="text-sm flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                            <span>{keyword.keyword}</span>
+                            <Badge variant="outline">{keyword.count}x</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </div>
           </CardContent>
@@ -751,28 +778,40 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold mb-3">SEO Meta Tags</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
-                    <div key={index} className="text-sm">
-                      <span className="font-medium">{tag.name}:</span>
-                      <span className="text-muted-foreground ml-1 truncate">{tag.content?.substring(0, 30)}...</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-3">Social Meta Tags</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
-                    <div key={index} className="text-sm">
-                      <span className="font-medium">{tag.property || tag.name}:</span>
-                      <span className="text-muted-foreground ml-1 truncate">{tag.content?.substring(0, 25)}...</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="col-span-2">
+                <Accordion type="multiple" className="w-full">
+                  <AccordionItem value="seo-meta">
+                    <AccordionTrigger>
+                      <span className="font-semibold">SEO Meta Tags ({technicalData.metaTagsAnalysis.seoMetaTags?.length || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-blue-200 dark:border-blue-600">
+                            <div className="font-medium text-blue-700 dark:text-blue-300">{tag.name}</div>
+                            <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="social-meta">
+                    <AccordionTrigger>
+                      <span className="font-semibold">Social Meta Tags ({technicalData.metaTagsAnalysis.socialMetaTags?.length || 0})</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-gray-50 dark:bg-gray-800 rounded border-l-2 border-green-200 dark:border-green-600">
+                            <div className="font-medium text-green-700 dark:text-green-300">{tag.property || tag.name}</div>
+                            <div className="text-muted-foreground text-xs mt-1 break-words">{tag.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </div>
           </CardContent>
