@@ -30,6 +30,7 @@ import { apiCall } from '@/lib/queryClient';
 import { useState } from "react";
 import { SeoAnalysisProgress } from "@/components/seo/seo-analysis-progress";
 import { ReportHistoryTable } from "@/components/seo/report-history-table";
+import { DetailedSeoReport } from "@/components/seo/detailed-seo-report";
 
 export default function WebsiteSEO() {
   const params = useParams();
@@ -43,6 +44,15 @@ export default function WebsiteSEO() {
     queryKey: ['/api/websites', websiteId],
     enabled: !!websiteId,
   });
+
+  // Fetch real SEO reports
+  const { data: seoReports, isLoading: reportsLoading, refetch: refetchReports } = useQuery<any[]>({
+    queryKey: ['/api/websites', websiteId, 'seo-reports'],
+    enabled: !!websiteId,
+  });
+
+  // Get the latest report if available
+  const realLatestReport = seoReports && Array.isArray(seoReports) && seoReports.length > 0 ? seoReports[0] : null;
 
   // Mock SEO data - in real implementation this would come from actual SEO analysis
   const seoData = {
@@ -82,8 +92,63 @@ export default function WebsiteSEO() {
     }
   };
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
+    setIsRunningAnalysis(true);
     setShowProgressModal(true);
+    
+    try {
+      const response = await apiCall('POST', `/api/websites/${websiteId}/seo-analysis`);
+      
+      // Poll for completion - the analysis runs asynchronously 
+      const pollInterval = setInterval(async () => {
+        try {
+          await refetchReports();
+          const updatedReports = await refetchReports();
+          if (updatedReports.data && updatedReports.data.length > 0) {
+            const latestReport = updatedReports.data[0];
+            if (latestReport.scanStatus === 'completed') {
+              clearInterval(pollInterval);
+              setIsRunningAnalysis(false);
+              setLatestReport(latestReport);
+              
+              toast({
+                title: "SEO Analysis Completed",
+                description: `Analysis completed with an overall score of ${latestReport.overallScore}/100`,
+              });
+              
+              setTimeout(() => {
+                setShowProgressModal(false);
+              }, 2000);
+            }
+          }
+        } catch (error) {
+          console.error('Error polling for analysis completion:', error);
+        }
+      }, 3000);
+
+      // Set timeout to stop polling after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (isRunningAnalysis) {
+          setIsRunningAnalysis(false);
+          setShowProgressModal(false);
+          toast({
+            title: "Analysis Taking Longer",
+            description: "The analysis is still running. Please check back in a few minutes.",
+            variant: "default"
+          });
+        }
+      }, 300000);
+      
+    } catch (error) {
+      setIsRunningAnalysis(false);
+      setShowProgressModal(false);
+      toast({
+        title: "Analysis Failed", 
+        description: "Failed to start SEO analysis. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAnalysisComplete = (report: any) => {
@@ -92,7 +157,6 @@ export default function WebsiteSEO() {
       title: "SEO Analysis Completed",
       description: `Analysis completed with an overall score of ${report.overallScore}`,
     });
-    // Auto-close modal after a short delay to show completion
     setTimeout(() => {
       setShowProgressModal(false);
     }, 2000);
@@ -100,6 +164,7 @@ export default function WebsiteSEO() {
 
   const handleModalClose = () => {
     setShowProgressModal(false);
+    setIsRunningAnalysis(false);
   };
 
   if (isLoading) {
@@ -183,6 +248,51 @@ export default function WebsiteSEO() {
               New SEO Analysis
             </Button>
           </div>
+
+          {/* Comprehensive SEO Report - Show if real analysis is available */}
+          {realLatestReport && realLatestReport.scanStatus === 'completed' && (
+            <div className="mb-8">
+              <DetailedSeoReport
+                report={{
+                  id: realLatestReport.id,
+                  generatedAt: realLatestReport.generatedAt,
+                  overallScore: realLatestReport.overallScore,
+                  metrics: {
+                    technicalSeo: realLatestReport.technicalScore || 0,
+                    contentQuality: realLatestReport.contentScore || 0,
+                    userExperience: realLatestReport.userExperienceScore || 0,
+                    mobileOptimization: realLatestReport.technicalScore || 85,
+                    siteSpeed: realLatestReport.userExperienceScore || 75,
+                    security: realLatestReport.backlinksScore || 70
+                  },
+                  issues: {
+                    critical: realLatestReport.criticalIssues || 0,
+                    warnings: realLatestReport.warnings || 0,
+                    suggestions: realLatestReport.notices || 0
+                  },
+                  recommendations: realLatestReport.recommendations || [],
+                  technicalFindings: realLatestReport.reportData ? {
+                    pagespeed: {
+                      desktop: Math.round(100 - (realLatestReport.reportData.performance?.loadTime / 50)) || 75,
+                      mobile: realLatestReport.reportData.technicalSeo?.isResponsive ? 85 : 40
+                    },
+                    sslEnabled: realLatestReport.reportData.technicalSeo?.hasSSL || false,
+                    metaTags: {
+                      missingTitle: realLatestReport.reportData.title ? 0 : 1,
+                      missingDescription: realLatestReport.reportData.metaDescription ? 0 : 1,
+                      duplicateTitle: 0
+                    },
+                    headingStructure: {
+                      missingH1: realLatestReport.reportData.h1Tags?.length === 0 ? 1 : 0,
+                      improperHierarchy: realLatestReport.reportData.h1Tags?.length > 1 ? 1 : 0
+                    }
+                  } : undefined
+                }}
+                websiteName={website.name}
+                websiteUrl={website.url}
+              />
+            </div>
+          )}
 
           {/* SEO Score Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
