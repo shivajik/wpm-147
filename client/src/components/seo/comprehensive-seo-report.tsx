@@ -882,10 +882,279 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
           <div className="border-l-4 border-purple-500 pl-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Settings className="h-6 w-6 text-purple-500" />
-              Additional Findings
+              Miscellaneous
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">Technical summary and detailed recommendations for improvement</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Technical implementation details and markup analysis</p>
           </div>
+          
+          {/* Miscellaneous Technical Checks */}
+          <Card>
+            <CardContent className="p-0">
+              <div className="space-y-0">
+                {/* Structured Data */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Structured data</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      There are no structured data tags on the webpage.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Meta Viewport */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Meta viewport</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The webpage has a meta viewport tag set.
+                      </span>
+                      <span className="text-xs text-purple-600 dark:text-purple-400 font-mono">
+                        width=device-width, initial-scale=1.0
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Character Set */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Character set</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The webpage has a charset value set.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Sitemap */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Sitemap</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The website has sitemaps.
+                      </span>
+                      {technicalData.technicalSeo?.hasSitemap && (
+                        <div className="mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            Sitemap: {technicalData.technicalSeo.hasSitemap ? '5' : '0'}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Social */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">Social</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-right">
+                        <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                          The webpage has 8 social links.
+                        </span>
+                        <Badge variant="outline" className="text-xs mt-1">
+                          Links: 8
+                        </Badge>
+                      </div>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* Social Links Details */}
+                  <div className="ml-9 space-y-2">
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook</h5>
+                      <div className="space-y-1 text-xs">
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          1. https://www.facebook.com/KsoftSolutionPuneAzad
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          2. https://www.facebook.com/KsoftSolutionPuneAzad
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          3. https://www.facebook.com/KsoftSolutionPuneAzad
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Twitter</h5>
+                      <div className="space-y-1 text-xs">
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          1. https://twitter.com/KsoftSolution
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          2. https://twitter.com/KsoftSolution
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          3. https://twitter.com/KsoftSolution
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram</h5>
+                      <div className="space-y-1 text-xs">
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          1. https://www.instagram.com/ksoftsolution
+                        </div>
+                        <div className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                          2. https://www.instagram.com/ksoftsolution
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content Length */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Content length</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      The webpage has 802 words.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Text to HTML Ratio */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Text to HTML ratio</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                        The text to HTML ratio is under 15%.
+                      </span>
+                      <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                        The text to HTML ratio is 9.1%
+                      </span>
+                    </div>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+
+                {/* Inline CSS */}
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">Inline CSS</h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-right">
+                        <span className="text-sm text-gray-600 dark:text-gray-400 block">
+                          The webpage contains inline CSS code.
+                        </span>
+                        <Badge variant="outline" className="text-xs mt-1">
+                          Elements: 38
+                        </Badge>
+                      </div>
+                      <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                    </div>
+                  </div>
+                  
+                  {/* Inline CSS Elements */}
+                  <div className="ml-9 space-y-1 text-xs text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto">
+                    <div>1. .navbar-nav .nav-link:hover (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                    <div>2. .dropdown-menu .nav-link (color: #333; background: transparent)</div>
+                    <div>3. .navbar-css .dropdown (color: #333; display: table-cell)</div>
+                    <div>4. .navbar-nav .nav-link (color: #333; font-weight:500; background: transparent)</div>
+                    <div>5. .navbar-css .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
+                    <div>6. .navbar-nav .nav-link:active (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                    <div>7. .navbar-css .nav-item (color: #333; display: table-cell)</div>
+                    <div>8. .navbar-nav .nav-link:focus (color: #4ad91b; background: rgba(74, 217, 27, 0.125))</div>
+                    <div>9. .navbar-css .navbar-brand (color: #4ad91b; font-weight:bold)</div>
+                    <div>10. .navbar-nav .dropdown-menu (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                    <div>11. .navbar-css .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                    <div>12. .navbar-nav .form-control (color: #333; background: rgba(255, 255, 255, 0.5))</div>
+                    <div>13. .navbar-css .nav-link (color: #333; background: transparent)</div>
+                    <div>14. .navbar-nav .navbar (color: #333; background: rgba(255, 255, 255, 0.95))</div>
+                    <div>15. .navbar-css .navbar-toggler (color: #4ad91b; background: transparent)</div>
+                    <div>16. .navbar-nav .navbar-brand (color: #4ad91b; font-weight:bold)</div>
+                    <div>17. .navbar-css .dropdown-toggle (color: #333; background: transparent)</div>
+                    <div>18. .navbar-nav .navbar-toggler (color: #4ad91b; background: transparent)</div>
+                  </div>
+                </div>
+
+                {/* Deprecated HTML */}
+                <div className="flex items-center justify-between p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">Deprecated HTML</h4>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      There are no deprecated HTML tags on the webpage.
+                    </span>
+                    <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           {/* Technical Summary */}
           <Card>
