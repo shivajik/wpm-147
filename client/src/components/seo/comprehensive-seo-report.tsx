@@ -433,6 +433,413 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
           </div>
         </CardContent>
       </Card>
+
+      {/* Enhanced Detailed Analysis Sections */}
+      {technicalData.headingAnalysis && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Heading Structure Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Heading Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Headings:</span>
+                    <Badge variant="outline">{technicalData.headingAnalysis.totalHeadings}</Badge>
+                  </div>
+                  {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => (
+                    <div key={tag} className="flex justify-between">
+                      <span>{tag.toUpperCase()}:</span>
+                      <Badge variant="outline">{headings.length}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-3">Hierarchy Issues</h4>
+                {technicalData.headingAnalysis.hierarchy?.issues?.length > 0 ? (
+                  <div className="space-y-2">
+                    {technicalData.headingAnalysis.hierarchy.issues.map((issue: string, index: number) => (
+                      <div key={index} className="text-sm text-red-600 flex items-center gap-2">
+                        <XCircle className="h-4 w-4" />
+                        {issue}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-green-600 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    No hierarchy issues detected
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Detailed Heading List */}
+            {Object.entries(technicalData.headingAnalysis.structure || {}).map(([tag, headings]: [string, any]) => 
+              headings.length > 0 && (
+                <div key={tag} className="mt-6">
+                  <h4 className="font-semibold mb-2 capitalize">{tag} Tags ({headings.length})</h4>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {headings.map((heading: any, index: number) => (
+                      <div key={index} className="text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                        {heading.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.contentKeywords && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Content Keywords Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Content Statistics</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Words:</span>
+                    <Badge variant="outline">{technicalData.contentKeywords.totalWords}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Unique Words:</span>
+                    <Badge variant="outline">{technicalData.contentKeywords.uniqueWords}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Avg Word Length:</span>
+                    <Badge variant="outline">{Math.round(technicalData.contentKeywords.avgWordLength || 0)}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Top Keywords</h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {technicalData.contentKeywords.topKeywords?.slice(0, 10).map((keyword: any, index: number) => (
+                    <div key={index} className="text-sm flex justify-between">
+                      <span>{keyword.keyword}</span>
+                      <span className="text-muted-foreground">{keyword.density}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Common Phrases</h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {technicalData.contentKeywords.keywordPhrases2?.slice(0, 8).map((phrase: any, index: number) => (
+                    <div key={index} className="text-sm flex justify-between">
+                      <span className="truncate">{phrase.phrase}</span>
+                      <span className="text-muted-foreground">{phrase.count}x</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.httpRequests && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              HTTP Requests Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Request Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Requests:</span>
+                    <Badge variant="outline">{technicalData.httpRequests.totalRequests}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>External:</span>
+                    <Badge variant="outline">{technicalData.httpRequests.externalRequests}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Internal:</span>
+                    <Badge variant="outline">{technicalData.httpRequests.internalRequests}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Request Types</h4>
+                <div className="space-y-2">
+                  {Object.entries(technicalData.httpRequests.requestsByType || {}).map(([type, count]: [string, any]) => (
+                    <div key={type} className="flex justify-between">
+                      <span className="capitalize">{type}:</span>
+                      <Badge variant="outline">{count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.javascriptAnalysis && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Code className="h-5 w-5" />
+              JavaScript Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Script Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Scripts:</span>
+                    <Badge variant="outline">{technicalData.javascriptAnalysis.totalScripts}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>External:</span>
+                    <Badge variant="outline">{technicalData.javascriptAnalysis.externalScripts}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Inline:</span>
+                    <Badge variant="outline">{technicalData.javascriptAnalysis.inlineScripts}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Loading Optimization</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Async:</span>
+                    <Badge variant="outline">{technicalData.javascriptAnalysis.asyncScripts}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Defer:</span>
+                    <Badge variant="outline">{technicalData.javascriptAnalysis.deferScripts}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Blocking:</span>
+                    <Badge variant={technicalData.javascriptAnalysis.blockingScripts > 3 ? "destructive" : "outline"}>
+                      {technicalData.javascriptAnalysis.blockingScripts}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Issues</h4>
+                {technicalData.javascriptAnalysis.optimizationIssues?.length > 0 ? (
+                  <div className="space-y-1">
+                    {technicalData.javascriptAnalysis.optimizationIssues.map((issue: string, index: number) => (
+                      <div key={index} className="text-sm text-orange-600 flex items-center gap-2">
+                        <AlertTriangle className="h-3 w-3" />
+                        {issue}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-green-600 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    No optimization issues
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.imageKeywords && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5" />
+              Image Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Image Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Images:</span>
+                    <Badge variant="outline">{technicalData.imageKeywords.totalImages}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>With Keywords:</span>
+                    <Badge variant="outline">{technicalData.imageKeywords.imagesWithKeywords}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Image Formats</h4>
+                <div className="space-y-1">
+                  {Object.entries(technicalData.imageKeywords.imageFormats || {}).map(([format, count]: [string, any]) => (
+                    <div key={format} className="text-sm flex justify-between">
+                      <span className="uppercase">{format}:</span>
+                      <Badge variant="outline">{count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Top Image Keywords</h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {technicalData.imageKeywords.topImageKeywords?.slice(0, 8).map((keyword: any, index: number) => (
+                    <div key={index} className="text-sm flex justify-between">
+                      <span>{keyword.keyword}</span>
+                      <span className="text-muted-foreground">{keyword.count}x</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.metaTagsAnalysis && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Meta Tags Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Meta Tag Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total Meta Tags:</span>
+                    <Badge variant="outline">{technicalData.metaTagsAnalysis.totalMetaTags}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>SEO Tags:</span>
+                    <Badge variant="outline">{technicalData.metaTagsAnalysis.seoMetaTags?.length || 0}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Social Tags:</span>
+                    <Badge variant="outline">{technicalData.metaTagsAnalysis.socialMetaTags?.length || 0}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">SEO Meta Tags</h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {technicalData.metaTagsAnalysis.seoMetaTags?.map((tag: any, index: number) => (
+                    <div key={index} className="text-sm">
+                      <span className="font-medium">{tag.name}:</span>
+                      <span className="text-muted-foreground ml-1 truncate">{tag.content?.substring(0, 30)}...</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Social Meta Tags</h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {technicalData.metaTagsAnalysis.socialMetaTags?.map((tag: any, index: number) => (
+                    <div key={index} className="text-sm">
+                      <span className="font-medium">{tag.property || tag.name}:</span>
+                      <span className="text-muted-foreground ml-1 truncate">{tag.content?.substring(0, 25)}...</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {technicalData.securityHeaders && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Security Headers Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Security Score</h4>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`text-3xl font-bold ${getScoreColor(technicalData.securityHeaders.securityScore)}`}>
+                    {technicalData.securityHeaders.securityScore}/100
+                  </div>
+                  <Progress value={technicalData.securityHeaders.securityScore} className="flex-1 h-3" />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Security Headers</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>HTTPS:</span>
+                    {technicalData.securityHeaders.hasHTTPS ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>HSTS:</span>
+                    {technicalData.securityHeaders.hasHSTS ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>CSP:</span>
+                    {technicalData.securityHeaders.hasCSP ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>X-Frame-Options:</span>
+                    {technicalData.securityHeaders.hasXFrameOptions ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

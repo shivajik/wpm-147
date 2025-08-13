@@ -1073,4 +1073,149 @@ export interface SeoAnalysisResult {
     recommendations: DetailedFinding[];
     positiveFindings: DetailedFinding[];
   };
+  
+  // Enhanced detailed analysis sections
+  headingAnalysis?: {
+    structure: { [key: string]: Array<{ text: string; order: number }> };
+    totalHeadings: number;
+    h1Count: number;
+    h2Count: number;
+    h3Count: number;
+    h4Count: number;
+    h5Count: number;
+    h6Count: number;
+    hierarchy: { issues: string[]; warnings: string[] };
+  };
+  
+  contentKeywords?: {
+    totalWords: number;
+    uniqueWords: number;
+    topKeywords: Array<{ keyword: string; count: number; density: number }>;
+    keywordPhrases2: Array<{ phrase: string; count: number }>;
+    keywordPhrases3: Array<{ phrase: string; count: number }>;
+    avgWordLength: number;
+  };
+  
+  httpRequests?: {
+    totalRequests: number;
+    requestsByType: { [key: string]: number };
+    externalRequests: number;
+    internalRequests: number;
+    requests: Array<{
+      type: string;
+      url: string;
+      isExternal: boolean;
+      hasAsync?: boolean;
+      hasDefer?: boolean;
+    }>;
+  };
+  
+  javascriptAnalysis?: {
+    totalScripts: number;
+    externalScripts: number;
+    inlineScripts: number;
+    asyncScripts: number;
+    deferScripts: number;
+    blockingScripts: number;
+    optimizationIssues: string[];
+    scripts: Array<{
+      type: 'inline' | 'external';
+      src?: string;
+      size?: number;
+      hasAsync: boolean;
+      hasDefer: boolean;
+      hasType?: string;
+    }>;
+  };
+  
+  cssAnalysis?: {
+    totalStylesheets: number;
+    externalStylesheets: number;
+    inlineStyles: number;
+    minifiedStylesheets: number;
+    optimizationIssues: string[];
+    stylesheets: Array<{
+      type: 'external' | 'inline';
+      href?: string;
+      size?: number;
+      media?: string;
+      isMinified?: boolean;
+    }>;
+  };
+  
+  metaTagsAnalysis?: {
+    totalMetaTags: number;
+    seoMetaTags: Array<{
+      name?: string;
+      property?: string;
+      httpEquiv?: string;
+      content?: string;
+      charset?: string;
+    }>;
+    socialMetaTags: Array<{
+      name?: string;
+      property?: string;
+      httpEquiv?: string;
+      content?: string;
+      charset?: string;
+    }>;
+    viewportTags: Array<{
+      name?: string;
+      property?: string;
+      httpEquiv?: string;
+      content?: string;
+      charset?: string;
+    }>;
+    allMetaTags: Array<{
+      name?: string;
+      property?: string;
+      httpEquiv?: string;
+      content?: string;
+      charset?: string;
+    }>;
+  };
+  
+  structuralData?: {
+    hasStructuredData: boolean;
+    jsonLdCount: number;
+    microdataCount: number;
+    structuredData: Array<{
+      type: string;
+      schema: string;
+      content: any;
+    }>;
+    microdata: Array<{
+      type: string;
+      itemType: string;
+      itemScope: boolean;
+    }>;
+  };
+  
+  imageKeywords?: {
+    totalImages: number;
+    imagesWithKeywords: number;
+    topImageKeywords: Array<{ keyword: string; count: number }>;
+    imageFormats: { [format: string]: number };
+  };
+  
+  loadingAnalysis?: {
+    lazyLoadedImages: number;
+    totalImages: number;
+    lazyLoadingPercentage: number;
+    preloadLinks: number;
+    prefetchLinks: number;
+    dnsPreconnects: number;
+    optimizations: string[];
+  };
+  
+  securityHeaders?: {
+    hasHTTPS: boolean;
+    hasHSTS: boolean;
+    hasCSP: boolean;
+    hasXFrameOptions: boolean;
+    hasXContentTypeOptions: boolean;
+    hasReferrerPolicy: boolean;
+    securityScore: number;
+    error?: string;
+  };
 }
