@@ -30,6 +30,7 @@ import WebsitePerformance from "@/pages/website-performance";
 import Subscription from "@/pages/subscription";
 import SubscriptionPreview from "@/pages/subscription-preview";
 import ViewReport from "@/pages/view-report";
+import SeoReportPage from "@/pages/seo-report";
 
 // Lazy load heavy components for performance
 import { 
@@ -115,6 +116,7 @@ function Router() {
           <Route path="/websites/:id/performance" component={WebsitePerformance} />
           <Route path="/websites/:id/backup" component={() => <Suspense fallback={<PageSkeleton />}><LazyWebsiteBackup /></Suspense>} />
           <Route path="/websites/:id/seo" component={() => <Suspense fallback={<PageSkeleton />}><LazyWebsiteSEO /></Suspense>} />
+          <Route path="/seo-report/:id" component={SeoReportPage} />
           <Route path="/websites/:id/link-monitor" component={() => <Suspense fallback={<PageSkeleton />}><LazyLinkMonitor /></Suspense>} />
           <Route path="/tasks" component={Tasks} />
           <Route path="/reports" component={() => <Suspense fallback={<PageSkeleton />}><LazyClientReports /></Suspense>} />

@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -18,21 +15,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiCall } from "@/lib/queryClient";
-import { ComprehensiveSeoReport } from "./comprehensive-seo-report";
 import {
   Eye,
   Download,
   Share2,
   MoreHorizontal,
-  Calendar,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -40,55 +29,51 @@ import {
   Copy,
   CheckCircle,
   Loader2,
-  FileText,
-  BarChart3
 } from "lucide-react";
 
 interface SeoReport {
   id: number;
+  websiteId?: number;
   generatedAt: string;
   overallScore: number;
-  metrics: {
+  scanStatus?: string;
+  scanDuration?: number;
+  metrics?: {
     technicalSeo: number;
     contentQuality: number;
     userExperience: number;
-    mobileOptimization: number;
-    siteSpeed: number;
-    security: number;
+    backlinks: number;
+    onPageSeo: number;
   };
-  issues: {
+  issues?: {
     critical: number;
     warnings: number;
     suggestions: number;
   };
-  recommendations: string[];
-  technicalFindings?: any;
+  recommendations?: string[];
+  reportData?: any;
 }
 
 interface ReportHistoryTableProps {
-  websiteId: string;
-  websiteName: string;
-  reports?: SeoReport[];
+  reports: SeoReport[];
+  onViewReport: (reportId: string) => void;
 }
 
-export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: ReportHistoryTableProps) {
+export function ReportHistoryTable({ reports = [], onViewReport }: ReportHistoryTableProps) {
   const { toast } = useToast();
-  const [selectedReport, setSelectedReport] = useState<SeoReport | null>(null);
-  const [showReportModal, setShowReportModal] = useState(false);
   const [loadingPdf, setLoadingPdf] = useState<number | null>(null);
-
-  // Fetch report history
-  const { data: reportHistory = [], isLoading } = useQuery({
-    queryKey: ['/api/seo-reports', websiteId, 'history'],
-    enabled: !!websiteId
-  });
-
-  const finalReports = reports && reports.length > 0 ? reports : reportHistory;
+  const [copiedReportId, setCopiedReportId] = useState<number | null>(null);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
     return "text-red-600";
+  };
+
+  const getScoreBadgeVariant = (score: number) => {
+    if (score >= 80) return "default";
+    if (score >= 60) return "secondary";
+    return "destructive";
   };
 
   const getScoreTrend = (currentScore: number, previousScore?: number) => {
@@ -116,37 +101,37 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
   };
 
   const handleViewReport = (report: SeoReport) => {
-    setSelectedReport(report);
-    setShowReportModal(true);
+    onViewReport(report.id.toString());
   };
 
   const handleDownloadPDF = async (report: SeoReport) => {
     setLoadingPdf(report.id);
     try {
-      const response = await apiCall(`/api/seo-reports/${report.id}/pdf`, {
-        method: 'POST',
-        responseType: 'blob'
-      });
+      // Call PDF generation endpoint
+      const response = await apiCall('POST', `/api/websites/${report.websiteId}/seo-reports/${report.id}/pdf`);
       
-      const blob = new Blob([response], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `seo-report-${websiteName}-${new Date(report.generatedAt).toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast({
-        title: "PDF Downloaded",
-        description: "SEO report has been downloaded successfully.",
-      });
-    } catch (error: any) {
+      if (response.success && response.pdfUrl) {
+        // Create download link
+        const link = document.createElement('a');
+        link.href = response.pdfUrl;
+        link.download = `seo-report-${report.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast({
+          title: "PDF Downloaded",
+          description: "The SEO report has been downloaded successfully.",
+        });
+      } else {
+        throw new Error("Failed to generate PDF");
+      }
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
       toast({
         title: "Download Failed",
-        description: error.message || "Failed to download PDF. Please try again.",
-        variant: "destructive",
+        description: "Failed to download the PDF report. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setLoadingPdf(null);
@@ -154,255 +139,180 @@ export function ReportHistoryTable({ websiteId, websiteName, reports = [] }: Rep
   };
 
   const handleShareReport = async (report: SeoReport) => {
+    const reportUrl = `${window.location.origin}/seo-report/${report.id}`;
+    
     try {
-      const response = await apiCall(`/api/seo-reports/${report.id}/share`, {
-        method: 'POST'
+      await navigator.clipboard.writeText(reportUrl);
+      setCopiedReportId(report.id);
+      
+      toast({
+        title: "Link Copied",
+        description: "The report link has been copied to your clipboard.",
       });
       
-      if (response.shareUrl) {
-        await navigator.clipboard.writeText(response.shareUrl);
-        toast({
-          title: "Share Link Copied",
-          description: "The report share link has been copied to your clipboard.",
-        });
-      }
-    } catch (error: any) {
+      setTimeout(() => setCopiedReportId(null), 2000);
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
       toast({
-        title: "Share Failed",
-        description: error.message || "Unable to generate share link. Please try again.",
-        variant: "destructive",
+        title: "Copy Failed",
+        description: "Failed to copy the link. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (reports.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-400 mb-2">No SEO reports found</div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Start your first SEO analysis to see reports here.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
-            Report History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin mr-2" />
-              <span>Loading report history...</span>
-            </div>
-          ) : finalReports.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No reports generated yet</p>
-              <p className="text-sm">Generate your first SEO analysis to see history here</p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date Generated</TableHead>
-                  <TableHead>Overall Score</TableHead>
-                  <TableHead>Issues</TableHead>
-                  <TableHead>Trend</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.isArray(finalReports) && finalReports.map((report, index) => {
-                  const previousReport = finalReports[index + 1];
-                  const trend = getScoreTrend(report.overallScore, previousReport?.overallScore);
-                  
-                  return (
-                    <TableRow key={report.id}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">
-                            {new Date(report.generatedAt).toLocaleDateString()}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(report.generatedAt).toLocaleTimeString()}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-2xl font-bold ${getScoreColor(report.overallScore)}`}>
-                            {report.overallScore}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Badge variant="destructive" className="text-xs">
-                            {report.issues.critical} Critical
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {report.issues.warnings} Warnings
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {trend && (
-                          <div className={`flex items-center gap-1 ${trend.color}`}>
-                            <trend.icon className="h-4 w-4" />
-                            <span className="text-sm font-medium">{trend.text}</span>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewReport(report)}
-                            className="flex items-center gap-1"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </Button>
-                          
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => handleDownloadPDF(report)}
-                                className="flex items-center gap-2"
-                                disabled={loadingPdf === report.id}
-                              >
-                                {loadingPdf === report.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Download className="h-4 w-4" />
-                                )}
-                                Download PDF
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleShareReport(report)}
-                                className="flex items-center gap-2"
-                              >
-                                <Share2 className="h-4 w-4" />
-                                Share Report
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Report View Modal */}
-      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5 text-blue-600" />
-              SEO Report - {websiteName}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedReport && (
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="detailed" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Detailed Analysis
-                </TabsTrigger>
-                <TabsTrigger value="comprehensive" className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Comprehensive Report
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview">
-                <div className="space-y-6">
-                  {/* Report Header */}
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                    <div>
-                      <h3 className="text-lg font-semibold">Overall SEO Score</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Generated on {new Date(selectedReport.generatedAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className={`text-4xl font-bold ${getScoreColor(selectedReport.overallScore)}`}>
-                        {selectedReport.overallScore}
+    <div className="space-y-4">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date Generated</TableHead>
+            <TableHead>Overall Score</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Critical Issues</TableHead>
+            <TableHead>Duration</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {reports.map((report, index) => {
+            const previousReport = reports[index + 1];
+            const trend = getScoreTrend(report.overallScore, previousReport?.overallScore);
+            
+            return (
+              <TableRow key={report.id} className="group">
+                <TableCell className="font-medium">
+                  {formatDate(report.generatedAt)}
+                </TableCell>
+                
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant={getScoreBadgeVariant(report.overallScore)}
+                      className="px-2 py-1"
+                    >
+                      {report.overallScore}/100
+                    </Badge>
+                    {trend && (
+                      <div className={`flex items-center gap-1 ${trend.color}`}>
+                        <trend.icon className="h-3 w-3" />
+                        <span className="text-xs">{trend.text}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">out of 100</p>
-                    </div>
-                  </div>
-
-                  {/* Quick Metrics */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-red-600">{selectedReport.issues.critical}</div>
-                      <p className="text-sm text-muted-foreground">Critical Issues</p>
-                    </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-600">{selectedReport.issues.warnings}</div>
-                      <p className="text-sm text-muted-foreground">Warnings</p>
-                    </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{selectedReport.issues.suggestions}</div>
-                      <p className="text-sm text-muted-foreground">Suggestions</p>
-                    </div>
-                  </div>
-
-                  {/* Key Recommendations */}
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold">Key Recommendations</h4>
-                    {selectedReport.recommendations && selectedReport.recommendations.length > 0 ? (
-                      selectedReport.recommendations.slice(0, 5).map((rec, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
-                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                          <p className="text-sm">{rec}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-sm text-muted-foreground">No recommendations available</div>
                     )}
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="detailed">
-                <div className="space-y-6">
-                  {/* Detailed metrics and findings would go here */}
-                  <div className="p-8 text-center text-muted-foreground">
-                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Detailed analysis view coming soon</p>
+                </TableCell>
+                
+                <TableCell>
+                  <Badge 
+                    variant={report.scanStatus === 'completed' ? 'default' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {report.scanStatus === 'completed' ? 'Completed' : report.scanStatus || 'Unknown'}
+                  </Badge>
+                </TableCell>
+                
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <span className="text-red-600 font-medium">
+                      {report.issues?.critical || 0}
+                    </span>
+                    <span className="text-xs text-gray-500">critical</span>
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="comprehensive">
-                <ComprehensiveSeoReport 
-                  report={{
-                    ...selectedReport,
-                    reportData: selectedReport.technicalFindings || {},
-                    generatedAt: selectedReport.generatedAt
-                  }}
-                  websiteName={websiteName}
-                  websiteUrl="https://example.com" // This would come from the website data
-                />
-              </TabsContent>
-            </Tabs>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+                </TableCell>
+                
+                <TableCell>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {report.scanDuration ? `${Math.round(report.scanDuration / 1000)}s` : 'N/A'}
+                  </span>
+                </TableCell>
+                
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewReport(report)}
+                      data-testid={`button-view-report-${report.id}`}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleViewReport(report)}>
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Open in New Window
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleShareReport(report)}>
+                          {copiedReportId === report.id ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy Link
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadPDF(report)}>
+                          {loadingPdf === report.id ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download PDF
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+      
+      {reports.length > 5 && (
+        <div className="text-center py-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Showing latest {Math.min(10, reports.length)} reports
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

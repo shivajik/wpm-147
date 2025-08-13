@@ -3633,6 +3633,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get SEO report by ID (simpler endpoint for direct report access)
+  app.get("/api/seo-reports/:id", authenticateToken, async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const userId = (req as AuthRequest).user!.id;
+      
+      if (isNaN(reportId)) {
+        return res.status(400).json({ message: "Invalid report ID" });
+      }
+
+      console.log(`[SEO] Fetching report ${reportId} for user ${userId}`);
+      const report = await storage.getSeoReportWithDetails(reportId, userId);
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+
+      console.log(`[SEO] Found report with scan status: ${report.scanStatus}`);
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching SEO report:", error);
+      res.status(500).json({ message: "Failed to fetch report" });
+    }
+  });
+
   // Generate PDF report endpoint
   app.post("/api/websites/:id/seo-reports/:reportId/pdf", authenticateToken, async (req, res) => {
     try {
