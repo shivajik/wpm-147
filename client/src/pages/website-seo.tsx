@@ -31,6 +31,7 @@ import { useState } from "react";
 import { SeoAnalysisProgress } from "@/components/seo/seo-analysis-progress";
 import { ReportHistoryTable } from "@/components/seo/report-history-table";
 import { DetailedSeoReport } from "@/components/seo/detailed-seo-report";
+import { ProfessionalSeoReport } from "@/components/seo/professional-seo-report";
 
 export default function WebsiteSEO() {
   const params = useParams();
@@ -97,7 +98,7 @@ export default function WebsiteSEO() {
     setShowProgressModal(true);
     
     try {
-      const response = await apiCall('POST', `/api/websites/${websiteId}/seo-analysis`);
+      const response = await apiCall('POST', `/api/websites/${websiteId}/seo-analysis`, {});
       
       // Poll for completion - the analysis runs asynchronously 
       const pollInterval = setInterval(async () => {
@@ -249,45 +250,11 @@ export default function WebsiteSEO() {
             </Button>
           </div>
 
-          {/* Comprehensive SEO Report - Show if real analysis is available */}
+          {/* Professional SEO Report - Show if real analysis is available */}
           {realLatestReport && realLatestReport.scanStatus === 'completed' && (
             <div className="mb-8">
-              <DetailedSeoReport
-                report={{
-                  id: realLatestReport.id,
-                  generatedAt: realLatestReport.generatedAt,
-                  overallScore: realLatestReport.overallScore,
-                  metrics: {
-                    technicalSeo: realLatestReport.technicalScore || 0,
-                    contentQuality: realLatestReport.contentScore || 0,
-                    userExperience: realLatestReport.userExperienceScore || 0,
-                    mobileOptimization: realLatestReport.technicalScore || 85,
-                    siteSpeed: realLatestReport.userExperienceScore || 75,
-                    security: realLatestReport.backlinksScore || 70
-                  },
-                  issues: {
-                    critical: realLatestReport.criticalIssues || 0,
-                    warnings: realLatestReport.warnings || 0,
-                    suggestions: realLatestReport.notices || 0
-                  },
-                  recommendations: realLatestReport.recommendations || [],
-                  technicalFindings: realLatestReport.reportData ? {
-                    pagespeed: {
-                      desktop: Math.round(100 - (realLatestReport.reportData.performance?.loadTime / 50)) || 75,
-                      mobile: realLatestReport.reportData.technicalSeo?.isResponsive ? 85 : 40
-                    },
-                    sslEnabled: realLatestReport.reportData.technicalSeo?.hasSSL || false,
-                    metaTags: {
-                      missingTitle: realLatestReport.reportData.title ? 0 : 1,
-                      missingDescription: realLatestReport.reportData.metaDescription ? 0 : 1,
-                      duplicateTitle: 0
-                    },
-                    headingStructure: {
-                      missingH1: realLatestReport.reportData.h1Tags?.length === 0 ? 1 : 0,
-                      improperHierarchy: realLatestReport.reportData.h1Tags?.length > 1 ? 1 : 0
-                    }
-                  } : undefined
-                }}
+              <ProfessionalSeoReport
+                report={realLatestReport}
                 websiteName={website.name}
                 websiteUrl={website.url}
               />
