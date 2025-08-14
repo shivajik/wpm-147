@@ -809,15 +809,17 @@ const performanceScans = pgTable('performance_scans', {
 
 const subscriptionPlans = pgTable('subscription_plans', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 50 }).notNull().unique(),
-  displayName: varchar('display_name', { length: 100 }).notNull(),
-  description: text('description'),
+  name: text('name').notNull().unique(),
+  displayName: text('display_name').notNull(),
+  description: text('description').notNull(),
   monthlyPrice: integer('monthly_price').notNull(),
-  yearlyPrice: integer('yearly_price').notNull(),
-  features: jsonb('features').notNull(),
-  isActive: boolean('is_active').default(true),
-  stripePriceIdMonthly: varchar('stripe_price_id_monthly', { length: 255 }),
-  stripePriceIdYearly: varchar('stripe_price_id_yearly', { length: 255 }),
+  yearlyPrice: integer('yearly_price'),
+  features: text('features').array(),
+  websiteLimit: integer('website_limit'),
+  scansPerMonth: integer('scans_per_month'),
+  isActive: boolean('is_active').notNull().default(true),
+  stripePriceIdMonthly: text('stripe_price_id_monthly'),
+  stripePriceIdYearly: text('stripe_price_id_yearly'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 });
@@ -1885,23 +1887,19 @@ export default async function handler(req: any, res: any) {
     // Health check endpoint
     if (path === '/api/health') {
       try {
-        // Test subscription plans table specifically
-        const plansResult = await db.select().from(subscriptionPlans).limit(1);
+        const testResult = await db.select().from(users).where(eq(users.email, 'nonexistent@example.com')).limit(1);
         return res.status(200).json({ 
           status: 'ok', 
           database: 'connected',
-          subscriptionPlansTableAccess: 'success',
-          planCount: plansResult.length,
-          message: 'Database and subscription plans table accessible',
+          message: 'Database connection successful',
           timestamp: new Date().toISOString()
         });
       } catch (error) {
-        console.error("Database/Subscription plans error:", error);
+        console.error("Database connection error:", error);
         return res.status(500).json({ 
           status: 'error', 
-          database: 'error',
-          subscriptionPlansTableAccess: 'failed',
-          message: error instanceof Error ? error.message : 'Subscription plans table access failed',
+          database: 'disconnected',
+          message: error instanceof Error ? error.message : 'Database connection failed',
           timestamp: new Date().toISOString()
         });
       }
@@ -2212,36 +2210,16 @@ export default async function handler(req: any, res: any) {
     // Subscription Plans endpoint
     if (path === '/api/subscription-plans' && req.method === 'GET') {
       try {
-        console.log('[VERCEL] Fetching subscription plans...');
-        console.log('[VERCEL] Database URL configured:', process.env.DATABASE_URL ? 'Yes' : 'No');
-        console.log('[VERCEL] Environment:', process.env.NODE_ENV || 'development');
-        console.log('[VERCEL] Database connection config:', {
-          ssl: connectionConfig.ssl ? 'enabled' : 'disabled',
-          max: connectionConfig.max,
-          timeout: connectionConfig.connect_timeout
-        });
-        
-        // Test with raw SQL first
-        const plansRaw = await client`SELECT * FROM subscription_plans WHERE is_active = true ORDER BY monthly_price`;
-        console.log('[VERCEL] Raw SQL result:', plansRaw.length, 'plans');
-        
         const plans = await db
           .select()
-          .from(subscriptionPlans);
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.isActive, true))
+          .orderBy(subscriptionPlans.monthlyPrice);
 
-        console.log('[VERCEL] Successfully fetched', plans.length, 'subscription plans');
         return res.status(200).json(plans);
       } catch (error) {
-        console.error("[VERCEL] Error fetching subscription plans:", error);
-        console.error("[VERCEL] Error details:", {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
-        return res.status(500).json({ 
-          message: "Failed to fetch subscription plans",
-          error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        console.error("Error fetching subscription plans:", error);
+        return res.status(500).json({ message: "Failed to fetch subscription plans" });
       }
     }
 

@@ -2194,24 +2194,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Subscription routes
   app.get("/api/subscription-plans", async (req, res) => {
     try {
-      console.log("Fetching subscription plans...");
-      console.log("Database URL configured:", process.env.DATABASE_URL ? "Yes" : "No");
-      console.log("Environment:", process.env.NODE_ENV || "development");
-      
       const plans = await storage.getSubscriptionPlans();
-      console.log("Successfully fetched", plans.length, "subscription plans");
       res.json(plans);
     } catch (error) {
       console.error("Error fetching subscription plans:", error);
-      console.error("Error details:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-      res.status(500).json({ 
-        message: "Failed to fetch subscription plans",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
     }
   });
 
