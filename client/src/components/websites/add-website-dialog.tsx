@@ -148,7 +148,7 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 m-4 sm:m-6">
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] sm:max-h-[85vh] flex flex-col p-0 m-2 sm:m-4 overflow-hidden">
         <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Globe className="h-5 w-5" />
@@ -159,10 +159,10 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden px-4 sm:px-6">
+        <div className="flex-1 overflow-hidden px-4 sm:px-6 min-h-0">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 pr-1 sm:pr-2 pb-4 scrollbar-thin dialog-scroll">
+              <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pr-2 pb-2 min-h-0" style={{ maxHeight: 'calc(90vh - 200px)' }}>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 h-auto p-1">
                 <TabsTrigger value="basic" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
@@ -284,21 +284,21 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                 />
               </TabsContent>
 
-              <TabsContent value="credentials" className="space-y-3 sm:space-y-4 mt-4">
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="border rounded-lg p-3 sm:p-4">
-                    <h4 className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">WordPress Admin Credentials</h4>
-                    <div className="space-y-3">
+              <TabsContent value="credentials" className="space-y-2 sm:space-y-3 mt-3">
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="border rounded-lg p-2 sm:p-3">
+                    <h4 className="font-medium mb-2 text-sm sm:text-base">WordPress Admin Credentials</h4>
+                    <div className="space-y-2 sm:space-y-3">
                       <FormField
                         control={form.control}
                         name="wpAdminUsername"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm sm:text-base">WordPress Username</FormLabel>
+                            <FormLabel className="text-xs sm:text-sm">WordPress Username</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="admin"
-                                className="text-sm sm:text-base"
+                                className="text-xs sm:text-sm h-8 sm:h-9"
                                 {...field}
                                 value={field.value || ""}
                               />
@@ -313,18 +313,18 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                         name="wpAdminPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm sm:text-base">WordPress Application Password</FormLabel>
+                            <FormLabel className="text-xs sm:text-sm">WordPress Application Password</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
-                                placeholder="xxxx xxxx xxxx xxxx xxxx xxxx"
-                                className="text-sm sm:text-base"
+                                placeholder="xxxx xxxx xxxx xxxx"
+                                className="text-xs sm:text-sm h-8 sm:h-9"
                                 {...field}
                                 value={field.value || ""}
                               />
                             </FormControl>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              This must be an Application Password, not your regular WordPress login password.
+                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              Use Application Password, not regular login password
                             </div>
                             <FormMessage />
                           </FormItem>
@@ -333,28 +333,28 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                     </div>
                   </div>
 
-                  <div className="text-center text-xs sm:text-sm text-gray-500">OR</div>
+                  <div className="text-center text-xs text-gray-500 py-1">OR</div>
 
-                  <div className="border rounded-lg p-3 sm:p-4 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
-                    <h4 className="font-medium mb-2 sm:mb-3 text-green-800 dark:text-green-200 text-sm sm:text-base">
-                      WP Remote Manager Plugin Connection (Recommended)
+                  <div className="border rounded-lg p-2 sm:p-3 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+                    <h4 className="font-medium mb-2 text-green-800 dark:text-green-200 text-xs sm:text-sm">
+                      WP Remote Manager Plugin (Recommended)
                     </h4>
                     <FormField
                       control={form.control}
                       name="wrmApiKey"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm sm:text-base">WP Remote Manager API Key</FormLabel>
+                          <FormLabel className="text-xs sm:text-sm">API Key</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter WP Remote Manager plugin API key"
-                              className="text-sm sm:text-base w-full min-w-0"
+                              placeholder="Enter WP Remote Manager API key"
+                              className="text-xs sm:text-sm h-8 sm:h-9"
                               {...field}
                               value={field.value || ""}
                             />
                           </FormControl>
-                          <FormDescription className="text-xs sm:text-sm">
-                            Provides complete WordPress management features including updates, security scans, and maintenance mode
+                          <FormDescription className="text-[10px] sm:text-xs mt-1">
+                            Complete WordPress management features
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -363,25 +363,25 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                   </div>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2 text-sm sm:text-base">
-                    WP Remote Manager Setup (Recommended):
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-2 sm:p-3">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1 text-xs sm:text-sm">
+                    Setup Instructions:
                   </h4>
-                  <ol className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside mb-3">
-                    <li>Install the <strong>WP Remote Manager</strong> plugin on your WordPress site</li>
-                    <li>Go to <strong>Settings → WP Remote Manager</strong> in your WordPress admin</li>
-                    <li>Generate a new API key and copy it</li>
-                    <li>Paste the API key in the field above for enhanced management features</li>
+                  <ol className="text-[10px] sm:text-xs text-blue-800 dark:text-blue-200 space-y-0.5 list-decimal list-inside mb-2">
+                    <li>Install <strong>WP Remote Manager</strong> plugin</li>
+                    <li>Go to <strong>Settings → WP Remote Manager</strong></li>
+                    <li>Generate and copy API key</li>
+                    <li>Paste key above</li>
                   </ol>
-                  <div className="mt-3 p-2 sm:p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded">
-                    <p className="text-xs sm:text-sm text-green-800 dark:text-green-200">
-                      <strong>Alternative:</strong> Use WordPress Application Passwords for basic monitoring. Create them in <strong>Users → Profile → Application Passwords</strong> section.
+                  <div className="p-1.5 sm:p-2 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded">
+                    <p className="text-[10px] sm:text-xs text-green-800 dark:text-green-200">
+                      <strong>Alternative:</strong> Use Application Passwords in <strong>Users → Profile</strong>
                     </p>
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="settings" className="space-y-3 sm:space-y-4 mt-4">
+              <TabsContent value="settings" className="space-y-2 sm:space-y-3 mt-3">
                 <FormField
                   control={form.control}
                   name="wpVersion"
@@ -438,14 +438,14 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
         </div>
         
         {/* Fixed footer buttons outside of scrollable area */}
-        <div className="flex-shrink-0 border-t bg-background px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3">
+        <div className="flex-shrink-0 border-t bg-background px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
               disabled={createWebsiteMutation.isPending}
-              className="w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
+              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
             >
               Cancel
             </Button>
@@ -453,9 +453,9 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
               type="submit"
               disabled={createWebsiteMutation.isPending}
               onClick={form.handleSubmit(onSubmit)}
-              className="w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
+              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
             >
-              {createWebsiteMutation.isPending ? "Adding Website..." : "Add Website"}
+              {createWebsiteMutation.isPending ? "Adding..." : "Add Website"}
             </Button>
           </div>
         </div>
