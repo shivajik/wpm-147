@@ -1046,7 +1046,31 @@ export interface SeoAnalysisResult {
   performance: {
     loadTime: number;
     pageSize: number;
+    pageSizeBytes?: number;
     requests: number;
+    resourceBreakdown?: {
+      scripts: number;
+      stylesheets: number;
+      images: number;
+      fonts: number;
+      preloads: number;
+      prefetches: number;
+    };
+    optimizations?: {
+      compression: boolean;
+      minifiedCSS: boolean;
+      minifiedJS: boolean;
+      cacheHeaders: boolean;
+      hasLazyLoading: boolean;
+      hasWebP: boolean;
+      hasAvif: boolean;
+      hasCriticalCSS: boolean;
+      hasAsyncJS: boolean;
+    };
+    performanceScore?: number;
+    performanceIssues?: string[];
+    recommendations?: string[];
+    // Legacy compatibility
     compression: boolean;
     minifiedCSS: boolean;
     minifiedJS: boolean;
@@ -1112,11 +1136,14 @@ export interface SeoAnalysisResult {
   
   javascriptAnalysis?: {
     totalScripts: number;
+    htmlScriptTags?: number;
     externalScripts: number;
     inlineScripts: number;
     asyncScripts: number;
     deferScripts: number;
     blockingScripts: number;
+    securityFeatures?: number;
+    largestInlineScript?: number;
     optimizationIssues: string[];
     scripts: Array<{
       type: 'inline' | 'external';
@@ -1125,6 +1152,8 @@ export interface SeoAnalysisResult {
       hasAsync: boolean;
       hasDefer: boolean;
       hasType?: string;
+      hasNonce?: boolean;
+      hasIntegrity?: boolean;
     }>;
   };
   
@@ -1133,6 +1162,10 @@ export interface SeoAnalysisResult {
     externalStylesheets: number;
     inlineStyles: number;
     minifiedStylesheets: number;
+    criticalCssCount?: number;
+    inlineStyleElements?: number;
+    totalInlineSize?: number;
+    largestInlineStyle?: number;
     optimizationIssues: string[];
     stylesheets: Array<{
       type: 'external' | 'inline';
@@ -1140,6 +1173,8 @@ export interface SeoAnalysisResult {
       size?: number;
       media?: string;
       isMinified?: boolean;
+      hasIntegrity?: boolean;
+      isCritical?: boolean;
     }>;
   };
   

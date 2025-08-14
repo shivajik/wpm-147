@@ -3473,7 +3473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .slice(0, 10)
         .map(([keyword, density]) => ({
           keyword,
-          searchVolume: Math.round(density * 100), // Approximate volume based on density
+          searchVolume: Math.round((density as number) * 100), // Approximate volume based on density
           difficulty: Math.round(Math.random() * 100), // Would need external API
           currentPosition: Math.round(Math.random() * 100) + 1,
           previousPosition: null,

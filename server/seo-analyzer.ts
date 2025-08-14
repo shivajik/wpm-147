@@ -1,7 +1,164 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { SeoAnalysisResult, DetailedFinding } from '@shared/schema';
 import { URL } from 'url';
+
+// Temporary inline types until we resolve the import issue
+export interface DetailedFinding {
+  category: string;
+  title: string;
+  description: string;
+  impact: 'critical' | 'high' | 'medium' | 'low';
+  technicalDetails: string;
+  recommendation: string;
+  howToFix?: string;
+  resources?: string[];
+}
+
+export interface SeoAnalysisResult {
+  url: string;
+  domain?: string;
+  title: string;
+  metaDescription: string;
+  h1Tags: string[];
+  h2Tags: string[];
+  h3Tags: string[];
+  pageContent: {
+    wordCount: number;
+    readabilityScore: number;
+    keywordDensity: { [keyword: string]: number };
+    sentences?: number;
+    paragraphs?: number;
+    avgWordsPerSentence?: number;
+  };
+  technicalSeo: {
+    hasSSL: boolean;
+    hasRobotsTxt: boolean;
+    hasSitemap: boolean;
+    isResponsive: boolean;
+    hasValidStructuredData: boolean;
+    statusCode: number;
+    responseTime: number;
+    canonicalTag?: string;
+    metaViewport?: string;
+    charset?: string;
+    doctype?: string;
+    lang?: string;
+    hreflang?: string[];
+    httpHeaders?: { [key: string]: string };
+  };
+  images: {
+    total: number;
+    withAlt: number;
+    missingAlt: number;
+    oversized: number;
+    formats: { [format: string]: number };
+    lazyLoaded: number;
+  };
+  links: {
+    internal: number;
+    external: number;
+    broken: number;
+    nofollow: number;
+    dofollow: number;
+    redirectChains: number;
+  };
+  performance: {
+    loadTime: number;
+    pageSize: number;
+    pageSizeBytes?: number;
+    requests: number;
+    resourceBreakdown?: {
+      scripts: number;
+      stylesheets: number;
+      images: number;
+      fonts: number;
+      preloads: number;
+      prefetches: number;
+    };
+    optimizations?: {
+      compression: boolean;
+      minifiedCSS: boolean;
+      minifiedJS: boolean;
+      cacheHeaders: boolean;
+      hasLazyLoading: boolean;
+      hasWebP: boolean;
+      hasAvif: boolean;
+      hasCriticalCSS: boolean;
+      hasAsyncJS: boolean;
+    };
+    performanceScore?: number;
+    performanceIssues?: string[];
+    recommendations?: string[];
+    // Legacy compatibility
+    compression: boolean;
+    minifiedCSS: boolean;
+    minifiedJS: boolean;
+    cacheHeaders: boolean;
+  };
+  socialMeta: {
+    hasOpenGraph: boolean;
+    hasTwitterCards: boolean;
+    hasFacebookMeta: boolean;
+    openGraphData: { [key: string]: string };
+    twitterCardData: { [key: string]: string };
+  };
+  accessibility: {
+    score: number;
+    issues: string[];
+    contrastIssues: number;
+    missingLabels: number;
+    missingHeadings: boolean;
+    skipLinks: boolean;
+  };
+  detailedFindings?: {
+    criticalIssues: DetailedFinding[];
+    warnings: DetailedFinding[];
+    recommendations: DetailedFinding[];
+    positiveFindings: DetailedFinding[];
+  };
+  javascriptAnalysis?: {
+    totalScripts: number;
+    htmlScriptTags?: number;
+    externalScripts: number;
+    inlineScripts: number;
+    asyncScripts: number;
+    deferScripts: number;
+    blockingScripts: number;
+    securityFeatures?: number;
+    largestInlineScript?: number;
+    optimizationIssues: string[];
+    scripts: Array<{
+      type: 'inline' | 'external';
+      src?: string;
+      size?: number;
+      hasAsync: boolean;
+      hasDefer: boolean;
+      hasType?: string;
+      hasNonce?: boolean;
+      hasIntegrity?: boolean;
+    }>;
+  };
+  cssAnalysis?: {
+    totalStylesheets: number;
+    externalStylesheets: number;
+    inlineStyles: number;
+    minifiedStylesheets: number;
+    criticalCssCount?: number;
+    inlineStyleElements?: number;
+    totalInlineSize?: number;
+    largestInlineStyle?: number;
+    optimizationIssues: string[];
+    stylesheets: Array<{
+      type: 'external' | 'inline';
+      href?: string;
+      size?: number;
+      media?: string;
+      isMinified?: boolean;
+      hasIntegrity?: boolean;
+      isCritical?: boolean;
+    }>;
+  };
+};
 
 
 
@@ -385,28 +542,134 @@ export class SeoAnalyzer {
   private analyzePerformance(html: string, responseTime: number) {
     const pageSize = Buffer.byteLength(html, 'utf8');
     
-    // Estimate resource requests (basic heuristic)
+    // Enhanced resource detection
     const scriptMatches = html.match(/<script[^>]*src=/g) || [];
     const styleMatches = html.match(/<link[^>]*stylesheet/g) || [];
     const imageMatches = html.match(/<img[^>]*src=/g) || [];
+    const fontMatches = html.match(/<link[^>]*font/g) || [];
+    const preloadMatches = html.match(/<link[^>]*rel="preload"/g) || [];
+    const prefetchMatches = html.match(/<link[^>]*rel="prefetch"/g) || [];
     
-    const requests = 1 + scriptMatches.length + styleMatches.length + imageMatches.length;
+    const totalRequests = 1 + scriptMatches.length + styleMatches.length + imageMatches.length + fontMatches.length;
 
-    // Check for compression and minification
+    // Enhanced optimization checks
     const compression = html.includes('Content-Encoding: gzip') || html.includes('Content-Encoding: br');
     const minifiedCSS = styleMatches.some(match => match.includes('.min.css'));
     const minifiedJS = scriptMatches.some(match => match.includes('.min.js'));
     const cacheHeaders = html.includes('Cache-Control') || html.includes('Expires');
+    
+    // Modern performance optimizations
+    const hasLazyLoading = html.includes('loading="lazy"') || html.includes('data-src');
+    const hasWebP = html.includes('.webp');
+    const hasAvif = html.includes('.avif');
+    const hasCriticalCSS = html.includes('rel="preload"') && html.includes('as="style"');
+    const hasAsyncJS = html.includes('async') || html.includes('defer');
+    
+    // Performance score calculation
+    let performanceScore = 100;
+    if (responseTime > 1000) performanceScore -= 20;
+    if (responseTime > 3000) performanceScore -= 30;
+    if (pageSize > 1024 * 1024) performanceScore -= 15; // > 1MB
+    if (totalRequests > 50) performanceScore -= 15;
+    if (!minifiedCSS) performanceScore -= 10;
+    if (!minifiedJS) performanceScore -= 10;
+    if (!compression) performanceScore -= 15;
+    if (!cacheHeaders) performanceScore -= 10;
+    
+    // Bonus points for modern optimizations
+    if (hasLazyLoading) performanceScore += 5;
+    if (hasWebP || hasAvif) performanceScore += 5;
+    if (hasCriticalCSS) performanceScore += 5;
+    if (hasAsyncJS) performanceScore += 5;
+
+    const performanceIssues = [];
+    if (responseTime > 3000) performanceIssues.push(`Slow server response time: ${responseTime}ms`);
+    if (pageSize > 1024 * 1024) performanceIssues.push(`Large page size: ${Math.round(pageSize / 1024)}KB`);
+    if (totalRequests > 50) performanceIssues.push(`Too many HTTP requests: ${totalRequests}`);
+    if (!minifiedCSS) performanceIssues.push('CSS files are not minified');
+    if (!minifiedJS) performanceIssues.push('JavaScript files are not minified');
+    if (!compression) performanceIssues.push('No compression detected');
+    if (!hasLazyLoading && imageMatches.length > 5) performanceIssues.push('No lazy loading detected for images');
 
     return {
       loadTime: responseTime,
       pageSize: Math.round(pageSize / 1024), // KB
-      requests,
+      pageSizeBytes: pageSize,
+      requests: totalRequests,
+      resourceBreakdown: {
+        scripts: scriptMatches.length,
+        stylesheets: styleMatches.length,
+        images: imageMatches.length,
+        fonts: fontMatches.length,
+        preloads: preloadMatches.length,
+        prefetches: prefetchMatches.length
+      },
+      optimizations: {
+        compression,
+        minifiedCSS,
+        minifiedJS,
+        cacheHeaders,
+        hasLazyLoading,
+        hasWebP,
+        hasAvif,
+        hasCriticalCSS,
+        hasAsyncJS
+      },
+      performanceScore: Math.max(0, Math.min(100, performanceScore)),
+      performanceIssues,
+      recommendations: this.generatePerformanceRecommendations({
+        responseTime,
+        pageSize,
+        totalRequests,
+        minifiedCSS,
+        minifiedJS,
+        compression,
+        hasLazyLoading,
+        imageCount: imageMatches.length
+      }),
+      // Legacy compatibility fields
       compression,
       minifiedCSS,
       minifiedJS,
       cacheHeaders
     };
+  }
+
+  private generatePerformanceRecommendations(metrics: {
+    responseTime: number;
+    pageSize: number;
+    totalRequests: number;
+    minifiedCSS: boolean;
+    minifiedJS: boolean;
+    compression: boolean;
+    hasLazyLoading: boolean;
+    imageCount: number;
+  }): string[] {
+    const recommendations = [];
+    
+    if (metrics.responseTime > 2000) {
+      recommendations.push('Optimize server response time - consider CDN or better hosting');
+    }
+    if (metrics.pageSize > 500 * 1024) {
+      recommendations.push('Reduce page size by optimizing images and removing unused code');
+    }
+    if (metrics.totalRequests > 30) {
+      recommendations.push('Combine CSS/JS files to reduce HTTP requests');
+    }
+    if (!metrics.minifiedCSS) {
+      recommendations.push('Enable CSS minification for faster loading');
+    }
+    if (!metrics.minifiedJS) {
+      recommendations.push('Enable JavaScript minification for better performance');
+    }
+    if (!metrics.compression) {
+      recommendations.push('Enable Gzip/Brotli compression on your server');
+    }
+    if (!metrics.hasLazyLoading && metrics.imageCount > 3) {
+      recommendations.push('Implement lazy loading for images below the fold');
+    }
+    
+    return recommendations;
   }
 
   private analyzeSocialMeta($: cheerio.CheerioAPI) {
@@ -1070,49 +1333,87 @@ export class SeoAnalyzer {
       hasAsync: boolean;
       hasDefer: boolean;
       hasType?: string;
+      hasNonce?: boolean;
+      hasIntegrity?: boolean;
     }> = [];
 
-    // External scripts
+    // External scripts with enhanced detection
     $('script[src]').each((_, element) => {
-      scripts.push({
-        type: 'external',
-        src: $(element).attr('src'),
-        hasAsync: $(element).attr('async') !== undefined,
-        hasDefer: $(element).attr('defer') !== undefined,
-        hasType: $(element).attr('type')
-      });
+      const $script = $(element);
+      const src = $script.attr('src');
+      if (src) {
+        scripts.push({
+          type: 'external',
+          src: src,
+          hasAsync: $script.attr('async') !== undefined,
+          hasDefer: $script.attr('defer') !== undefined,
+          hasType: $script.attr('type'),
+          hasNonce: $script.attr('nonce') !== undefined,
+          hasIntegrity: $script.attr('integrity') !== undefined
+        });
+      }
     });
 
-    // Inline scripts
+    // Inline scripts with enhanced detection
     $('script:not([src])').each((_, element) => {
-      const content = $(element).html() || '';
-      scripts.push({
-        type: 'inline',
-        size: content.length,
-        hasAsync: false,
-        hasDefer: false,
-        hasType: $(element).attr('type')
-      });
+      const $script = $(element);
+      const content = $script.html() || '';
+      const type = $script.attr('type');
+      
+      // Skip JSON-LD and other non-executable scripts
+      if (type && (type.includes('json') || type.includes('template'))) {
+        return;
+      }
+      
+      if (content.trim().length > 0) {
+        scripts.push({
+          type: 'inline',
+          size: content.length,
+          hasAsync: false,
+          hasDefer: false,
+          hasType: type,
+          hasNonce: $script.attr('nonce') !== undefined,
+          hasIntegrity: false
+        });
+      }
     });
+
+    // Also check for scripts in the HTML string directly (in case cheerio misses some)
+    const scriptMatches = html.match(/<script[^>]*>/g) || [];
+    const htmlScriptCount = scriptMatches.length;
 
     const optimizationIssues = [];
     const asyncCount = scripts.filter(s => s.hasAsync).length;
     const deferCount = scripts.filter(s => s.hasDefer).length;
     const blockingScripts = scripts.filter(s => !s.hasAsync && !s.hasDefer && s.type === 'external').length;
+    const securityFeatures = scripts.filter(s => s.hasNonce || s.hasIntegrity).length;
 
     if (blockingScripts > 3) {
       optimizationIssues.push(`${blockingScripts} render-blocking JavaScript files detected`);
     }
+    
+    if (scripts.length > 0 && securityFeatures === 0) {
+      optimizationIssues.push('No security features (nonce, integrity) detected on scripts');
+    }
+
+    if (asyncCount === 0 && deferCount === 0 && scripts.filter(s => s.type === 'external').length > 0) {
+      optimizationIssues.push('No async or defer attributes found on external scripts');
+    }
 
     return {
       totalScripts: scripts.length,
+      htmlScriptTags: htmlScriptCount, // Raw count from HTML
       externalScripts: scripts.filter(s => s.type === 'external').length,
       inlineScripts: scripts.filter(s => s.type === 'inline').length,
       asyncScripts: asyncCount,
       deferScripts: deferCount,
       blockingScripts,
+      securityFeatures,
       optimizationIssues,
-      scripts: scripts.slice(0, 20) // Limit for display
+      scripts: scripts.slice(0, 20), // Limit for display
+      largestInlineScript: scripts
+        .filter(s => s.type === 'inline' && s.size)
+        .sort((a, b) => (b.size || 0) - (a.size || 0))[0]?.size || 0
     };
   }
 
@@ -1123,34 +1424,82 @@ export class SeoAnalyzer {
       size?: number;
       media?: string;
       isMinified?: boolean;
+      hasIntegrity?: boolean;
+      isCritical?: boolean;
     }> = [];
 
-    // External stylesheets
+    // External stylesheets with enhanced detection
     $('link[rel="stylesheet"]').each((_, element) => {
-      const href = $(element).attr('href');
-      stylesheets.push({
-        type: 'external',
-        href,
-        media: $(element).attr('media') || 'all',
-        isMinified: href?.includes('.min.css') || false
-      });
+      const $link = $(element);
+      const href = $link.attr('href');
+      if (href) {
+        stylesheets.push({
+          type: 'external',
+          href,
+          media: $link.attr('media') || 'all',
+          isMinified: href.includes('.min.css') || false,
+          hasIntegrity: $link.attr('integrity') !== undefined,
+          isCritical: $link.attr('rel')?.includes('preload') || false
+        });
+      }
     });
 
-    // Inline styles
-    $('style').each((_, element) => {
-      const content = $(element).html() || '';
-      stylesheets.push({
-        type: 'inline',
-        size: content.length,
-        media: $(element).attr('media') || 'all'
-      });
+    // Critical CSS (preload stylesheets)
+    $('link[rel="preload"][as="style"]').each((_, element) => {
+      const $link = $(element);
+      const href = $link.attr('href');
+      if (href) {
+        stylesheets.push({
+          type: 'external',
+          href,
+          media: $link.attr('media') || 'all',
+          isMinified: href.includes('.min.css') || false,
+          hasIntegrity: $link.attr('integrity') !== undefined,
+          isCritical: true
+        });
+      }
     });
+
+    // Inline styles with enhanced detection
+    $('style').each((_, element) => {
+      const $style = $(element);
+      const content = $style.html() || '';
+      if (content.trim().length > 0) {
+        stylesheets.push({
+          type: 'inline',
+          size: content.length,
+          media: $style.attr('media') || 'all',
+          isMinified: false,
+          hasIntegrity: false,
+          isCritical: true // Inline styles are considered critical
+        });
+      }
+    });
+
+    // Also check for style attributes on elements
+    const inlineStyleElements = $('[style]').length;
 
     const optimizationIssues = [];
     const unminifiedExternal = stylesheets.filter(s => s.type === 'external' && !s.isMinified).length;
+    const criticalCss = stylesheets.filter(s => s.isCritical).length;
+    const totalInlineSize = stylesheets
+      .filter(s => s.type === 'inline')
+      .reduce((sum, s) => sum + (s.size || 0), 0);
     
     if (unminifiedExternal > 0) {
       optimizationIssues.push(`${unminifiedExternal} unminified CSS files detected`);
+    }
+    
+    if (criticalCss === 0) {
+      optimizationIssues.push('No critical CSS optimization detected');
+    }
+    
+    if (inlineStyleElements > 50) {
+      optimizationIssues.push(`${inlineStyleElements} elements with inline styles detected`);
+    }
+
+    if (totalInlineSize > 10000) {
+      optimizationIssues.push(`Large inline CSS detected (${Math.round(totalInlineSize/1024)}KB)`);
     }
 
     return {
@@ -1158,8 +1507,14 @@ export class SeoAnalyzer {
       externalStylesheets: stylesheets.filter(s => s.type === 'external').length,
       inlineStyles: stylesheets.filter(s => s.type === 'inline').length,
       minifiedStylesheets: stylesheets.filter(s => s.isMinified).length,
+      criticalCssCount: criticalCss,
+      inlineStyleElements,
+      totalInlineSize,
       optimizationIssues,
-      stylesheets: stylesheets.slice(0, 10) // Limit for display
+      stylesheets: stylesheets.slice(0, 15), // Limit for display
+      largestInlineStyle: stylesheets
+        .filter(s => s.type === 'inline' && s.size)
+        .sort((a, b) => (b.size || 0) - (a.size || 0))[0]?.size || 0
     };
   }
 
