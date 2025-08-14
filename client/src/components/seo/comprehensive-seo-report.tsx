@@ -901,14 +901,16 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               <CardContent>
                 <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    The webpage makes more than 50 HTTP requests.
+                    {technicalData.httpRequests ? 
+                      `The webpage makes ${technicalData.httpRequests.total || 'several'} HTTP requests.` :
+                      "HTTP request analysis not available for this domain."}
                   </p>
                 </div>
                 
                 <Accordion type="multiple" className="w-full">
                   <AccordionItem value="javascripts">
                     <AccordionTrigger>
-                      <span className="font-semibold">JavaScripts <Badge variant="outline" className="ml-2">23</Badge></span>
+                      <span className="font-semibold">JavaScripts <Badge variant="outline" className="ml-2">{technicalData.httpRequests?.javascript?.total || 0}</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-4">
@@ -916,29 +918,29 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>Total Scripts:</span>
-                              <Badge variant="outline">23</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.javascript?.total || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>External:</span>
-                              <Badge variant="outline">15</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.javascript?.external || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Inline:</span>
-                              <Badge variant="outline">8</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.javascript?.inline || 0}</Badge>
                             </div>
                           </div>
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>Async:</span>
-                              <Badge variant="outline">4</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.javascript?.async || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Defer:</span>
-                              <Badge variant="outline">19</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.javascript?.defer || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Blocking:</span>
-                              <Badge variant="destructive">0</Badge>
+                              <Badge variant="destructive">{technicalData.httpRequests?.javascript?.blocking || 0}</Badge>
                             </div>
                           </div>
                         </div>
@@ -946,43 +948,34 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <div className="space-y-3">
                           <h5 className="font-medium text-sm">JavaScript Files:</h5>
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {[
-                              { src: '/wp-content/themes/seosight/js/jquery.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/bootstrap.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/owl.carousel.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/aos.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/jquery.waypoints.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/jquery.counterup.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/isotope.pkgd.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/lightbox.min.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/themes/seosight/js/custom.js', type: 'External', loading: 'Defer' },
-                              { src: '/wp-content/plugins/contact-form-7/includes/js/index.js', type: 'External', loading: 'Async' },
-                              { src: '/wp-includes/js/wp-embed.min.js', type: 'External', loading: 'Defer' },
-                              { src: 'https://www.google-analytics.com/analytics.js', type: 'External', loading: 'Async' },
-                              { src: 'https://www.googletagmanager.com/gtag/js', type: 'External', loading: 'Async' },
-                              { src: 'Inline Analytics Script', type: 'Inline', loading: 'Blocking' },
-                              { src: 'Inline Menu Toggle', type: 'Inline', loading: 'Normal' }
-                            ].map((script, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
-                                <div className="flex items-center gap-2">
-                                  <Code className="h-3 w-3 text-blue-500 flex-shrink-0" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
-                                    {script.src}
-                                  </span>
+                            {technicalData.httpRequests?.javascript?.files?.length > 0 ? (
+                              technicalData.httpRequests.javascript.files.map((script: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                  <div className="flex items-center gap-2">
+                                    <Code className="h-3 w-3 text-blue-500 flex-shrink-0" />
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
+                                      {script.src || script.name || script}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {script.type || 'External'}
+                                    </Badge>
+                                    <Badge 
+                                      variant={script.loading === 'Defer' ? 'default' : script.loading === 'Async' ? 'secondary' : 'destructive'} 
+                                      className="text-xs"
+                                    >
+                                      {script.loading || 'Normal'}
+                                    </Badge>
+                                  </div>
                                 </div>
-                                <div className="flex gap-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {script.type}
-                                  </Badge>
-                                  <Badge 
-                                    variant={script.loading === 'Defer' ? 'default' : script.loading === 'Async' ? 'secondary' : 'destructive'} 
-                                    className="text-xs"
-                                  >
-                                    {script.loading}
-                                  </Badge>
-                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Code className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>JavaScript file analysis not available for this domain.</p>
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
                       </div>
@@ -991,7 +984,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   
                   <AccordionItem value="css">
                     <AccordionTrigger>
-                      <span className="font-semibold">CSS <Badge variant="outline" className="ml-2">20</Badge></span>
+                      <span className="font-semibold">CSS <Badge variant="outline" className="ml-2">{technicalData.httpRequests?.css?.total || 0}</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-4">
@@ -999,29 +992,29 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>CSS Files:</span>
-                              <Badge variant="outline">20</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.css?.total || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>External:</span>
-                              <Badge variant="outline">12</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.css?.external || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Inline:</span>
-                              <Badge variant="outline">8</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.css?.inline || 0}</Badge>
                             </div>
                           </div>
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>Critical CSS:</span>
-                              <Badge variant="outline">2</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.css?.critical || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Non-Critical:</span>
-                              <Badge variant="outline">18</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.css?.nonCritical || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Render-Blocking:</span>
-                              <Badge variant="destructive">15</Badge>
+                              <Badge variant="destructive">{technicalData.httpRequests?.css?.blocking || 0}</Badge>
                             </div>
                           </div>
                         </div>
@@ -1029,38 +1022,34 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <div className="space-y-3">
                           <h5 className="font-medium text-sm">CSS Files:</h5>
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {[
-                              { src: '/wp-content/themes/seosight/style.css', type: 'External', blocking: true, size: '45KB' },
-                              { src: '/wp-content/themes/seosight/css/bootstrap.min.css', type: 'External', blocking: true, size: '120KB' },
-                              { src: '/wp-content/themes/seosight/css/font-awesome.min.css', type: 'External', blocking: true, size: '30KB' },
-                              { src: '/wp-content/themes/seosight/css/owl.carousel.min.css', type: 'External', blocking: true, size: '8KB' },
-                              { src: '/wp-content/themes/seosight/css/aos.css', type: 'External', blocking: true, size: '12KB' },
-                              { src: '/wp-content/themes/seosight/css/lightbox.min.css', type: 'External', blocking: true, size: '6KB' },
-                              { src: '/wp-content/plugins/contact-form-7/includes/css/styles.css', type: 'External', blocking: true, size: '4KB' },
-                              { src: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700', type: 'External', blocking: true, size: '25KB' },
-                              { src: 'Inline Critical CSS', type: 'Inline', blocking: false, size: '2KB' },
-                              { src: 'Inline Custom Styles', type: 'Inline', blocking: false, size: '1KB' }
-                            ].map((css, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
-                                <div className="flex items-center gap-2">
-                                  <Settings className="h-3 w-3 text-purple-500 flex-shrink-0" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
-                                    {css.src}
-                                  </span>
+                            {technicalData.httpRequests?.css?.files?.length > 0 ? (
+                              technicalData.httpRequests.css.files.map((css: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                  <div className="flex items-center gap-2">
+                                    <Settings className="h-3 w-3 text-purple-500 flex-shrink-0" />
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-72">
+                                      {css.src || css.name || css}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {css.size || 'N/A'}
+                                    </Badge>
+                                    <Badge 
+                                      variant={css.blocking ? 'destructive' : 'default'} 
+                                      className="text-xs"
+                                    >
+                                      {css.blocking ? 'Blocking' : 'Non-blocking'}
+                                    </Badge>
+                                  </div>
                                 </div>
-                                <div className="flex gap-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {css.size}
-                                  </Badge>
-                                  <Badge 
-                                    variant={css.blocking ? 'destructive' : 'default'} 
-                                    className="text-xs"
-                                  >
-                                    {css.blocking ? 'Blocking' : 'Non-blocking'}
-                                  </Badge>
-                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Settings className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>CSS file analysis not available for this domain.</p>
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1069,7 +1058,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   
                   <AccordionItem value="images">
                     <AccordionTrigger>
-                      <span className="font-semibold">Images <Badge variant="outline" className="ml-2">33</Badge></span>
+                      <span className="font-semibold">Images <Badge variant="outline" className="ml-2">{technicalData.httpRequests?.images?.total || 0}</Badge></span>
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-4">
@@ -1077,29 +1066,29 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>Total Images:</span>
-                              <Badge variant="outline">33</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.images?.total || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Optimized (WebP/AVIF):</span>
-                              <Badge variant="outline">0</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.images?.optimized || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Legacy Format:</span>
-                              <Badge variant="destructive">33</Badge>
+                              <Badge variant="destructive">{technicalData.httpRequests?.images?.legacy || 0}</Badge>
                             </div>
                           </div>
                           <div className="space-y-2">
                             <div className="flex justify-between">
                               <span>JPG:</span>
-                              <Badge variant="outline">18</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.images?.jpg || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>PNG:</span>
-                              <Badge variant="outline">12</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.images?.png || 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>SVG:</span>
-                              <Badge variant="outline">3</Badge>
+                              <Badge variant="outline">{technicalData.httpRequests?.images?.svg || 0}</Badge>
                             </div>
                           </div>
                         </div>
@@ -1107,41 +1096,36 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <div className="space-y-3">
                           <h5 className="font-medium text-sm">Images Not Using Modern Formats:</h5>
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {[
-                              { src: '/wp-content/uploads/2023/hero-banner.jpg', format: 'JPG', size: '250KB', savings: '75KB' },
-                              { src: '/wp-content/uploads/2023/about-us.jpg', format: 'JPG', size: '180KB', savings: '54KB' },
-                              { src: '/wp-content/uploads/2023/service-web-dev.jpg', format: 'JPG', size: '220KB', savings: '66KB' },
-                              { src: '/wp-content/uploads/2023/service-mobile.jpg', format: 'JPG', size: '200KB', savings: '60KB' },
-                              { src: '/wp-content/uploads/2023/portfolio-1.jpg', format: 'JPG', size: '300KB', savings: '90KB' },
-                              { src: '/wp-content/uploads/2023/portfolio-2.jpg', format: 'JPG', size: '280KB', savings: '84KB' },
-                              { src: '/wp-content/uploads/2023/team-member-1.jpg', format: 'JPG', size: '150KB', savings: '45KB' },
-                              { src: '/wp-content/uploads/2023/team-member-2.jpg', format: 'JPG', size: '160KB', savings: '48KB' },
-                              { src: '/wp-content/uploads/2023/logo.png', format: 'PNG', size: '45KB', savings: '25KB' },
-                              { src: '/wp-content/uploads/2023/client-logo-1.png', format: 'PNG', size: '35KB', savings: '20KB' },
-                              { src: '/wp-content/uploads/2023/client-logo-2.png', format: 'PNG', size: '40KB', savings: '22KB' },
-                              { src: '/wp-content/uploads/2023/testimonial-bg.jpg', format: 'JPG', size: '320KB', savings: '96KB' },
-                              { src: '/wp-content/uploads/2023/contact-bg.jpg', format: 'JPG', size: '280KB', savings: '84KB' }
-                            ].map((image, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
-                                <div className="flex items-center gap-2">
-                                  <Image className="h-3 w-3 text-orange-500 flex-shrink-0" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
-                                    {image.src}
-                                  </span>
+                            {technicalData.httpRequests?.images?.files?.length > 0 ? (
+                              technicalData.httpRequests.images.files.map((image: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                  <div className="flex items-center gap-2">
+                                    <Image className="h-3 w-3 text-orange-500 flex-shrink-0" />
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
+                                      {image.src || image.name || image}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {image.format || 'N/A'}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {image.size || 'N/A'}
+                                    </Badge>
+                                    {image.savings && (
+                                      <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        Save {image.savings}
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
-                                <div className="flex gap-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {image.format}
-                                  </Badge>
-                                  <Badge variant="secondary" className="text-xs">
-                                    {image.size}
-                                  </Badge>
-                                  <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                    Save {image.savings}
-                                  </Badge>
-                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Image className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>Image optimization analysis not available for this domain.</p>
                               </div>
-                            ))}
+                            )}
                           </div>
                           
                           <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded text-xs text-orange-800 dark:text-orange-200">
@@ -1332,44 +1316,31 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           </div>
                           
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {[
-                              { src: '/wp-content/themes/seosight/js/jquery.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/bootstrap.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/owl.carousel.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/aos.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/jquery.waypoints.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/jquery.counterup.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/isotope.pkgd.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/lightbox.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/themes/seosight/js/custom.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-content/plugins/contact-form-7/includes/js/index.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: '/wp-includes/js/wp-embed.min.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: 'https://www.google-analytics.com/analytics.js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: 'https://www.googletagmanager.com/gtag/js', issue: 'No defer attribute', impact: 'Blocks parsing' },
-                              { src: 'Inline Analytics Script', issue: 'Inline without defer', impact: 'Blocks parsing' },
-                              { src: 'Inline Menu Toggle', issue: 'Inline without defer', impact: 'Blocks parsing' },
-                              { src: 'Inline Contact Form Handler', issue: 'Inline without defer', impact: 'Blocks parsing' },
-                              { src: 'Inline Slider Initialization', issue: 'Inline without defer', impact: 'Blocks parsing' },
-                              { src: 'Inline Animation Scripts', issue: 'Inline without defer', impact: 'Blocks parsing' },
-                              { src: 'Inline Tracking Code', issue: 'Inline without defer', impact: 'Blocks parsing' }
-                            ].map((script, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
-                                <div className="flex items-center gap-2">
-                                  <Code className="h-3 w-3 text-red-500 flex-shrink-0" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
-                                    {script.src}
-                                  </span>
+                            {technicalData.performance?.scriptIssues?.length > 0 ? (
+                              technicalData.performance.scriptIssues.map((script: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
+                                  <div className="flex items-center gap-2">
+                                    <Code className="h-3 w-3 text-red-500 flex-shrink-0" />
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-64">
+                                      {script.src || script.name || script}
+                                    </span>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {script.issue || 'Performance Issue'}
+                                    </Badge>
+                                    <Badge variant="destructive" className="text-xs">
+                                      {script.impact || 'Affects Loading'}
+                                    </Badge>
+                                  </div>
                                 </div>
-                                <div className="flex gap-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {script.issue}
-                                  </Badge>
-                                  <Badge variant="destructive" className="text-xs">
-                                    {script.impact}
-                                  </Badge>
-                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Code className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>No JavaScript performance issues detected for this domain.</p>
                               </div>
-                            ))}
+                            )}
                           </div>
                           
                           <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
@@ -1397,7 +1368,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         The DOM size is optimal.
                       </span>
                       <span className="text-xs text-blue-600 dark:text-blue-400">
-                        The HTML file has 657 DOM nodes.
+                        The HTML file has {technicalData.performance?.domNodes || 'N/A'} DOM nodes.
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -2105,11 +2076,15 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 <div className="mt-1 space-y-1">
                                   <div className="flex justify-between">
                                     <span>HTTPS Links:</span>
-                                    <Badge variant="default" className="text-xs">7/9</Badge>
+                                    <Badge variant="default" className="text-xs">
+                                      {technicalData.socialMedia?.httpsCount || 0}/{technicalData.socialMedia?.totalCount || 0}
+                                    </Badge>
                                   </div>
                                   <div className="flex justify-between">
                                     <span>Valid URLs:</span>
-                                    <Badge variant="default" className="text-xs">9/9</Badge>
+                                    <Badge variant="default" className="text-xs">
+                                      {technicalData.socialMedia?.validCount || 0}/{technicalData.socialMedia?.totalCount || 0}
+                                    </Badge>
                                   </div>
                                 </div>
                               </div>
@@ -2118,19 +2093,31 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 <div className="mt-1 space-y-1">
                                   <div className="flex justify-between">
                                     <span>Major Platforms:</span>
-                                    <Badge variant="default" className="text-xs">3/5</Badge>
+                                    <Badge variant="default" className="text-xs">
+                                      {technicalData.socialMedia?.platformCount || 0}/5
+                                    </Badge>
                                   </div>
                                   <div className="flex justify-between">
                                     <span>Business Focus:</span>
-                                    <Badge variant="secondary" className="text-xs">✓ Good</Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {technicalData.socialMedia?.platformCount >= 3 ? '✓ Good' : '⚠ Limited'}
+                                    </Badge>
                                   </div>
                                 </div>
                               </div>
                               <div>
                                 <span className="font-medium text-blue-800 dark:text-blue-200">Opportunities:</span>
                                 <div className="mt-1 space-y-1">
-                                  <Badge variant="outline" className="text-xs">+ LinkedIn</Badge>
-                                  <Badge variant="outline" className="text-xs">+ YouTube</Badge>
+                                  {technicalData.socialMedia?.missingPlatforms ? (
+                                    technicalData.socialMedia.missingPlatforms.map((platform: string, index: number) => (
+                                      <Badge key={index} variant="outline" className="text-xs">+ {platform}</Badge>
+                                    ))
+                                  ) : (
+                                    <>
+                                      <Badge variant="outline" className="text-xs">+ LinkedIn</Badge>
+                                      <Badge variant="outline" className="text-xs">+ YouTube</Badge>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2156,11 +2143,11 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                               <div className="space-y-2">
                                 {[
                                   { tag: 'og:title', value: technicalData.metaTags?.title || technicalData.title || 'Website Title', status: 'present' },
-                                  { tag: 'og:description', value: 'Professional web design and development services...', status: 'present' },
+                                  { tag: 'og:description', value: technicalData.metaTags?.description || technicalData.description || 'Website description...', status: 'present' },
                                   { tag: 'og:image', value: `${technicalData.url || websiteUrl}/og-image.jpg`, status: 'present' },
                                   { tag: 'og:url', value: technicalData.url || websiteUrl, status: 'present' },
                                   { tag: 'og:type', value: 'website', status: 'present' },
-                                  { tag: 'og:site_name', value: 'KSoft Solution', status: 'present' }
+                                  { tag: 'og:site_name', value: technicalData.metaTags?.siteName || technicalData.title || 'Website', status: 'present' }
                                 ].map((item, index) => (
                                   <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
                                     <div className="flex items-center gap-2">
@@ -2182,7 +2169,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                   { tag: 'twitter:card', value: 'summary_large_image', status: 'present' },
                                   { tag: 'twitter:site', value: technicalData.metaTags?.twitterSite || '@website', status: 'present' },
                                   { tag: 'twitter:title', value: (technicalData.metaTags?.title || technicalData.title || 'Website Title').substring(0, 70) + '...', status: 'present' },
-                                  { tag: 'twitter:description', value: 'Professional web design...', status: 'present' },
+                                  { tag: 'twitter:description', value: technicalData.metaTags?.description || technicalData.description || 'Website description...', status: 'present' },
                                   { tag: 'twitter:image', value: `${technicalData.url || websiteUrl}/twitter-card.jpg`, status: 'present' }
                                 ].map((item, index) => (
                                   <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
