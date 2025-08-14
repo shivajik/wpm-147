@@ -61,7 +61,9 @@ export default function WebsiteSEO() {
     setShowProgressModal(true);
     
     try {
-      await apiCall('POST', `/api/websites/${websiteId}/seo-analysis`, {});
+      await apiCall(`/api/websites/${websiteId}/seo-analysis`, {
+        method: 'POST',
+      });
       
       // Poll for completion - the analysis runs asynchronously 
       const pollInterval = setInterval(async () => {
@@ -142,7 +144,11 @@ export default function WebsiteSEO() {
     return (
       <AppLayout>
         <div className="flex h-screen">
-          <MaintenanceSidebar />
+          <MaintenanceSidebar 
+            websiteId={parseInt(websiteId || '0')}
+            websiteName="Loading..."
+            websiteUrl=""
+          />
           <div className="flex-1 p-6">
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -157,7 +163,11 @@ export default function WebsiteSEO() {
     return (
       <AppLayout>
         <div className="flex h-screen">
-          <MaintenanceSidebar />
+          <MaintenanceSidebar 
+            websiteId={parseInt(websiteId || '0')}
+            websiteName="Unknown"
+            websiteUrl=""
+          />
           <div className="flex-1 p-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Website not found</h1>
@@ -172,7 +182,11 @@ export default function WebsiteSEO() {
   return (
     <AppLayout>
       <div className="flex h-screen">
-        <MaintenanceSidebar />
+        <MaintenanceSidebar 
+          websiteId={parseInt(websiteId || '0')}
+          websiteName={website.name}
+          websiteUrl={website.url}
+        />
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
             {/* Header */}
