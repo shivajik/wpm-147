@@ -142,8 +142,8 @@ export default function WebsiteSEO() {
 
   if (isLoading) {
     return (
-      <AppLayout>
-        <div className="flex h-screen">
+      <AppLayout title="SEO Analysis - Loading..." defaultOpen={false}>
+        <div className="flex gap-6">
           <MaintenanceSidebar 
             websiteId={parseInt(websiteId || '0')}
             websiteName="Loading..."
@@ -161,8 +161,8 @@ export default function WebsiteSEO() {
 
   if (!website) {
     return (
-      <AppLayout>
-        <div className="flex h-screen">
+      <AppLayout title="SEO Analysis - Website Not Found" defaultOpen={false}>
+        <div className="flex gap-6">
           <MaintenanceSidebar 
             websiteId={parseInt(websiteId || '0')}
             websiteName="Unknown"
@@ -180,8 +180,8 @@ export default function WebsiteSEO() {
   }
 
   return (
-    <AppLayout>
-      <div className="flex h-screen">
+    <AppLayout title={`${website.name} - SEO Analysis`} defaultOpen={false}>
+      <div className="flex gap-6">
         <MaintenanceSidebar 
           websiteId={parseInt(websiteId || '0')}
           websiteName={website.name}
