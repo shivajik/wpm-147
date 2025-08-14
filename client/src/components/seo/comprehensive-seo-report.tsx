@@ -763,20 +763,16 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                             <div className="space-y-2">
                               <div className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded">
                                 <span className="text-sm font-medium">Externals</span>
-                                <Badge variant="outline" className="text-xs">{technicalData.links?.external?.length || 0}</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.links?.external || 0}</Badge>
                               </div>
                               
                               <div className="space-y-1 max-h-48 overflow-y-auto">
-                                {technicalData.links?.external?.length > 0 ? (
-                                  technicalData.links.external.slice(0, 10).map((link: any, index: number) => (
-                                    <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
-                                      <ExternalLink className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                                      <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text || 'External Link'}</span>
-                                      <span className="text-blue-600 dark:text-blue-400 truncate text-xs">
-                                        {(link.url || link).replace('https://', '').replace('http://', '')}
-                                      </span>
-                                    </div>
-                                  ))
+                                {(technicalData.links?.external || 0) > 0 ? (
+                                  <div className="text-center p-4 text-xs text-green-600">
+                                    <ExternalLink className="h-6 w-6 mx-auto mb-2 text-green-500" />
+                                    <p><strong>{technicalData.links?.external || 0}</strong> external links detected</p>
+                                    <p className="text-gray-500 mt-1">External links help establish connections with other websites</p>
+                                  </div>
                                 ) : (
                                   <div className="text-center p-4 text-xs text-gray-500">
                                     <ExternalLink className="h-6 w-6 mx-auto mb-2 text-gray-400" />
@@ -790,29 +786,20 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                             <div className="space-y-2">
                               <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-2 rounded">
                                 <span className="text-sm font-medium">Internals</span>
-                                <Badge variant="outline" className="text-xs">{technicalData.links?.internal?.length || 0}</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.links?.internal || 0}</Badge>
                               </div>
                               
                               <div className="space-y-1 max-h-48 overflow-y-auto">
-                                {technicalData.links?.internal?.length > 0 ? (
-                                  technicalData.links.internal.slice(0, 10).map((link: any, index: number) => (
-                                    <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
-                                      <Link2 className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                                      <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text || 'Internal Link'}</span>
-                                      <span className="text-green-600 dark:text-green-400 truncate text-xs">
-                                        {link.url || link}
-                                      </span>
-                                    </div>
-                                  ))
+                                {(technicalData.links?.internal || 0) > 0 ? (
+                                  <div className="text-center p-4 text-xs text-green-600">
+                                    <Link2 className="h-6 w-6 mx-auto mb-2 text-green-500" />
+                                    <p><strong>{technicalData.links?.internal || 0}</strong> internal links detected</p>
+                                    <p className="text-gray-500 mt-1">Good internal linking helps with site navigation and SEO</p>
+                                  </div>
                                 ) : (
                                   <div className="text-center p-4 text-xs text-gray-500">
                                     <Link2 className="h-6 w-6 mx-auto mb-2 text-gray-400" />
                                     <p>No internal links found.</p>
-                                  </div>
-                                )}
-                                {technicalData.links?.internal?.length > 10 && (
-                                  <div className="text-center p-1">
-                                    <span className="text-xs text-gray-500">... and {technicalData.links.internal.length - 10} more</span>
                                   </div>
                                 )}
                               </div>
@@ -820,7 +807,10 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           </div>
                           
                           <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs text-green-800 dark:text-green-200">
-                            <strong>Analysis:</strong> Good balance of internal (39) and external (13) links. Internal linking helps with site navigation and SEO.
+                            <strong>Analysis:</strong> {(technicalData.links?.internal || 0) > 0 ? 
+                              `Good balance of internal (${technicalData.links?.internal || 0}) and external (${technicalData.links?.external || 0}) links. Internal linking helps with site navigation and SEO.` :
+                              'No links detected. Consider adding internal links to improve site navigation and SEO.'
+                            }
                           </div>
                         </AccordionContent>
                       </AccordionItem>
