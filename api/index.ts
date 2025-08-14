@@ -2221,11 +2221,13 @@ export default async function handler(req: any, res: any) {
           timeout: connectionConfig.connect_timeout
         });
         
+        // Test with raw SQL first
+        const plansRaw = await client`SELECT * FROM subscription_plans WHERE is_active = true ORDER BY monthly_price`;
+        console.log('[VERCEL] Raw SQL result:', plansRaw.length, 'plans');
+        
         const plans = await db
           .select()
-          .from(subscriptionPlans)
-          .where(eq(subscriptionPlans.isActive, true))
-          .orderBy(subscriptionPlans.monthlyPrice);
+          .from(subscriptionPlans);
 
         console.log('[VERCEL] Successfully fetched', plans.length, 'subscription plans');
         return res.status(200).json(plans);
