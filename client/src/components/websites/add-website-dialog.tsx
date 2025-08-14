@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,7 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiCall } from "@/lib/queryClient";
 import { insertWebsiteSchema, type InsertWebsite, type Client } from "@shared/schema";
-import { Globe, Key, Settings } from "lucide-react";
+import { Globe, Key, Settings, Plus, UserPlus } from "lucide-react";
+import AddClientDialog from "@/components/clients/add-client-dialog";
 
 interface AddWebsiteDialogProps {
   open: boolean;
@@ -40,6 +41,7 @@ const websiteFormSchema = insertWebsiteSchema.extend({
 
 export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialogProps) {
   const [activeTab, setActiveTab] = useState("basic");
+  const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -65,6 +67,17 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
     queryKey: ["/api/clients"],
     enabled: open,
   });
+
+  // Auto-select the newest client when the list updates (after adding a new client)
+  useEffect(() => {
+    if (clients && clients.length > 0 && !form.getValues().clientId) {
+      // Sort clients by id (assuming higher id = newer) and select the latest one
+      const newestClient = clients.reduce((prev, current) => 
+        (current.id > prev.id) ? current : prev
+      );
+      form.setValue('clientId', newestClient.id);
+    }
+  }, [clients, form]);
 
   const createWebsiteMutation = useMutation({
     mutationFn: async (data: WebsiteFormData) => {
@@ -217,24 +230,51 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm sm:text-base">Client</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(parseInt(value))}
-                        value={field.value ? field.value.toString() : ""}
-                        disabled={clientsLoading}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="text-sm sm:text-base">
-                            <SelectValue placeholder="Select a client" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Array.isArray(clients) && clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id.toString()}>
-                              <span className="truncate">{client.name} ({client.email})</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {Array.isArray(clients) && clients.length > 0 ? (
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value ? field.value.toString() : ""}
+                          disabled={clientsLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="text-sm sm:text-base">
+                              <SelectValue placeholder="Select a client" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clients.map((client) => (
+                              <SelectItem key={client.id} value={client.id.toString()}>
+                                <span className="truncate">{client.name} ({client.email})</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
+                            <div className="flex items-center space-x-2">
+                              <UserPlus className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                              <span className="text-sm text-orange-800 dark:text-orange-200">
+                                {clientsLoading ? "Loading clients..." : "No clients found. Please add a client first."}
+                              </span>
+                            </div>
+                            {!clientsLoading && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setIsAddClientDialogOpen(true)}
+                                className="border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:text-orange-300 dark:hover:bg-orange-900"
+                                data-testid="button-add-client-from-website"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add Client
+                              </Button>
+                            )}
+                          </div>
+                          <input type="hidden" {...field} />
+                        </div>
+                      )}
                       <FormDescription className="text-xs sm:text-sm">
                         Which client owns this website?
                       </FormDescription>
@@ -420,6 +460,18 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
           </div>
         </div>
       </DialogContent>
+      
+      {/* Add Client Dialog */}
+      <AddClientDialog 
+        open={isAddClientDialogOpen} 
+        onOpenChange={(open) => {
+          setIsAddClientDialogOpen(open);
+          if (!open) {
+            // Refresh clients when dialog is closed
+            queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+          }
+        }} 
+      />
     </Dialog>
   );
 }
