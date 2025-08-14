@@ -35,8 +35,10 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
   });
 
   // Fetch WordPress data
-  const { data: wpData, isLoading: wpDataLoading } = useQuery({
+  const { data: wpData, isLoading: wpDataLoading, refetch: refetchWpData } = useQuery({
     queryKey: [`/api/websites/${websiteId}/wordpress-data`],
+    staleTime: 30 * 1000, // 30 seconds instead of default 5 minutes
+    gcTime: 60 * 1000, // 1 minute cache (gcTime in TanStack Query v5)
   });
 
   // Fetch health data
@@ -182,27 +184,41 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm text-gray-600 dark:text-gray-400">Updates</p>
-                {(wpData as any)?.updateData?.count?.total > 0 ? (
-                  <div>
-                    <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
-                      {(wpData as any)?.updateData?.count?.total}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      Updates available
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                      Up to date
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      All current
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  // Calculate total updates manually from the actual data
+                  const pluginUpdates = (wpData as any)?.updateData?.plugins?.length || 0;
+                  const themeUpdates = (wpData as any)?.updateData?.themes?.length || 0;
+                  const coreUpdate = (wpData as any)?.updateData?.wordpress?.update_available ? 1 : 0;
+                  const totalUpdates = pluginUpdates + themeUpdates + coreUpdate;
+                  
+                  return totalUpdates > 0 ? (
+                    <div>
+                      <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                        {totalUpdates}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
+                        Updates available
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                        Up to date
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
+                        All current
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
-              <TrendingUp className={`h-8 w-8 ${(wpData as any)?.updateData?.count?.total > 0 ? 'text-orange-500' : 'text-green-500'}`} />
+              <TrendingUp className={`h-8 w-8 ${(() => {
+                const pluginUpdates = (wpData as any)?.updateData?.plugins?.length || 0;
+                const themeUpdates = (wpData as any)?.updateData?.themes?.length || 0;
+                const coreUpdate = (wpData as any)?.updateData?.wordpress?.update_available ? 1 : 0;
+                const totalUpdates = pluginUpdates + themeUpdates + coreUpdate;
+                return totalUpdates > 0 ? 'text-orange-500' : 'text-green-500';
+              })()}`} />
             </div>
           </CardContent>
         </Card>
