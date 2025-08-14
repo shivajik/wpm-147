@@ -18,9 +18,29 @@ export default function WebsiteDetail() {
   const { id: websiteId } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
 
+  // Debug logging
+  console.log('WebsiteDetail - Raw websiteId from URL params:', websiteId);
+  
+  // Check if websiteId is valid
+  if (!websiteId || websiteId === 'undefined' || websiteId === 'null' || isNaN(Number(websiteId))) {
+    return (
+      <AppLayout title="Invalid Website" defaultOpen={false}>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Invalid Website ID</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            The website ID "{websiteId}" is not valid.
+          </p>
+          <Button onClick={() => setLocation('/websites')}>
+            Back to Websites
+          </Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
   const { data: website, isLoading } = useQuery<Website>({
     queryKey: ['/api/websites', websiteId],
-    enabled: !!websiteId,
+    enabled: !!websiteId && websiteId !== 'undefined',
   });
 
   const { data: wordpressData } = useQuery({

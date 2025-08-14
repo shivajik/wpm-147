@@ -1,6 +1,7 @@
 import { useParams, useLocation } from "wouter";
 import type { Website } from "@shared/schema";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { isValidWebsiteId, InvalidWebsiteIdPage } from "@/lib/website-validation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,11 @@ export default function WebsiteThemes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedThemes, setSelectedThemes] = useState<number[]>([]);
   const { toast } = useToast();
+
+  // Validate website ID
+  if (!isValidWebsiteId(websiteId)) {
+    return <InvalidWebsiteIdPage websiteId={websiteId} />;
+  }
 
   const { data: website, isLoading } = useQuery<Website>({
     queryKey: ['/api/websites', websiteId],

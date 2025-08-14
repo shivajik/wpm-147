@@ -58,6 +58,26 @@ export default function WebsitePlugins() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const websiteId = params.id;
+
+  // Debug logging
+  console.log('WebsitePlugins - Raw websiteId from URL params:', websiteId);
+  
+  // Check if websiteId is valid
+  if (!websiteId || websiteId === 'undefined' || websiteId === 'null' || isNaN(Number(websiteId))) {
+    return (
+      <AppLayout title="Invalid Website" defaultOpen={false}>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Invalid Website ID</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            The website ID "{websiteId}" is not valid.
+          </p>
+          <Button onClick={() => setLocation('/websites')}>
+            Back to Websites
+          </Button>
+        </div>
+      </AppLayout>
+    );
+  }
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedPlugins, setSelectedPlugins] = useState<number[]>([]);
