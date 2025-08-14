@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiCall } from "@/lib/queryClient";
 import { insertWebsiteSchema, type InsertWebsite, type Client } from "@shared/schema";
-import { Globe, Key, Settings, Plus, UserPlus } from "lucide-react";
+import { Globe, Key, Settings, Plus, UserPlus, AlertCircle } from "lucide-react";
 import AddClientDialog from "@/components/clients/add-client-dialog";
 
 interface AddWebsiteDialogProps {
@@ -79,6 +79,28 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
     }
   }, [clients, form]);
 
+  // Helper function to check which tabs have errors
+  const getTabErrors = () => {
+    const errors = form.formState.errors;
+    return {
+      basic: !!(errors.name || errors.url || errors.clientId),
+      credentials: !!(errors.wpAdminUsername || errors.wpAdminPassword || errors.wrmApiKey),
+      settings: !!(errors.wpVersion || errors.healthStatus)
+    };
+  };
+
+  // Auto-switch to tab with errors when validation fails
+  const handleSubmitError = () => {
+    const tabErrors = getTabErrors();
+    if (tabErrors.basic) {
+      setActiveTab("basic");
+    } else if (tabErrors.credentials) {
+      setActiveTab("credentials");
+    } else if (tabErrors.settings) {
+      setActiveTab("settings");
+    }
+  };
+
   const createWebsiteMutation = useMutation({
     mutationFn: async (data: WebsiteFormData) => {
       return await apiCall("/api/websites", {
@@ -119,11 +141,22 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
       onOpenChange(false);
     },
     onError: (error: any) => {
+      // Check for validation errors and guide user to correct tab
+      const tabErrors = getTabErrors();
+      let errorMessage = error?.message || "Please check the form for errors.";
+      
+      if (tabErrors.basic || tabErrors.credentials || tabErrors.settings) {
+        errorMessage = "Please check the highlighted tabs for required fields and fix any errors.";
+      }
+
       toast({
         title: "Failed to add website",
-        description: error?.message || "There was an error adding the website. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // Auto-switch to first tab with errors
+      handleSubmitError();
     },
   });
 
@@ -161,23 +194,50 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
 
         <div className="flex-1 overflow-hidden px-4 sm:px-6 min-h-0">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <form onSubmit={form.handleSubmit(onSubmit, handleSubmitError)} className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pr-2 pb-2 min-h-0" style={{ maxHeight: 'calc(90vh - 200px)' }}>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                <TabsTrigger value="basic" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+                <TabsTrigger 
+                  value="basic" 
+                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
+                    getTabErrors().basic ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
+                  }`}
+                  data-testid="tab-basic"
+                >
                   <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Basic Info</span>
                   <span className="sm:hidden">Basic</span>
+                  {getTabErrors().basic && (
+                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="credentials" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+                <TabsTrigger 
+                  value="credentials" 
+                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
+                    getTabErrors().credentials ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
+                  }`}
+                  data-testid="tab-credentials"
+                >
                   <Key className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Connection</span>
                   <span className="sm:hidden">Connect</span>
+                  {getTabErrors().credentials && (
+                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+                <TabsTrigger 
+                  value="settings" 
+                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
+                    getTabErrors().settings ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
+                  }`}
+                  data-testid="tab-settings"
+                >
                   <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                   Settings
+                  {getTabErrors().settings && (
+                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -452,8 +512,9 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
             <Button
               type="submit"
               disabled={createWebsiteMutation.isPending}
-              onClick={form.handleSubmit(onSubmit)}
+              onClick={form.handleSubmit(onSubmit, handleSubmitError)}
               className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+              data-testid="button-submit-website"
             >
               {createWebsiteMutation.isPending ? "Adding..." : "Add Website"}
             </Button>
