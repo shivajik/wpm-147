@@ -340,7 +340,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-gray-400" />
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">1.80 seconds</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{((technicalData.performance?.loadTime || 0) / 1000).toFixed(2)} seconds</div>
                   <div className="text-sm text-gray-500">Load time</div>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-gray-400" />
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">19.03 KB</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{((technicalData.performance?.pageSizeBytes || 0) / 1024).toFixed(2)} KB</div>
                   <div className="text-sm text-gray-500">Page size</div>
                 </div>
               </div>
@@ -358,7 +358,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               <div className="flex items-center gap-3">
                 <Users className="h-5 w-5 text-gray-400" />
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">76 resources</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{technicalData.httpRequests?.total || technicalData.performance?.requests || 0} resources</div>
                   <div className="text-sm text-gray-500">HTTP requests</div>
                 </div>
               </div>
@@ -367,8 +367,8 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
               <div className="flex items-center gap-3">
                 <Shield className="h-5 w-5 text-gray-400" />
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">Secure</div>
-                  <div className="text-sm text-gray-500">HTTPS enabled</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{technicalData.technicalSeo?.httpsEnabled ? 'Secure' : 'Not Secure'}</div>
+                  <div className="text-sm text-gray-500">{technicalData.technicalSeo?.httpsEnabled ? 'HTTPS enabled' : 'HTTPS missing'}</div>
                 </div>
               </div>
             </div>
@@ -540,9 +540,21 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                             <div className="text-xs text-gray-500 p-2">H4-H6 headings analysis available in detailed scan</div>
                           </div>
                           
-                          <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-200">
-                            <strong>Issue:</strong> Multiple h1 tags found (2). There should be only one h1 tag per page. Consider using h2-h6 for subheadings to create a proper heading hierarchy.
-                          </div>
+                          {technicalData.h1Tags?.length > 1 && (
+                            <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-200">
+                              <strong>Issue:</strong> Multiple h1 tags found ({technicalData.h1Tags.length}). There should be only one h1 tag per page. Consider using h2-h6 for subheadings to create a proper heading hierarchy.
+                            </div>
+                          )}
+                          {technicalData.h1Tags?.length === 1 && (
+                            <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs text-green-800 dark:text-green-200">
+                              <strong>Good:</strong> Perfect heading structure with one h1 tag.
+                            </div>
+                          )}
+                          {(!technicalData.h1Tags || technicalData.h1Tags?.length === 0) && (
+                            <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-200">
+                              <strong>Critical:</strong> No h1 tag found. Add a primary heading (h1) to define the main topic of this page.
+                            </div>
+                          )}
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
@@ -834,7 +846,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         The webpage has the language declared.
                       </span>
                       <Badge variant="secondary" className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 mt-1">
-                        en-US
+                        {technicalData.technicalSeo?.lang || "en-US"}
                       </Badge>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -1119,7 +1131,10 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                           </div>
                           
                           <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded text-xs text-orange-800 dark:text-orange-200">
-                            <strong>Recommendation:</strong> Convert images to modern formats like WebP or AVIF to reduce file sizes by up to 30-50% while maintaining quality. Total potential savings: ~900KB
+                            <strong>Recommendation:</strong> Convert images to modern formats like WebP or AVIF to reduce file sizes by up to 30-50% while maintaining quality. 
+                            {technicalData.images?.total > 0 && 
+                              ` Found ${technicalData.images.total} images, ${technicalData.images.total - (technicalData.images.formats?.webp || 0) - (technicalData.images.formats?.avif || 0)} need optimization.`
+                            }
                           </div>
                         </div>
                       </div>
@@ -1147,10 +1162,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <span className="text-sm text-gray-600 dark:text-gray-400 block">
-                        The HTML file is compressed.
+                        {technicalData.performance?.optimizations?.compression ? 
+                          "The HTML file is compressed." : 
+                          "The HTML file is not compressed. Enable Gzip/Brotli compression."}
                       </span>
                       <span className="text-xs text-blue-600 dark:text-blue-400">
-                        The HTML filesize is 19.03 KB.
+                        The HTML filesize is {((technicalData.performance?.pageSizeBytes || 0) / 1024).toFixed(2)} KB.
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -1169,7 +1186,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      The webpage loaded in 1.80 seconds.
+                      The webpage loaded in {((technicalData.performance?.loadTime || 0) / 1000).toFixed(2)} seconds.
                     </span>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
@@ -1187,7 +1204,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      The size of the HTML webpage is 19.03 KB.
+                      The size of the HTML webpage is {((technicalData.performance?.pageSizeBytes || 0) / 1024).toFixed(2)} KB.
                     </span>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
@@ -1206,7 +1223,9 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        There are 33 images that are not using the AVIF, WebP format.
+                        {technicalData.images?.total > 0 
+                          ? `There are ${technicalData.images.total - (technicalData.images.formats?.webp || 0) - (technicalData.images.formats?.avif || 0)} images that are not using the AVIF, WebP format.`
+                          : "No images found that need format optimization."}
                       </span>
                       <Info className="h-4 w-4 text-gray-400 cursor-help" />
                     </div>
@@ -1222,7 +1241,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         <AccordionContent className="space-y-3 pb-2">
                           <div className="flex justify-between items-center bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
                             <span className="text-sm font-medium">Images</span>
-                            <Badge variant="outline" className="text-xs">33</Badge>
+                            <Badge variant="outline" className="text-xs">{technicalData.images?.total - (technicalData.images?.formats?.webp || 0) - (technicalData.images?.formats?.avif || 0) || 0}</Badge>
                           </div>
                           
                           <div className="grid grid-cols-3 gap-4 text-sm">
