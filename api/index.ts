@@ -1884,6 +1884,10 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+
+
+
+
     // Debug endpoint
     if (path === '/api/debug') {
       const dbUrl = process.env.DATABASE_URL;
@@ -2760,7 +2764,7 @@ export default async function handler(req: any, res: any) {
           return res.status(404).json({ message: "SEO report not found" });
         }
 
-        const report = reportResult[0].seoReports;
+        const report = reportResult[0].seo_reports;
         return res.status(200).json({
           id: report.id,
           websiteId: report.websiteId,
@@ -2795,11 +2799,18 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    // Get SEO report by direct ID (without website scope)
+    // Get SEO report by direct ID (without website scope) or by share token
     if (path.match(/^\/api\/seo-reports\/\d+$/) && req.method === 'GET') {
-      const user = authenticateToken(req);
-      if (!user) {
-        return res.status(401).json({ message: 'Unauthorized' });
+      // Check for share token first (public access)
+      const shareToken = url.searchParams.get('token');
+      let user = null;
+      
+      if (!shareToken) {
+        // No share token provided, require authentication
+        user = authenticateToken(req);
+        if (!user) {
+          return res.status(401).json({ message: 'Unauthorized' });
+        }
       }
 
       const reportId = parseInt(path.split('/')[3]);
@@ -2808,18 +2819,34 @@ export default async function handler(req: any, res: any) {
       }
 
       try {
-        const reportResult = await db.select()
-          .from(seoReports)
-          .innerJoin(websites, eq(seoReports.websiteId, websites.id))
-          .innerJoin(clients, eq(websites.clientId, clients.id))
-          .where(and(eq(seoReports.id, reportId), eq(clients.userId, user.id)))
-          .limit(1);
+        let reportResult;
+        
+        if (shareToken) {
+          // Public access via share token
+          reportResult = await db.select()
+            .from(seoReports)
+            .innerJoin(websites, eq(seoReports.websiteId, websites.id))
+            .where(and(
+              eq(seoReports.id, reportId),
+              eq(seoReports.shareToken, shareToken),
+              eq(seoReports.isShareable, true)
+            ))
+            .limit(1);
+        } else {
+          // Authenticated access
+          reportResult = await db.select()
+            .from(seoReports)
+            .innerJoin(websites, eq(seoReports.websiteId, websites.id))
+            .innerJoin(clients, eq(websites.clientId, clients.id))
+            .where(and(eq(seoReports.id, reportId), eq(clients.userId, user.id)))
+            .limit(1);
+        }
 
         if (reportResult.length === 0) {
           return res.status(404).json({ message: "SEO report not found" });
         }
 
-        const report = reportResult[0].seoReports;
+        const report = reportResult[0].seo_reports;
         const website = reportResult[0].websites;
 
         return res.status(200).json({
@@ -2951,7 +2978,7 @@ export default async function handler(req: any, res: any) {
           return res.status(404).json({ message: "SEO report not found" });
         }
 
-        const report = reportResult[0].seoReports;
+        const report = reportResult[0].seo_reports;
         const website = reportResult[0].websites;
 
         // Generate PDF download URL
@@ -2998,7 +3025,7 @@ export default async function handler(req: any, res: any) {
           return res.status(404).json({ message: "SEO report not found" });
         }
 
-        const report = reportResult[0].seoReports;
+        const report = reportResult[0].seo_reports;
         const website = reportResult[0].websites;
 
         // Generate or get existing share token
@@ -3027,6 +3054,65 @@ export default async function handler(req: any, res: any) {
       } catch (error) {
         console.error("Error generating share link:", error);
         return res.status(500).json({ message: "Failed to generate share link" });
+      }
+    }
+
+    // Public SEO report access by share token (no authentication required)
+    if (path.match(/^\/api\/reports\/(.+)$/) && req.method === 'GET') {
+      console.log('[DEBUG] Public SEO report route matched:', path);
+      const shareToken = path.split('/')[3];
+      console.log('[DEBUG] Share token extracted:', shareToken);
+      
+      try {
+        const reportResult = await db.select()
+          .from(seoReports)
+          .innerJoin(websites, eq(seoReports.websiteId, websites.id))
+          .where(and(
+            eq(seoReports.shareToken, shareToken),
+            eq(seoReports.isShareable, true)
+          ))
+          .limit(1);
+
+        if (reportResult.length === 0) {
+          return res.status(404).json({ message: "SEO report not found or not shared" });
+        }
+
+        const report = reportResult[0].seo_reports;
+        const website = reportResult[0].websites;
+
+        return res.status(200).json({
+          id: report.id,
+          websiteId: report.website_id,
+          websiteName: website.name,
+          websiteUrl: website.url,
+          overallScore: report.overall_score,
+          technicalScore: report.technical_score,
+          contentScore: report.content_score,
+          userExperienceScore: report.user_experience_score,
+          backlinksScore: report.backlinks_score,
+          onPageSeoScore: report.on_page_seo_score,
+          reportData: typeof report.report_data === 'string' 
+            ? JSON.parse(report.report_data) 
+            : report.report_data,
+          recommendations: typeof report.recommendations === 'string'
+            ? JSON.parse(report.recommendations)
+            : report.recommendations,
+          detailedFindings: typeof report.detailed_findings === 'string'
+            ? JSON.parse(report.detailed_findings || '{}')
+            : (report.detailed_findings || {}),
+          criticalIssues: report.critical_issues,
+          warnings: report.warnings,
+          notices: report.notices,
+          scanDuration: report.scan_duration,
+          scanStatus: report.scan_status,
+          generatedAt: report.generated_at,
+          isShareable: report.is_shareable,
+          shareToken: report.share_token
+        });
+
+      } catch (error) {
+        console.error("Error fetching shared SEO report:", error);
+        return res.status(500).json({ message: "Failed to fetch SEO report" });
       }
     }
 

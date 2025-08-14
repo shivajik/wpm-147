@@ -129,6 +129,7 @@ function Router() {
       )}
       {/* SEO reports should be accessible in both authenticated and unauthenticated modes */}
       <Route path="/seo-report/:id" component={SeoReportPage} />
+      <Route path="/reports/:token" component={SeoReportPage} />
       <Route component={NotFound} />
     </Switch>
   );

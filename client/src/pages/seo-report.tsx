@@ -16,11 +16,22 @@ type SeoReportWithDetails = SeoReport & {
 export default function SeoReportPage() {
   const params = useParams();
   const reportId = params.id;
+  const shareToken = params.token;
   const [authReady, setAuthReady] = useState(false);
+
+  // Determine if we're accessing via share token or report ID
+  const isSharedAccess = !!shareToken;
+  const identifier = shareToken || reportId;
 
   // Wait for authentication to be ready before making the query
   useEffect(() => {
     const checkAuth = () => {
+      // For shared access, skip authentication
+      if (isSharedAccess) {
+        setAuthReady(true);
+        return;
+      }
+
       // Check for token in URL parameters (for new windows)
       const urlParams = new URLSearchParams(window.location.search);
       const urlToken = urlParams.get('token');
@@ -54,14 +65,14 @@ export default function SeoReportPage() {
     };
     
     checkAuth();
-  }, []);
+  }, [isSharedAccess]);
 
   const { data: report, isLoading, error } = useQuery<SeoReportWithDetails>({
-    queryKey: ['/api/seo-reports', reportId],
-    enabled: !!reportId && authReady,
+    queryKey: isSharedAccess ? ['/api/reports', shareToken] : ['/api/seo-reports', reportId],
+    enabled: !!identifier && authReady,
     retry: (failureCount, error: any) => {
-      // Don't retry on authentication errors
-      if (error?.message?.includes('401') || error?.message?.includes('Access token required')) {
+      // Don't retry on authentication errors for authenticated access
+      if (!isSharedAccess && (error?.message?.includes('401') || error?.message?.includes('Access token required'))) {
         return false;
       }
       return failureCount < 2;
