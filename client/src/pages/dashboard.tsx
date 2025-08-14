@@ -225,16 +225,22 @@ export default function Dashboard() {
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-4 mt-8">
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-foreground mb-1">{clientCount}</div>
+                <div className="text-2xl font-bold text-foreground mb-1">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                </div>
                 <div className="text-xs text-muted-foreground">Clients</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-foreground mb-1">{websiteCount}</div>
+                <div className="text-2xl font-bold text-foreground mb-1">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                </div>
                 <div className="text-xs text-muted-foreground">Websites</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-green-600 mb-1">99.9%</div>
-                <div className="text-xs text-muted-foreground">Uptime</div>
+                <div className="text-2xl font-bold text-muted-foreground mb-1">
+                  <RefreshCw className="h-6 w-6 animate-spin mx-auto" />
+                </div>
+                <div className="text-xs text-muted-foreground">Syncing...</div>
               </div>
             </div>
           </div>
