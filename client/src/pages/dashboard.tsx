@@ -364,40 +364,6 @@ export default function Dashboard() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setLocation('/analytics')}
-                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700"
-                        >
-                          <BarChart3 className="h-4 w-4 text-blue-600" />
-                          <span>Analytics</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>View website analytics and performance metrics</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setLocation('/security')}
-                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700"
-                        >
-                          <Shield className="h-4 w-4 text-orange-600" />
-                          <span>Security</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Run security scans and manage website protection</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => autoSync()}
                           disabled={isAutoSyncing}
                           className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700"
@@ -416,23 +382,6 @@ export default function Dashboard() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setLocation('/performance')}
-                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700"
-                        >
-                          <Zap className="h-4 w-4 text-green-600" />
-                          <span>Performance</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Monitor website speed and optimization</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => setLocation('/clients')}
                           className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700"
                         >
@@ -442,6 +391,23 @@ export default function Dashboard() {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Manage clients and generate reports</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLocation('/reports')}
+                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700"
+                        >
+                          <BarChart3 className="h-4 w-4 text-blue-600" />
+                          <span>Reports</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View and manage client reports</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
