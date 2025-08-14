@@ -32,11 +32,34 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginUser) => {
-      const response = await apiCall("/api/auth/login", {
+      // For login, we need to handle authentication errors differently
+      // to avoid redirect loops in the apiCall function
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/auth/login`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
       });
-      return response;
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText || response.statusText };
+        }
+        
+        // Create error object with backend error structure
+        const error = new Error(errorData.message || `HTTP ${response.status}`);
+        (error as any).type = errorData.type;
+        (error as any).errors = errorData.errors;
+        throw error;
+      }
+
+      return response.json();
     },
     onSuccess: async (data) => {
       // Store the token
