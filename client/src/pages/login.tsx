@@ -129,9 +129,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+    <div className="h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 overflow-hidden">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex flex-1 items-center justify-center p-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
         {/* Background Decorative Elements */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
         <div className="absolute top-10 right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -141,70 +141,70 @@ export default function Login() {
         
         <div className="relative z-10 max-w-md text-center text-white">
           {/* Main Logo with Animation */}
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="relative">
-              <div className="w-24 h-24 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl animate-float">
-                <SiWordpress className="h-12 w-12 text-white" />
+              <div className="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-2xl animate-float">
+                <SiWordpress className="h-10 w-10 text-white" />
               </div>
               {/* Floating icons around the main logo */}
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-300">
-                <CheckCircle2 className="h-4 w-4 text-white" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-300">
+                <CheckCircle2 className="h-3 w-3 text-white" />
               </div>
-              <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-700">
-                <Shield className="h-4 w-4 text-white" />
+              <div className="absolute -bottom-1 -left-1 w-6 h-6 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-700">
+                <Shield className="h-3 w-3 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
               AIO Webcare
             </h1>
-            <p className="text-xl text-slate-300">Professional WordPress Management Platform</p>
+            <p className="text-lg text-slate-300">Professional WordPress Management Platform</p>
           </div>
 
           {/* Feature Benefits with Icons */}
-          <div className="space-y-6 text-left">
-            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Shield className="h-6 w-6 text-white" />
+          <div className="space-y-4 text-left">
+            <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Shield className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Advanced Security</h3>
-                <p className="text-slate-300 text-sm">24/7 malware detection & protection</p>
+                <h3 className="font-semibold text-white text-sm">Advanced Security</h3>
+                <p className="text-slate-300 text-xs">24/7 malware detection & protection</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Zap className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Zap className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Automated Tasks</h3>
-                <p className="text-slate-300 text-sm">Updates, backups & maintenance</p>
+                <h3 className="font-semibold text-white text-sm">Automated Tasks</h3>
+                <p className="text-slate-300 text-xs">Updates, backups & maintenance</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Activity className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all group">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Activity className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Real-time Analytics</h3>
-                <p className="text-slate-300 text-sm">Performance monitoring & insights</p>
+                <h3 className="font-semibold text-white text-sm">Real-time Analytics</h3>
+                <p className="text-slate-300 text-xs">Performance monitoring & insights</p>
               </div>
             </div>
           </div>
 
           {/* Stats Row */}
-          <div className="flex justify-center gap-8 mt-12 pt-8 border-t border-white/10">
+          <div className="flex justify-center gap-6 mt-8 pt-6 border-t border-white/10">
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">10k+</div>
+              <div className="text-xl font-bold text-white">10k+</div>
               <div className="text-xs text-slate-400">Sites Protected</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">99.9%</div>
+              <div className="text-xl font-bold text-white">99.9%</div>
               <div className="text-xs text-slate-400">Uptime</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">24/7</div>
+              <div className="text-xl font-bold text-white">24/7</div>
               <div className="text-xs text-slate-400">Monitoring</div>
             </div>
           </div>
@@ -212,17 +212,17 @@ export default function Login() {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md border-0 shadow-2xl">
-          <CardHeader className="space-y-4 text-center pb-8 relative">
+      <div className="flex-1 flex items-center justify-center p-4 overflow-y-auto">
+        <Card className="w-full max-w-md border-0 shadow-2xl my-4">
+          <CardHeader className="space-y-3 text-center pb-6 relative">
             {/* Mobile Logo */}
-            <div className="lg:hidden mb-6">
+            <div className="lg:hidden mb-4">
               <div className="relative">
-                <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
-                  <SiWordpress className="h-10 w-10 text-white" />
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg animate-float">
+                  <SiWordpress className="h-8 w-8 text-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-                  <CheckCircle2 className="h-3 w-3 text-white" />
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                  <CheckCircle2 className="h-2.5 w-2.5 text-white" />
                 </div>
               </div>
             </div>
@@ -235,13 +235,13 @@ export default function Login() {
               <Lock className="w-3 h-3 mr-1" />
               Welcome Back
             </Badge>
-            <CardTitle className="text-3xl font-bold gradient-text">Sign In</CardTitle>
-            <CardDescription className="text-lg text-muted-foreground">
+            <CardTitle className="text-2xl font-bold gradient-text">Sign In</CardTitle>
+            <CardDescription className="text-base text-muted-foreground">
               Access your WordPress maintenance dashboard
             </CardDescription>
             
             {/* Trust Indicators */}
-            <div className="flex justify-center gap-4 pt-2">
+            <div className="flex justify-center gap-3 pt-2">
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <Shield className="w-3 h-3" />
                 <span>Secure</span>
@@ -258,7 +258,7 @@ export default function Login() {
           </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
               <FormField
                 control={form.control}
                 name="email"
