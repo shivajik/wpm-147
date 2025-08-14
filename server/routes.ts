@@ -3411,7 +3411,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const issues = categorizeIssues(analysisResults);
       const recommendations = generateRecommendations(analysisResults);
 
-      // Update report with analysis results
+      // Transform enhanced analysis data to frontend-compatible format
+      const transformedAnalysisResults = {
+        ...analysisResults,
+        // Transform httpRequests to match frontend expectations
+        httpRequests: {
+          ...analysisResults.httpRequests,
+          total: analysisResults.httpRequests?.totalRequests || analysisResults.performance.requests,
+          // Transform JavaScript analysis to httpRequests.javascript format
+          javascript: {
+            total: analysisResults.javascriptAnalysis?.totalScripts || 0,
+            external: analysisResults.javascriptAnalysis?.externalScripts || 0,
+            inline: analysisResults.javascriptAnalysis?.inlineScripts || 0,
+            async: analysisResults.javascriptAnalysis?.asyncScripts || 0,
+            defer: analysisResults.javascriptAnalysis?.deferScripts || 0,
+            blocking: analysisResults.javascriptAnalysis?.blockingScripts || 0,
+            files: analysisResults.javascriptAnalysis?.scripts?.map(script => ({
+              src: script.src,
+              name: script.src?.split('/').pop() || 'inline',
+              type: script.type,
+              loading: script.hasAsync ? 'Async' : script.hasDefer ? 'Defer' : 'Normal'
+            })) || []
+          },
+          // Transform CSS analysis to httpRequests.css format  
+          css: {
+            total: analysisResults.cssAnalysis?.totalStylesheets || 0,
+            external: analysisResults.cssAnalysis?.externalStylesheets || 0,
+            inline: analysisResults.cssAnalysis?.inlineStyles || 0,
+            critical: analysisResults.cssAnalysis?.criticalCssCount || 0,
+            nonCritical: (analysisResults.cssAnalysis?.totalStylesheets || 0) - (analysisResults.cssAnalysis?.criticalCssCount || 0),
+            blocking: (analysisResults.cssAnalysis?.totalStylesheets || 0) - (analysisResults.cssAnalysis?.criticalCssCount || 0),
+            files: analysisResults.cssAnalysis?.stylesheets?.map(css => ({
+              src: css.href,
+              name: css.href?.split('/').pop() || 'inline',
+              size: css.size ? `${Math.round(css.size / 1024)}KB` : 'N/A',
+              blocking: !css.isCritical
+            })) || []
+          },
+          // Transform images to httpRequests.images format
+          images: {
+            total: analysisResults.images?.total || 0,
+            optimized: (analysisResults.images?.formats?.webp || 0) + (analysisResults.images?.formats?.avif || 0),
+            unoptimized: (analysisResults.images?.total || 0) - ((analysisResults.images?.formats?.webp || 0) + (analysisResults.images?.formats?.avif || 0))
+          }
+        }
+      };
+
+      // Update report with transformed analysis results
       const updatedReport = await storage.updateSeoReport(report.id, {
         scanStatus: "completed",
         scanDuration,
@@ -3424,7 +3470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         criticalIssues: issues.critical,
         warnings: issues.warnings,
         notices: issues.notices,
-        reportData: analysisResults,
+        reportData: transformedAnalysisResults,
         recommendations,
       });
 
