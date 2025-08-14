@@ -57,14 +57,14 @@ export default function Dashboard() {
   }, [user, autoSync, toast]);
 
   // Fetch real data for dynamic content with optimized caching
-  const { data: websites = [] } = useQuery<Website[]>({ 
+  const { data: websites = [], isLoading: websitesLoading } = useQuery<Website[]>({ 
     queryKey: ['/api/websites'], 
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
   });
   
-  const { data: clients = [] } = useQuery({ 
+  const { data: clients = [], isLoading: clientsLoading } = useQuery({ 
     queryKey: ['/api/clients'], 
     enabled: !!user,
     staleTime: 10 * 60 * 1000, // 10 minutes (clients change less frequently)
@@ -106,6 +106,9 @@ export default function Dashboard() {
   // Calculate dynamic statistics from real data
   const clientCount = Array.isArray(clients) ? clients.length : 0;
   const websiteCount = Array.isArray(websites) ? websites.length : 0;
+  
+  // Check if we're still loading initial data (auth is complete but data queries are pending)
+  const isDataLoading = websitesLoading || clientsLoading;
 
   // Calculate real maintenance statistics
   const maintenanceStats = {
@@ -197,7 +200,7 @@ export default function Dashboard() {
               </Badge>
               <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800">
                 <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                Loading...
+                Initializing...
               </Badge>
             </div>
             
@@ -215,33 +218,97 @@ export default function Dashboard() {
             <div className="space-y-4 max-w-sm mx-auto">
               <div className="flex items-center gap-3 justify-center">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <span className="text-sm text-muted-foreground">Loading websites and data...</span>
+                <span className="text-sm text-muted-foreground">Loading dashboard data...</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full animate-pulse transition-all duration-500" style={{ width: '65%' }}></div>
+                <div className="bg-primary h-2 rounded-full animate-pulse transition-all duration-1000" style={{ width: '75%' }}></div>
               </div>
             </div>
             
-            {/* Quick Stats */}
+            {/* Professional Loading Cards */}
             <div className="grid grid-cols-3 gap-4 mt-8">
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-foreground mb-1">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                </div>
+                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
                 <div className="text-xs text-muted-foreground">Clients</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-foreground mb-1">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                </div>
+                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
                 <div className="text-xs text-muted-foreground">Websites</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-muted-foreground mb-1">
-                  <RefreshCw className="h-6 w-6 animate-spin mx-auto" />
-                </div>
-                <div className="text-xs text-muted-foreground">Syncing...</div>
+                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
+                <div className="text-xs text-muted-foreground">Status</div>
               </div>
+            </div>
+
+            {/* Loading Phase Indicator */}
+            <div className="pt-4">
+              <p className="text-xs text-muted-foreground">
+                Connecting to websites and synchronizing data...
+              </p>
+            </div>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show data loading state if auth is complete but data is still loading
+  if (isDataLoading) {
+    return (
+      <AppLayout>
+        <div className="space-y-8 p-6">
+          {/* Status Indicator */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
+              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+              Loading Dashboard Data...
+            </Badge>
+          </div>
+
+          {/* Header Skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-8 bg-muted rounded w-64 animate-pulse"></div>
+              <div className="h-4 bg-muted rounded w-48 animate-pulse"></div>
+            </div>
+            <div className="h-9 bg-muted rounded w-32 animate-pulse"></div>
+          </div>
+
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-6">
+                <div className="space-y-3">
+                  <div className="h-4 bg-muted rounded w-20 animate-pulse"></div>
+                  <div className="h-8 bg-muted rounded w-16 animate-pulse"></div>
+                  <div className="h-3 bg-muted rounded w-24 animate-pulse"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Main Content Skeleton */}
+          <div className="space-y-6">
+            <div className="h-6 bg-muted rounded w-48 animate-pulse"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 bg-muted rounded animate-pulse"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted rounded w-32 animate-pulse"></div>
+                        <div className="h-3 bg-muted rounded w-24 animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-muted rounded w-full animate-pulse"></div>
+                      <div className="h-3 bg-muted rounded w-3/4 animate-pulse"></div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
