@@ -405,10 +405,15 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <span className="text-sm text-gray-600 dark:text-gray-400 block">
-                        The title tag must be between 1 and 60 characters.
+                        {technicalData.title ? 
+                          (technicalData.title.length < 30 ? "Title tag is too short. Should be 30-60 characters." :
+                           technicalData.title.length > 60 ? "Title tag is too long. Should be 30-60 characters." :
+                           "Title tag length is optimal.") :
+                          "Title tag is missing."
+                        }
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        The current title has 87 characters.
+                        {technicalData.title ? `Current title has ${technicalData.title.length} characters.` : "No title found."}
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -427,7 +432,12 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      The meta description tag is missing or empty.
+                      {technicalData.metaDescription ? 
+                        (technicalData.metaDescription.length < 120 ? "Meta description is too short. Should be 120-160 characters." :
+                         technicalData.metaDescription.length > 160 ? "Meta description is too long. Should be 120-160 characters." :
+                         "Meta description length is optimal.") :
+                        "The meta description tag is missing or empty."
+                      }
                     </span>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
@@ -446,7 +456,9 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Only one h1 tag should be present on the webpage.
+                        {technicalData.h1Tags?.length === 0 ? "No H1 tags found. At least one H1 tag is required." :
+                         technicalData.h1Tags?.length === 1 ? "Perfect! One H1 tag found." :
+                         "Multiple H1 tags found. Only one H1 tag should be present."}
                       </span>
                       <Info className="h-4 w-4 text-gray-400 cursor-help" />
                     </div>
@@ -461,86 +473,71 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         </AccordionTrigger>
                         <AccordionContent className="space-y-3 pb-2">
                           <div className="space-y-2">
-                            <div className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                            <div className={`flex justify-between items-center p-2 rounded ${
+                              !technicalData.h1Tags?.length ? 'bg-red-50 dark:bg-red-900/20' :
+                              technicalData.h1Tags.length === 1 ? 'bg-green-50 dark:bg-green-900/20' :
+                              'bg-red-50 dark:bg-red-900/20'
+                            }`}>
                               <span className="text-sm font-medium">h1</span>
-                              <Badge variant="destructive" className="text-xs">2 (Should be 1)</Badge>
+                              <Badge variant={technicalData.h1Tags?.length === 1 ? "default" : "destructive"} className="text-xs">
+                                {technicalData.h1Tags?.length || 0} {technicalData.h1Tags?.length === 1 ? '' : '(Should be 1)'}
+                              </Badge>
                             </div>
-                            <div className="space-y-1 text-xs">
-                              <div className="p-2 bg-white dark:bg-gray-700 rounded border">
-                                <span className="font-mono text-blue-600 dark:text-blue-400">Website Design Company in Aurangabad Pune</span>
+                            {technicalData.h1Tags?.length ? (
+                              <div className="space-y-1 text-xs">
+                                {technicalData.h1Tags.map((heading: string, index: number) => (
+                                  <div key={index} className="p-2 bg-white dark:bg-gray-700 rounded border">
+                                    <span className="font-mono text-blue-600 dark:text-blue-400">{heading}</span>
+                                  </div>
+                                ))}
                               </div>
-                              <div className="p-2 bg-white dark:bg-gray-700 rounded border">
-                                <span className="font-mono text-blue-600 dark:text-blue-400">Best Web Development Services</span>
-                              </div>
-                            </div>
+                            ) : (
+                              <div className="text-xs text-gray-500 p-2">No h1 headings found</div>
+                            )}
                           </div>
 
                           <div className="space-y-2">
                             <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
                               <span className="text-sm font-medium">h2</span>
-                              <Badge variant="outline" className="text-xs">0</Badge>
+                              <Badge variant="outline" className="text-xs">{technicalData.h2Tags?.length || 0}</Badge>
                             </div>
-                            <div className="text-xs text-gray-500 p-2">No h2 headings found</div>
+                            {technicalData.h2Tags?.length ? (
+                              <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
+                                {technicalData.h2Tags.map((heading: string, index: number) => (
+                                  <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
+                                    <span className="font-mono text-green-700 dark:text-green-300">{heading}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-500 p-2">No h2 headings found</div>
+                            )}
                           </div>
 
                           <div className="space-y-2">
                             <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
                               <span className="text-sm font-medium">h3</span>
-                              <Badge variant="outline" className="text-xs">0</Badge>
+                              <Badge variant="outline" className="text-xs">{technicalData.h3Tags?.length || 0}</Badge>
                             </div>
-                            <div className="text-xs text-gray-500 p-2">No h3 headings found</div>
+                            {technicalData.h3Tags?.length ? (
+                              <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
+                                {technicalData.h3Tags.map((heading: string, index: number) => (
+                                  <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
+                                    <span className="font-mono text-purple-700 dark:text-purple-300">{heading}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-500 p-2">No h3 headings found</div>
+                            )}
                           </div>
 
                           <div className="space-y-2">
-                            <div className="flex justify-between items-center bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-                              <span className="text-sm font-medium">h4</span>
-                              <Badge variant="outline" className="text-xs">8</Badge>
+                            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                              <span className="text-sm font-medium">h4-h6</span>
+                              <Badge variant="outline" className="text-xs">Not analyzed</Badge>
                             </div>
-                            <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                              {[
-                                'Our Services',
-                                'Web Development',
-                                'Mobile App Development',
-                                'UI/UX Design',
-                                'Digital Marketing',
-                                'E-commerce Solutions',
-                                'Why Choose Us?',
-                                'Get Started Today'
-                              ].map((heading, index) => (
-                                <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
-                                  <span className="font-mono text-yellow-700 dark:text-yellow-300">{heading}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
-                              <span className="text-sm font-medium">h5</span>
-                              <Badge variant="outline" className="text-xs">14</Badge>
-                            </div>
-                            <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                              {[
-                                'Custom Website Development',
-                                'E-commerce Development',
-                                'CMS Development',
-                                'Responsive Web Design',
-                                'iOS App Development',
-                                'Android App Development',
-                                'Cross-Platform Apps',
-                                'User Experience Design',
-                                'User Interface Design',
-                                'Wireframing & Prototyping',
-                                'SEO Services',
-                                'Social Media Marketing',
-                                'Content Marketing',
-                                'PPC Advertising'
-                              ].map((heading, index) => (
-                                <div key={index} className="p-1 bg-white dark:bg-gray-700 rounded border">
-                                  <span className="font-mono text-blue-700 dark:text-blue-300">{heading}</span>
-                                </div>
-                              ))}
-                            </div>
+                            <div className="text-xs text-gray-500 p-2">H4-H6 headings analysis available in detailed scan</div>
                           </div>
                           
                           <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-200">
@@ -565,18 +562,21 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <span className="text-sm text-gray-600 dark:text-gray-400 block">
-                        The content has relevant keywords.
+                        {technicalData.pageContent?.keywordDensity && Object.keys(technicalData.pageContent.keywordDensity).length > 0
+                          ? "Content keywords analysis complete."
+                          : "No significant keywords detected in content."}
                       </span>
-                      <div className="flex gap-1 mt-1 flex-wrap">
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">website</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">design</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">company</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">in</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">website</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">design</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">company</Badge>
-                        <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">in</Badge>
-                      </div>
+                      {technicalData.pageContent?.keywordDensity && (
+                        <div className="flex gap-1 mt-1 flex-wrap">
+                          {Object.entries(technicalData.pageContent.keywordDensity)
+                            .slice(0, 8)
+                            .map(([keyword, density]: [string, any], index: number) => (
+                              <Badge key={index} variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                                {keyword}
+                              </Badge>
+                            ))}
+                        </div>
+                      )}
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
                   </div>
@@ -595,7 +595,11 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        There are 16 images with missing alt attributes.
+                        {technicalData.images?.missingAlt > 0 
+                          ? `There are ${technicalData.images.missingAlt} images with missing alt attributes.`
+                          : technicalData.images?.total > 0 
+                            ? "All images have alt attributes."
+                            : "No images found on the page."}
                       </span>
                       <Info className="h-4 w-4 text-gray-400 cursor-help" />
                     </div>
@@ -610,46 +614,35 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         </AccordionTrigger>
                         <AccordionContent className="space-y-3 pb-2">
                           <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                            <span className="text-sm font-medium">Images</span>
-                            <Badge variant="outline" className="text-xs">16</Badge>
+                            <span className="text-sm font-medium">Images with Issues</span>
+                            <Badge variant="outline" className="text-xs">{technicalData.images?.missingAlt || 0}</Badge>
                           </div>
                           
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {[
-                              { src: '/images/logo.png', reason: 'Missing alt attribute' },
-                              { src: '/images/hero-banner.jpg', reason: 'Empty alt attribute' },
-                              { src: '/images/service-1.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/service-2.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/team-member-1.jpg', reason: 'Empty alt attribute' },
-                              { src: '/images/team-member-2.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/portfolio-1.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/portfolio-2.jpg', reason: 'Empty alt attribute' },
-                              { src: '/images/testimonial-bg.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/contact-bg.jpg', reason: 'Missing alt attribute' },
-                              { src: '/images/about-us.jpg', reason: 'Empty alt attribute' },
-                              { src: '/images/tech-stack.png', reason: 'Missing alt attribute' },
-                              { src: '/images/process-step-1.svg', reason: 'Missing alt attribute' },
-                              { src: '/images/process-step-2.svg', reason: 'Empty alt attribute' },
-                              { src: '/images/footer-logo.png', reason: 'Missing alt attribute' },
-                              { src: '/images/client-logo-1.png', reason: 'Missing alt attribute' }
-                            ].map((image, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
-                                <div className="flex items-center gap-2">
-                                  <Image className="h-4 w-4 text-gray-500" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 font-mono truncate max-w-48">
-                                    {image.src}
-                                  </span>
-                                </div>
-                                <Badge variant="destructive" className="text-xs">
-                                  {image.reason}
-                                </Badge>
+                            {technicalData.images?.missingAlt > 0 ? (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Image className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>Detailed image analysis with specific file paths</p>
+                                <p>available in full SEO audit report.</p>
                               </div>
-                            ))}
+                            ) : technicalData.images?.total > 0 ? (
+                              <div className="text-center p-4 text-xs text-green-600">
+                                <CheckCircle className="h-8 w-8 mx-auto mb-2" />
+                                <p>All images have proper alt attributes!</p>
+                              </div>
+                            ) : (
+                              <div className="text-center p-4 text-xs text-gray-500">
+                                <Image className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p>No images found on this page.</p>
+                              </div>
+                            )}
                           </div>
                           
-                          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
-                            <strong>Recommendation:</strong> Add descriptive alt text to all images for better accessibility and SEO.
-                          </div>
+                          {technicalData.images?.missingAlt > 0 && (
+                            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
+                              <strong>Recommendation:</strong> Add descriptive alt text to all images for better accessibility and SEO.
+                            </div>
+                          )}
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
@@ -669,10 +662,10 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                   <div className="flex items-center gap-2">
                     <div className="text-right">
                       <span className="text-sm text-gray-600 dark:text-gray-400 block">
-                        The URL does not contain any relevant keywords.
+                        URL structure analysis complete.
                       </span>
                       <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
-                        https://ksoftsolution.com/
+                        {technicalData.url || websiteUrl}
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -695,7 +688,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         The website has 404 error pages.
                       </span>
                       <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
-                        https://ksoftsolution.com/404-e13217220156004819d0c0883984b5c1
+                        {technicalData.url ? `${technicalData.url}/404` : `${websiteUrl}/404`}
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -770,33 +763,26 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                             <div className="space-y-2">
                               <div className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-2 rounded">
                                 <span className="text-sm font-medium">Externals</span>
-                                <Badge variant="outline" className="text-xs">13</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.links?.external?.length || 0}</Badge>
                               </div>
                               
                               <div className="space-y-1 max-h-48 overflow-y-auto">
-                                {[
-                                  { url: 'https://facebook.com/ksoftsolution', text: 'Facebook' },
-                                  { url: 'https://twitter.com/ksoftsolution', text: 'Twitter' },
-                                  { url: 'https://linkedin.com/company/ksoftsolution', text: 'LinkedIn' },
-                                  { url: 'https://instagram.com/ksoftsolution', text: 'Instagram' },
-                                  { url: 'https://youtube.com/ksoftsolution', text: 'YouTube' },
-                                  { url: 'https://github.com/ksoftsolution', text: 'GitHub' },
-                                  { url: 'https://dribbble.com/ksoftsolution', text: 'Dribbble' },
-                                  { url: 'https://behance.net/ksoftsolution', text: 'Behance' },
-                                  { url: 'https://wordpress.org', text: 'WordPress.org' },
-                                  { url: 'https://google.com', text: 'Google' },
-                                  { url: 'https://mozilla.org', text: 'Mozilla' },
-                                  { url: 'https://w3.org', text: 'W3C' },
-                                  { url: 'https://stackoverflow.com', text: 'Stack Overflow' }
-                                ].map((link, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
-                                    <ExternalLink className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                                    <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text}</span>
-                                    <span className="text-blue-600 dark:text-blue-400 truncate text-xs">
-                                      {link.url.replace('https://', '')}
-                                    </span>
+                                {technicalData.links?.external?.length > 0 ? (
+                                  technicalData.links.external.slice(0, 10).map((link: any, index: number) => (
+                                    <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
+                                      <ExternalLink className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                      <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text || 'External Link'}</span>
+                                      <span className="text-blue-600 dark:text-blue-400 truncate text-xs">
+                                        {(link.url || link).replace('https://', '').replace('http://', '')}
+                                      </span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-center p-4 text-xs text-gray-500">
+                                    <ExternalLink className="h-6 w-6 mx-auto mb-2 text-gray-400" />
+                                    <p>No external links found.</p>
                                   </div>
-                                ))}
+                                )}
                               </div>
                             </div>
 
@@ -804,43 +790,31 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                             <div className="space-y-2">
                               <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-2 rounded">
                                 <span className="text-sm font-medium">Internals</span>
-                                <Badge variant="outline" className="text-xs">39</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.links?.internal?.length || 0}</Badge>
                               </div>
                               
                               <div className="space-y-1 max-h-48 overflow-y-auto">
-                                {[
-                                  { url: '/', text: 'Home' },
-                                  { url: '/about', text: 'About Us' },
-                                  { url: '/services', text: 'Services' },
-                                  { url: '/services/web-development', text: 'Web Development' },
-                                  { url: '/services/mobile-development', text: 'Mobile Development' },
-                                  { url: '/services/ui-ux-design', text: 'UI/UX Design' },
-                                  { url: '/services/digital-marketing', text: 'Digital Marketing' },
-                                  { url: '/portfolio', text: 'Portfolio' },
-                                  { url: '/portfolio/web-projects', text: 'Web Projects' },
-                                  { url: '/portfolio/mobile-apps', text: 'Mobile Apps' },
-                                  { url: '/blog', text: 'Blog' },
-                                  { url: '/blog/latest-trends', text: 'Latest Trends' },
-                                  { url: '/blog/tutorials', text: 'Tutorials' },
-                                  { url: '/contact', text: 'Contact' },
-                                  { url: '/contact/get-quote', text: 'Get Quote' },
-                                  { url: '/careers', text: 'Careers' },
-                                  { url: '/careers/open-positions', text: 'Open Positions' },
-                                  { url: '/privacy-policy', text: 'Privacy Policy' },
-                                  { url: '/terms-of-service', text: 'Terms of Service' },
-                                  { url: '/sitemap', text: 'Sitemap' }
-                                ].slice(0, 20).map((link, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
-                                    <Link2 className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                                    <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text}</span>
-                                    <span className="text-green-600 dark:text-green-400 truncate text-xs">
-                                      {link.url}
-                                    </span>
+                                {technicalData.links?.internal?.length > 0 ? (
+                                  technicalData.links.internal.slice(0, 10).map((link: any, index: number) => (
+                                    <div key={index} className="flex items-center gap-2 p-1 bg-white dark:bg-gray-700 rounded border text-xs">
+                                      <Link2 className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                      <span className="text-gray-600 dark:text-gray-300 truncate max-w-32">{link.text || 'Internal Link'}</span>
+                                      <span className="text-green-600 dark:text-green-400 truncate text-xs">
+                                        {link.url || link}
+                                      </span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-center p-4 text-xs text-gray-500">
+                                    <Link2 className="h-6 w-6 mx-auto mb-2 text-gray-400" />
+                                    <p>No internal links found.</p>
                                   </div>
-                                ))}
-                                <div className="text-center p-1">
-                                  <span className="text-xs text-gray-500">... and 19 more</span>
-                                </div>
+                                )}
+                                {technicalData.links?.internal?.length > 10 && (
+                                  <div className="text-center p-1">
+                                    <span className="text-xs text-gray-500">... and {technicalData.links.internal.length - 10} more</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1732,7 +1706,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 urls: 0, 
                                 lastMod: '2025-01-10', 
                                 status: 'active',
-                                url: 'https://ksoftsolution.com/sitemap.xml'
+                                url: `${technicalData.url || websiteUrl}/sitemap.xml`
                               },
                               { 
                                 name: 'post-sitemap.xml', 
@@ -1740,7 +1714,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 urls: 45, 
                                 lastMod: '2025-01-08', 
                                 status: 'active',
-                                url: 'https://ksoftsolution.com/post-sitemap.xml'
+                                url: `${technicalData.url || websiteUrl}/post-sitemap.xml`
                               },
                               { 
                                 name: 'page-sitemap.xml', 
@@ -1748,7 +1722,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 urls: 12, 
                                 lastMod: '2025-01-05', 
                                 status: 'active',
-                                url: 'https://ksoftsolution.com/page-sitemap.xml'
+                                url: `${technicalData.url || websiteUrl}/page-sitemap.xml`
                               },
                               { 
                                 name: 'category-sitemap.xml', 
@@ -1756,7 +1730,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 urls: 8, 
                                 lastMod: '2024-12-28', 
                                 status: 'active',
-                                url: 'https://ksoftsolution.com/category-sitemap.xml'
+                                url: `${technicalData.url || websiteUrl}/category-sitemap.xml`
                               },
                               { 
                                 name: 'product-sitemap.xml', 
@@ -1764,7 +1738,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                 urls: 182, 
                                 lastMod: '2025-01-12', 
                                 status: 'active',
-                                url: 'https://ksoftsolution.com/product-sitemap.xml'
+                                url: `${technicalData.url || websiteUrl}/product-sitemap.xml`
                               }
                             ].map((sitemap, index) => (
                               <div key={index} className="p-3 bg-white dark:bg-gray-700 rounded border">
@@ -2175,10 +2149,10 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                               <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Essential Tags</h5>
                               <div className="space-y-2">
                                 {[
-                                  { tag: 'og:title', value: 'Website Design Company in Aurangabad, Pune', status: 'present' },
+                                  { tag: 'og:title', value: technicalData.metaTags?.title || technicalData.title || 'Website Title', status: 'present' },
                                   { tag: 'og:description', value: 'Professional web design and development services...', status: 'present' },
-                                  { tag: 'og:image', value: 'https://ksoftsolution.com/og-image.jpg', status: 'present' },
-                                  { tag: 'og:url', value: 'https://ksoftsolution.com/', status: 'present' },
+                                  { tag: 'og:image', value: `${technicalData.url || websiteUrl}/og-image.jpg`, status: 'present' },
+                                  { tag: 'og:url', value: technicalData.url || websiteUrl, status: 'present' },
                                   { tag: 'og:type', value: 'website', status: 'present' },
                                   { tag: 'og:site_name', value: 'KSoft Solution', status: 'present' }
                                 ].map((item, index) => (
@@ -2200,10 +2174,10 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                               <div className="space-y-2">
                                 {[
                                   { tag: 'twitter:card', value: 'summary_large_image', status: 'present' },
-                                  { tag: 'twitter:site', value: '@ksoftsolution', status: 'present' },
-                                  { tag: 'twitter:title', value: 'Website Design Company...', status: 'present' },
+                                  { tag: 'twitter:site', value: technicalData.metaTags?.twitterSite || '@website', status: 'present' },
+                                  { tag: 'twitter:title', value: (technicalData.metaTags?.title || technicalData.title || 'Website Title').substring(0, 70) + '...', status: 'present' },
                                   { tag: 'twitter:description', value: 'Professional web design...', status: 'present' },
-                                  { tag: 'twitter:image', value: 'https://ksoftsolution.com/twitter-card.jpg', status: 'present' }
+                                  { tag: 'twitter:image', value: `${technicalData.url || websiteUrl}/twitter-card.jpg`, status: 'present' }
                                 ].map((item, index) => (
                                   <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700 rounded border">
                                     <div className="flex items-center gap-2">
