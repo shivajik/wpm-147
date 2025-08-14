@@ -807,6 +807,23 @@ const performanceScans = pgTable('performance_scans', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+const subscriptionPlans = pgTable('subscription_plans', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  displayName: text('display_name').notNull(),
+  description: text('description').notNull(),
+  monthlyPrice: integer('monthly_price').notNull(),
+  yearlyPrice: integer('yearly_price'),
+  features: text('features').array(),
+  websiteLimit: integer('website_limit'),
+  scansPerMonth: integer('scans_per_month'),
+  isActive: boolean('is_active').notNull().default(true),
+  stripePriceIdMonthly: text('stripe_price_id_monthly'),
+  stripePriceIdYearly: text('stripe_price_id_yearly'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
+});
+
 // Database connection with debugging - Use Supabase consistently
 const DATABASE_URL = process.env.DATABASE_URL || (() => {
   if (process.env.NODE_ENV === 'production') {
@@ -831,7 +848,7 @@ const connectionConfig = {
 };
 
 const client = postgres(DATABASE_URL, connectionConfig);
-const db = drizzle(client, { schema: { users, clients, websites, tasks, updateLogs, seoReports, securityScanHistory, linkScanHistory, clientReports, reportTemplates, performanceScans } });
+const db = drizzle(client, { schema: { users, clients, websites, tasks, updateLogs, seoReports, securityScanHistory, linkScanHistory, clientReports, reportTemplates, performanceScans, subscriptionPlans } });
 
 // Simple WordPress Remote Manager client for Vercel functions
 class VercelWPRemoteManagerClient {
@@ -1915,6 +1932,9 @@ export default async function handler(req: any, res: any) {
           'POST /api/auth/register',
           'POST /api/auth/login', 
           'GET /api/auth/user',
+          'GET /api/subscription-plans',
+          'GET /api/user/subscription',
+          'PUT /api/user/subscription',
           'GET /api/clients',
           'POST /api/clients',
           'DELETE /api/clients/:id',
@@ -2185,6 +2205,79 @@ export default async function handler(req: any, res: any) {
         subscriptionPlan: userData.subscriptionPlan,
         subscriptionStatus: userData.subscriptionStatus,
       });
+    }
+
+    // Subscription Plans endpoint
+    if (path === '/api/subscription-plans' && req.method === 'GET') {
+      try {
+        const plans = await db
+          .select()
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.isActive, true))
+          .orderBy(subscriptionPlans.monthlyPrice);
+
+        return res.status(200).json(plans);
+      } catch (error) {
+        console.error("Error fetching subscription plans:", error);
+        return res.status(500).json({ message: "Failed to fetch subscription plans" });
+      }
+    }
+
+    // User subscription endpoint
+    if (path === '/api/user/subscription' && req.method === 'GET') {
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const userResult = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+        if (userResult.length === 0) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+
+        const userData = userResult[0];
+        return res.status(200).json({
+          subscriptionPlan: userData.subscriptionPlan || 'free',
+          subscriptionStatus: userData.subscriptionStatus || 'active',
+          subscriptionEndsAt: userData.subscriptionEndsAt || null
+        });
+      } catch (error) {
+        console.error("Error fetching user subscription:", error);
+        return res.status(500).json({ message: "Failed to fetch user subscription" });
+      }
+    }
+
+    // Update user subscription endpoint
+    if (path === '/api/user/subscription' && req.method === 'PUT') {
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const { subscriptionPlan, subscriptionStatus, subscriptionEndsAt } = req.body;
+
+        const [updatedUser] = await db
+          .update(users)
+          .set({
+            subscriptionPlan,
+            subscriptionStatus,
+            subscriptionEndsAt: subscriptionEndsAt ? new Date(subscriptionEndsAt) : null,
+            updatedAt: new Date()
+          })
+          .where(eq(users.id, user.id))
+          .returning();
+
+        return res.status(200).json({
+          subscriptionPlan: updatedUser.subscriptionPlan,
+          subscriptionStatus: updatedUser.subscriptionStatus,
+          subscriptionEndsAt: updatedUser.subscriptionEndsAt
+        });
+      } catch (error) {
+        console.error("Error updating user subscription:", error);
+        return res.status(500).json({ message: "Failed to update user subscription" });
+      }
     }
 
     // Profile endpoints
