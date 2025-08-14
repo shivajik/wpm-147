@@ -35,10 +35,8 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
   });
 
   // Fetch WordPress data
-  const { data: wpData, isLoading: wpDataLoading, refetch: refetchWpData } = useQuery({
+  const { data: wpData, isLoading: wpDataLoading } = useQuery({
     queryKey: [`/api/websites/${websiteId}/wordpress-data`],
-    staleTime: 30 * 1000, // 30 seconds instead of default 5 minutes
-    gcTime: 60 * 1000, // 1 minute cache (gcTime in TanStack Query v5)
   });
 
   // Fetch health data
@@ -127,129 +125,72 @@ export default function ComprehensiveDashboard({ websiteId }: ComprehensiveDashb
 
       {/* Quick Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* WordPress Version Card */}
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm text-gray-600 dark:text-gray-400">WordPress</p>
-                <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  v{(wpData as any)?.systemInfo?.wordpress_version || 'Loading...'}
-                </p>
-                {(wpData as any)?.updateData?.wordpress?.update_available && (
-                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                    Update available
+                <p className="text-sm text-gray-600 dark:text-gray-400">Health Score</p>
+                {healthScore && typeof healthScore === 'number' ? (
+                  <p className={`text-2xl font-bold ${getHealthColor(healthScore)}`}>
+                    {healthScore}%
                   </p>
-                )}
-              </div>
-              <Globe className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Security Status Card */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Security</p>
-                {securityScan && !securityLoading && (securityScan as any)?.overallSecurityScore ? (
-                  <div>
-                    <p className={`text-lg font-semibold ${(securityScan as any).overallSecurityScore >= 80 ? 'text-green-600' : (securityScan as any).overallSecurityScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                      {(securityScan as any).overallSecurityScore}%
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      {(securityScan as any).threatsDetected || 0} threats
-                    </p>
-                  </div>
                 ) : (
                   <div>
-                    <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                      Protected
+                    <p className="text-lg font-semibold text-gray-400 dark:text-gray-500">
+                      {getEmptyStateDisplay('health').text}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      Scanning active
+                      {getEmptyStateDisplay('health').subtext}
                     </p>
                   </div>
                 )}
               </div>
-              <Shield className={`h-8 w-8 ${securityScan && !securityLoading && (securityScan as any)?.overallSecurityScore ? ((securityScan as any).overallSecurityScore >= 80 ? 'text-green-500' : (securityScan as any).overallSecurityScore >= 60 ? 'text-yellow-500' : 'text-red-500') : 'text-green-500'}`} />
+              <Shield className={`h-8 w-8 ${healthScore && typeof healthScore === 'number' ? getHealthColor(healthScore) : getEmptyStateDisplay('health').icon}`} />
             </div>
           </CardContent>
         </Card>
 
-        {/* Updates Available Card */}
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Updates</p>
-                {(() => {
-                  // Calculate total updates manually from the actual data
-                  const pluginUpdates = (wpData as any)?.updateData?.plugins?.length || 0;
-                  const themeUpdates = (wpData as any)?.updateData?.themes?.length || 0;
-                  const coreUpdate = (wpData as any)?.updateData?.wordpress?.update_available ? 1 : 0;
-                  const totalUpdates = pluginUpdates + themeUpdates + coreUpdate;
-                  
-                  return totalUpdates > 0 ? (
-                    <div>
-                      <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
-                        {totalUpdates}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                        Updates available
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                        Up to date
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                        All current
-                      </p>
-                    </div>
-                  );
-                })()}
+                <p className="text-sm text-gray-600 dark:text-gray-400">Uptime</p>
+                <div>
+                  <p className="text-lg font-semibold text-gray-400 dark:text-gray-500">
+                    {getEmptyStateDisplay('uptime').text}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
+                    {getEmptyStateDisplay('uptime').subtext}
+                  </p>
+                </div>
               </div>
-              <TrendingUp className={`h-8 w-8 ${(() => {
-                const pluginUpdates = (wpData as any)?.updateData?.plugins?.length || 0;
-                const themeUpdates = (wpData as any)?.updateData?.themes?.length || 0;
-                const coreUpdate = (wpData as any)?.updateData?.wordpress?.update_available ? 1 : 0;
-                const totalUpdates = pluginUpdates + themeUpdates + coreUpdate;
-                return totalUpdates > 0 ? 'text-orange-500' : 'text-green-500';
-              })()}`} />
+              <Activity className={`h-8 w-8 ${getEmptyStateDisplay('uptime').icon}`} />
             </div>
           </CardContent>
         </Card>
 
-        {/* Performance Card */}
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Performance</p>
-                {performanceScan && Array.isArray(performanceScan) && performanceScan.length > 0 && !performanceLoading ? (
-                  <div>
-                    <p className={`text-lg font-semibold ${(performanceScan as any)[0].pagespeedScore >= 80 ? 'text-green-600' : (performanceScan as any)[0].pagespeedScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                      {(performanceScan as any)[0].pagespeedScore}%
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      {(performanceScan as any)[0].loadTime}s load
-                    </p>
-                  </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Last Backup</p>
+                {(website as any)?.lastBackup ? (
+                  <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                    {format(new Date((website as any).lastBackup), 'MMM dd')}
+                  </p>
                 ) : (
                   <div>
-                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                      Optimized
+                    <p className="text-lg font-semibold text-gray-400 dark:text-gray-500">
+                      {getEmptyStateDisplay('backup').text}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
-                      Running smooth
+                      {getEmptyStateDisplay('backup').subtext}
                     </p>
                   </div>
                 )}
               </div>
-              <Zap className={`h-8 w-8 ${performanceScan && Array.isArray(performanceScan) && performanceScan.length > 0 && !performanceLoading ? ((performanceScan as any)[0].pagespeedScore >= 80 ? 'text-green-500' : (performanceScan as any)[0].pagespeedScore >= 60 ? 'text-yellow-500' : 'text-red-500') : 'text-blue-500'}`} />
+              <Database className={`h-8 w-8 ${(website as any)?.lastBackup ? 'text-purple-500' : getEmptyStateDisplay('backup').icon}`} />
             </div>
           </CardContent>
         </Card>

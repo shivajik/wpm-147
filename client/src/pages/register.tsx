@@ -91,9 +91,9 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 overflow-hidden">
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       {/* Left Panel - Benefits */}
-      <div className="hidden lg:flex flex-1 items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 items-center justify-center p-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
         <div className="absolute top-20 right-20 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -104,109 +104,109 @@ export default function Register() {
         
         <div className="relative z-10 max-w-md text-center text-white">
           {/* Special Offer Banner */}
-          <div className="mb-6 p-3 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl border border-yellow-400/30 backdrop-blur-sm animate-pulse">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Sparkles className="h-4 w-4 text-yellow-400 animate-spin" />
-              <span className="text-yellow-400 font-bold text-xs">LIMITED TIME OFFER</span>
-              <Sparkles className="h-4 w-4 text-yellow-400 animate-spin" />
+          <div className="mb-8 p-4 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-2xl border border-yellow-400/30 backdrop-blur-sm animate-pulse">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-yellow-400 animate-spin" />
+              <span className="text-yellow-400 font-bold text-sm">LIMITED TIME OFFER</span>
+              <Sparkles className="h-5 w-5 text-yellow-400 animate-spin" />
             </div>
-            <p className="text-xs text-white">Get 3 months FREE when you sign up today!</p>
+            <p className="text-sm text-white">Get 3 months FREE when you sign up today!</p>
           </div>
 
           {/* Main Logo with Animation */}
-          <div className="mb-8">
+          <div className="mb-12">
             <div className="relative">
-              <div className="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-2xl animate-float">
-                <SiWordpress className="h-10 w-10 text-white" />
+              <div className="w-24 h-24 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl animate-float">
+                <SiWordpress className="h-12 w-12 text-white" />
               </div>
               {/* Floating celebration icons */}
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-200">
-                <Gift className="h-4 w-4 text-white" />
+              <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg animate-bounce delay-200">
+                <Gift className="h-5 w-5 text-white" />
               </div>
-              <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-500">
-                <Star className="h-4 w-4 text-white" />
+              <div className="absolute -bottom-3 -left-3 w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg animate-bounce delay-500">
+                <Star className="h-5 w-5 text-white" />
               </div>
-              <div className="absolute top-0 -left-4 w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-lg animate-bounce delay-1000">
-                <Sparkles className="h-3 w-3 text-white" />
+              <div className="absolute top-0 -left-6 w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg animate-bounce delay-1000">
+                <Sparkles className="h-4 w-4 text-white" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">
               Join WP ProCare
             </h1>
-            <p className="text-lg text-slate-300">Start your WordPress management journey</p>
+            <p className="text-xl text-slate-300">Start your WordPress management journey</p>
           </div>
 
           {/* Enhanced Benefits with Animated Icons */}
-          <div className="space-y-3 text-left">
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg backdrop-blur-sm border border-yellow-400/20 hover:border-yellow-400/40 transition-all group">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform relative">
-                <Gift className="h-5 w-5 text-white" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+          <div className="space-y-4 text-left">
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl backdrop-blur-sm border border-yellow-400/20 hover:border-yellow-400/40 transition-all group">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform relative">
+                <Gift className="h-6 w-6 text-white" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
               </div>
               <div>
-                <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
+                <h3 className="font-semibold text-white flex items-center gap-2">
                   30-Day Free Trial 
-                  <span className="text-yellow-400 text-xs bg-yellow-400/20 px-1 py-0.5 rounded">FREE</span>
+                  <span className="text-yellow-400 text-xs bg-yellow-400/20 px-2 py-1 rounded-full">FREE</span>
                 </h3>
-                <p className="text-slate-300 text-xs">Full access to all features, no credit card required</p>
+                <p className="text-slate-300 text-sm">Full access to all features, no credit card required</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg backdrop-blur-sm border border-blue-400/20 hover:border-blue-400/40 transition-all group">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Globe className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl backdrop-blur-sm border border-blue-400/20 hover:border-blue-400/40 transition-all group">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Globe className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
+                <h3 className="font-semibold text-white flex items-center gap-2">
                   Unlimited Sites
                   <span className="text-blue-400 text-xs">∞</span>
                 </h3>
-                <p className="text-slate-300 text-xs">Manage as many WordPress sites as you need</p>
+                <p className="text-slate-300 text-sm">Manage as many WordPress sites as you need</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg backdrop-blur-sm border border-green-400/20 hover:border-green-400/40 transition-all group">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Zap className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl backdrop-blur-sm border border-green-400/20 hover:border-green-400/40 transition-all group">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Zap className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
+                <h3 className="font-semibold text-white flex items-center gap-2">
                   Auto-Everything
                   <Clock className="h-3 w-3 text-green-400 animate-spin" />
                 </h3>
-                <p className="text-slate-300 text-xs">Updates, backups, security scans run automatically</p>
+                <p className="text-slate-300 text-sm">Updates, backups, security scans run automatically</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg backdrop-blur-sm border border-purple-400/20 hover:border-purple-400/40 transition-all group">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Activity className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl backdrop-blur-sm border border-purple-400/20 hover:border-purple-400/40 transition-all group">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Activity className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
+                <h3 className="font-semibold text-white flex items-center gap-2">
                   24/7 Monitoring
                   <TrendingUp className="h-3 w-3 text-purple-400" />
                 </h3>
-                <p className="text-slate-300 text-xs">Real-time performance and security monitoring</p>
+                <p className="text-slate-300 text-sm">Real-time performance and security monitoring</p>
               </div>
             </div>
           </div>
 
           {/* Success Stats */}
-          <div className="flex justify-center gap-4 mt-6 pt-6 border-t border-white/10">
+          <div className="flex justify-center gap-6 mt-12 pt-8 border-t border-white/10">
             <div className="text-center">
-              <div className="text-lg font-bold text-white flex items-center justify-center gap-1">
-                <Star className="h-4 w-4 text-yellow-400" />
+              <div className="text-2xl font-bold text-white flex items-center justify-center gap-1">
+                <Star className="h-5 w-5 text-yellow-400" />
                 4.9
               </div>
               <div className="text-xs text-slate-400">User Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-white">10k+</div>
+              <div className="text-2xl font-bold text-white">10k+</div>
               <div className="text-xs text-slate-400">Happy Users</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-white">99.9%</div>
+              <div className="text-2xl font-bold text-white">99.9%</div>
               <div className="text-xs text-slate-400">Uptime</div>
             </div>
           </div>
@@ -214,29 +214,29 @@ export default function Register() {
       </div>
 
       {/* Right Panel - Registration Form */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-y-auto">
-        <Card className="w-full max-w-md border-0 shadow-2xl my-4">
-          <CardHeader className="space-y-3 text-center pb-6 relative">
+      <div className="flex-1 flex items-center justify-center p-8">
+        <Card className="w-full max-w-md border-0 shadow-2xl">
+          <CardHeader className="space-y-4 text-center pb-8 relative">
             {/* Mobile Logo with Special Offer */}
-            <div className="lg:hidden mb-4">
+            <div className="lg:hidden mb-6">
               <div className="relative">
-                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg animate-float">
-                  <SiWordpress className="h-8 w-8 text-white" />
+                <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
+                  <SiWordpress className="h-10 w-10 text-white" />
                 </div>
                 {/* Special offer badge */}
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-bounce">
-                  <Gift className="h-3 w-3 text-white" />
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-bounce">
+                  <Gift className="h-4 w-4 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-                  <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                  <CheckCircle2 className="h-3 w-3 text-white" />
                 </div>
               </div>
               {/* Mobile special offer */}
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-2 mb-3">
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-3 mb-4">
                 <div className="flex items-center justify-center gap-2 text-orange-600">
-                  <Sparkles className="h-3 w-3" />
-                  <span className="text-xs font-semibold">3 Months FREE - Limited Time!</span>
-                  <Sparkles className="h-3 w-3" />
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-semibold">3 Months FREE - Limited Time!</span>
+                  <Sparkles className="h-4 w-4" />
                 </div>
               </div>
             </div>
@@ -251,20 +251,20 @@ export default function Register() {
               <Gift className="w-3 h-3 mr-1" />
               Get Started Today
             </Badge>
-            <CardTitle className="text-2xl font-bold gradient-text">Create Account</CardTitle>
-            <CardDescription className="text-base text-muted-foreground">
+            <CardTitle className="text-3xl font-bold gradient-text">Create Account</CardTitle>
+            <CardDescription className="text-lg text-muted-foreground">
               Join thousands of WordPress professionals
             </CardDescription>
             
             {/* Benefits Preview */}
-            <div className="flex justify-center gap-2 pt-2">
+            <div className="flex justify-center gap-4 pt-2">
               <div className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
                 <Gift className="w-3 h-3" />
                 <span>3 Months Free</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                 <CheckCircle2 className="w-3 h-3" />
-                <span>No Card</span>
+                <span>No Credit Card</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
                 <Clock className="w-3 h-3" />
@@ -274,7 +274,7 @@ export default function Register() {
           </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}

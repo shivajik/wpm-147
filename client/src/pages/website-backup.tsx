@@ -1,7 +1,6 @@
 import { useParams } from "wouter";
 import type { Website, BackupConfiguration, BackupHistory } from "@shared/schema";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { isValidWebsiteId, InvalidWebsiteIdPage } from "@/lib/website-validation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,11 +32,6 @@ import { useState } from "react";
 export default function WebsiteBackupPage() {
   const { id: websiteId } = useParams();
   const { toast } = useToast();
-
-  // Validate website ID
-  if (!isValidWebsiteId(websiteId)) {
-    return <InvalidWebsiteIdPage websiteId={websiteId} />;
-  }
   const [showRestoreOptions, setShowRestoreOptions] = useState(false);
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null);
   const [manualTriggerInstructions, setManualTriggerInstructions] = useState<{

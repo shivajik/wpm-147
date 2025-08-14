@@ -13,10 +13,8 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   const token = localStorage.getItem("auth_token");
-  const baseUrl = getBaseUrl();
-  const fullUrl = url.startsWith('http') ? url : baseUrl + url;
   
-  const res = await fetch(fullUrl, {
+  const res = await fetch(url, {
     method,
     headers: {
       ...(data ? { "Content-Type": "application/json" } : {}),
@@ -38,10 +36,8 @@ export async function apiRequest(
 // New simplified API request for direct use
 export async function apiCall(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem("auth_token");
-  const baseUrl = getBaseUrl();
-  const fullUrl = url.startsWith('http') ? url : baseUrl + url;
   
-  const response = await fetch(fullUrl, {
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -83,27 +79,14 @@ export async function apiCall(url: string, options: RequestInit = {}) {
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-// Get the base URL for API requests
-function getBaseUrl(): string {
-  // In development, use localhost
-  if (import.meta.env.DEV) {
-    return '';  // Relative URLs work in development with Vite proxy
-  }
-  
-  // In production, use the current origin (same domain as the frontend)
-  return '';  // Relative URLs work since frontend and backend are served from same domain
-}
-
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const token = localStorage.getItem("auth_token");
-    const baseUrl = getBaseUrl();
-    const url = baseUrl + queryKey.join("/");
     
-    const res = await fetch(url, {
+    const res = await fetch(queryKey.join("/") as string, {
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
       },

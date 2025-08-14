@@ -1,33 +1,14 @@
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import type { Website } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Gauge, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import AppLayout from "@/components/layout/app-layout";
 import { MaintenanceSidebar } from "@/components/maintenance/maintenance-sidebar";
 import { PerformanceScan } from "@/components/performance/performance-scan";
 
 export default function WebsitePerformance() {
   const params = useParams();
-  const [, setLocation] = useLocation();
   const websiteId = params.id;
-
-  // Check if websiteId is valid
-  if (!websiteId || websiteId === 'undefined' || websiteId === 'null' || isNaN(Number(websiteId))) {
-    return (
-      <AppLayout title="Invalid Website" defaultOpen={false}>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Invalid Website ID</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            The website ID "{websiteId}" is not valid.
-          </p>
-          <Button onClick={() => setLocation('/websites')}>
-            Back to Websites
-          </Button>
-        </div>
-      </AppLayout>
-    );
-  }
 
   const { data: website, isLoading } = useQuery<Website>({
     queryKey: ['/api/websites', websiteId],

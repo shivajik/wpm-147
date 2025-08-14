@@ -57,14 +57,14 @@ export default function Dashboard() {
   }, [user, autoSync, toast]);
 
   // Fetch real data for dynamic content with optimized caching
-  const { data: websites = [], isLoading: websitesLoading } = useQuery<Website[]>({ 
+  const { data: websites = [] } = useQuery<Website[]>({ 
     queryKey: ['/api/websites'], 
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
   });
   
-  const { data: clients = [], isLoading: clientsLoading } = useQuery({ 
+  const { data: clients = [] } = useQuery({ 
     queryKey: ['/api/clients'], 
     enabled: !!user,
     staleTime: 10 * 60 * 1000, // 10 minutes (clients change less frequently)
@@ -106,9 +106,6 @@ export default function Dashboard() {
   // Calculate dynamic statistics from real data
   const clientCount = Array.isArray(clients) ? clients.length : 0;
   const websiteCount = Array.isArray(websites) ? websites.length : 0;
-  
-  // Check if we're still loading initial data (auth is complete but data queries are pending)
-  const isDataLoading = websitesLoading || clientsLoading;
 
   // Calculate real maintenance statistics
   const maintenanceStats = {
@@ -200,7 +197,7 @@ export default function Dashboard() {
               </Badge>
               <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800">
                 <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                Initializing...
+                Loading...
               </Badge>
             </div>
             
@@ -218,97 +215,27 @@ export default function Dashboard() {
             <div className="space-y-4 max-w-sm mx-auto">
               <div className="flex items-center gap-3 justify-center">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <span className="text-sm text-muted-foreground">Loading dashboard data...</span>
+                <span className="text-sm text-muted-foreground">Loading websites and data...</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full animate-pulse transition-all duration-1000" style={{ width: '75%' }}></div>
+                <div className="bg-primary h-2 rounded-full animate-pulse transition-all duration-500" style={{ width: '65%' }}></div>
               </div>
             </div>
             
-            {/* Professional Loading Cards */}
+            {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-4 mt-8">
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
+                <div className="text-2xl font-bold text-foreground mb-1">{clientCount}</div>
                 <div className="text-xs text-muted-foreground">Clients</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
+                <div className="text-2xl font-bold text-foreground mb-1">{websiteCount}</div>
                 <div className="text-xs text-muted-foreground">Websites</div>
               </div>
               <div className="text-center p-4 bg-card border rounded-lg">
-                <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
-                <div className="text-xs text-muted-foreground">Status</div>
+                <div className="text-2xl font-bold text-green-600 mb-1">99.9%</div>
+                <div className="text-xs text-muted-foreground">Uptime</div>
               </div>
-            </div>
-
-            {/* Loading Phase Indicator */}
-            <div className="pt-4">
-              <p className="text-xs text-muted-foreground">
-                Connecting to websites and synchronizing data...
-              </p>
-            </div>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  // Show data loading state if auth is complete but data is still loading
-  if (isDataLoading) {
-    return (
-      <AppLayout>
-        <div className="space-y-8 p-6">
-          {/* Status Indicator */}
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
-              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-              Loading Dashboard Data...
-            </Badge>
-          </div>
-
-          {/* Header Skeleton */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <div className="h-8 bg-muted rounded w-64 animate-pulse"></div>
-              <div className="h-4 bg-muted rounded w-48 animate-pulse"></div>
-            </div>
-            <div className="h-9 bg-muted rounded w-32 animate-pulse"></div>
-          </div>
-
-          {/* Stats Cards Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-6">
-                <div className="space-y-3">
-                  <div className="h-4 bg-muted rounded w-20 animate-pulse"></div>
-                  <div className="h-8 bg-muted rounded w-16 animate-pulse"></div>
-                  <div className="h-3 bg-muted rounded w-24 animate-pulse"></div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Main Content Skeleton */}
-          <div className="space-y-6">
-            <div className="h-6 bg-muted rounded w-48 animate-pulse"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 bg-muted rounded animate-pulse"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-muted rounded w-32 animate-pulse"></div>
-                        <div className="h-3 bg-muted rounded w-24 animate-pulse"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-muted rounded w-full animate-pulse"></div>
-                      <div className="h-3 bg-muted rounded w-3/4 animate-pulse"></div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
             </div>
           </div>
         </div>
@@ -364,6 +291,40 @@ export default function Dashboard() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setLocation('/analytics')}
+                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700"
+                        >
+                          <BarChart3 className="h-4 w-4 text-blue-600" />
+                          <span>Analytics</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View website analytics and performance metrics</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLocation('/security')}
+                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700"
+                        >
+                          <Shield className="h-4 w-4 text-orange-600" />
+                          <span>Security</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Run security scans and manage website protection</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => autoSync()}
                           disabled={isAutoSyncing}
                           className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700"
@@ -382,6 +343,23 @@ export default function Dashboard() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setLocation('/performance')}
+                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700"
+                        >
+                          <Zap className="h-4 w-4 text-green-600" />
+                          <span>Performance</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Monitor website speed and optimization</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => setLocation('/clients')}
                           className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700"
                         >
@@ -391,23 +369,6 @@ export default function Dashboard() {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Manage clients and generate reports</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setLocation('/reports')}
-                          className="flex items-center space-x-2 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700"
-                        >
-                          <BarChart3 className="h-4 w-4 text-blue-600" />
-                          <span>Reports</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>View and manage client reports</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

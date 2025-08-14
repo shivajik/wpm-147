@@ -12,7 +12,7 @@ export default function PluginDownloadSection() {
   const handleDownload = () => {
     // Download the exact plugin that works with KSoft Solution (AS College compatibility fix)
     const link = document.createElement('a');
-    link.href = '/downloads/wp-remote-manager-enhanced-users-v3.2.0-final-exact.zip';
+    link.href = '/wp-remote-manager-enhanced-users-v3.2.0-final-exact.zip';
     link.download = 'wp-remote-manager-enhanced-users-v3.2.0-final-exact.zip';
     document.body.appendChild(link);
     link.click();

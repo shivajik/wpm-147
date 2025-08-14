@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,8 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiCall } from "@/lib/queryClient";
 import { insertWebsiteSchema, type InsertWebsite, type Client } from "@shared/schema";
-import { Globe, Key, Settings, Plus, UserPlus, AlertCircle } from "lucide-react";
-import AddClientDialog from "@/components/clients/add-client-dialog";
+import { Globe, Key, Settings } from "lucide-react";
 
 interface AddWebsiteDialogProps {
   open: boolean;
@@ -41,7 +40,6 @@ const websiteFormSchema = insertWebsiteSchema.extend({
 
 export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialogProps) {
   const [activeTab, setActiveTab] = useState("basic");
-  const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -67,39 +65,6 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
     queryKey: ["/api/clients"],
     enabled: open,
   });
-
-  // Auto-select the newest client when the list updates (after adding a new client)
-  useEffect(() => {
-    if (clients && clients.length > 0 && !form.getValues().clientId) {
-      // Sort clients by id (assuming higher id = newer) and select the latest one
-      const newestClient = clients.reduce((prev, current) => 
-        (current.id > prev.id) ? current : prev
-      );
-      form.setValue('clientId', newestClient.id);
-    }
-  }, [clients, form]);
-
-  // Helper function to check which tabs have errors
-  const getTabErrors = () => {
-    const errors = form.formState.errors;
-    return {
-      basic: !!(errors.name || errors.url || errors.clientId),
-      credentials: !!(errors.wpAdminUsername || errors.wpAdminPassword || errors.wrmApiKey),
-      settings: !!(errors.wpVersion || errors.healthStatus)
-    };
-  };
-
-  // Auto-switch to tab with errors when validation fails
-  const handleSubmitError = () => {
-    const tabErrors = getTabErrors();
-    if (tabErrors.basic) {
-      setActiveTab("basic");
-    } else if (tabErrors.credentials) {
-      setActiveTab("credentials");
-    } else if (tabErrors.settings) {
-      setActiveTab("settings");
-    }
-  };
 
   const createWebsiteMutation = useMutation({
     mutationFn: async (data: WebsiteFormData) => {
@@ -141,22 +106,11 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
       onOpenChange(false);
     },
     onError: (error: any) => {
-      // Check for validation errors and guide user to correct tab
-      const tabErrors = getTabErrors();
-      let errorMessage = error?.message || "Please check the form for errors.";
-      
-      if (tabErrors.basic || tabErrors.credentials || tabErrors.settings) {
-        errorMessage = "Please check the highlighted tabs for required fields and fix any errors.";
-      }
-
       toast({
         title: "Failed to add website",
-        description: errorMessage,
+        description: error?.message || "There was an error adding the website. Please try again.",
         variant: "destructive",
       });
-      
-      // Auto-switch to first tab with errors
-      handleSubmitError();
     },
   });
 
@@ -181,7 +135,7 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] sm:max-h-[85vh] flex flex-col p-0 m-2 sm:m-4 overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 m-4 sm:m-6">
         <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Globe className="h-5 w-5" />
@@ -192,52 +146,25 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden px-4 sm:px-6 min-h-0">
+        <div className="flex-1 overflow-hidden px-4 sm:px-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, handleSubmitError)} className="flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pr-2 pb-2 min-h-0" style={{ maxHeight: 'calc(90vh - 200px)' }}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+              <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 pr-1 sm:pr-2 pb-4 scrollbar-thin dialog-scroll">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                <TabsTrigger 
-                  value="basic" 
-                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
-                    getTabErrors().basic ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
-                  }`}
-                  data-testid="tab-basic"
-                >
+                <TabsTrigger value="basic" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
                   <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Basic Info</span>
                   <span className="sm:hidden">Basic</span>
-                  {getTabErrors().basic && (
-                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
-                  )}
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="credentials" 
-                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
-                    getTabErrors().credentials ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
-                  }`}
-                  data-testid="tab-credentials"
-                >
+                <TabsTrigger value="credentials" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
                   <Key className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Connection</span>
                   <span className="sm:hidden">Connect</span>
-                  {getTabErrors().credentials && (
-                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
-                  )}
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="settings" 
-                  className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2 relative ${
-                    getTabErrors().settings ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' : ''
-                  }`}
-                  data-testid="tab-settings"
-                >
+                <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
                   <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                   Settings
-                  {getTabErrors().settings && (
-                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
-                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -290,51 +217,24 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm sm:text-base">Client</FormLabel>
-                      {Array.isArray(clients) && clients.length > 0 ? (
-                        <Select
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                          value={field.value ? field.value.toString() : ""}
-                          disabled={clientsLoading}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="text-sm sm:text-base">
-                              <SelectValue placeholder="Select a client" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id.toString()}>
-                                <span className="truncate">{client.name} ({client.email})</span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
-                            <div className="flex items-center space-x-2">
-                              <UserPlus className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                              <span className="text-sm text-orange-800 dark:text-orange-200">
-                                {clientsLoading ? "Loading clients..." : "No clients found. Please add a client first."}
-                              </span>
-                            </div>
-                            {!clientsLoading && (
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setIsAddClientDialogOpen(true)}
-                                className="border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:text-orange-300 dark:hover:bg-orange-900"
-                                data-testid="button-add-client-from-website"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Add Client
-                              </Button>
-                            )}
-                          </div>
-                          <input type="hidden" {...field} />
-                        </div>
-                      )}
+                      <Select
+                        onValueChange={(value) => field.onChange(parseInt(value))}
+                        value={field.value ? field.value.toString() : ""}
+                        disabled={clientsLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="text-sm sm:text-base">
+                            <SelectValue placeholder="Select a client" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Array.isArray(clients) && clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id.toString()}>
+                              <span className="truncate">{client.name} ({client.email})</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormDescription className="text-xs sm:text-sm">
                         Which client owns this website?
                       </FormDescription>
@@ -344,21 +244,21 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                 />
               </TabsContent>
 
-              <TabsContent value="credentials" className="space-y-2 sm:space-y-3 mt-3">
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="border rounded-lg p-2 sm:p-3">
-                    <h4 className="font-medium mb-2 text-sm sm:text-base">WordPress Admin Credentials</h4>
-                    <div className="space-y-2 sm:space-y-3">
+              <TabsContent value="credentials" className="space-y-3 sm:space-y-4 mt-4">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="border rounded-lg p-3 sm:p-4">
+                    <h4 className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">WordPress Admin Credentials</h4>
+                    <div className="space-y-3">
                       <FormField
                         control={form.control}
                         name="wpAdminUsername"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs sm:text-sm">WordPress Username</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">WordPress Username</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="admin"
-                                className="text-xs sm:text-sm h-8 sm:h-9"
+                                className="text-sm sm:text-base"
                                 {...field}
                                 value={field.value || ""}
                               />
@@ -373,18 +273,18 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                         name="wpAdminPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs sm:text-sm">WordPress Application Password</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">WordPress Application Password</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
-                                placeholder="xxxx xxxx xxxx xxxx"
-                                className="text-xs sm:text-sm h-8 sm:h-9"
+                                placeholder="xxxx xxxx xxxx xxxx xxxx xxxx"
+                                className="text-sm sm:text-base"
                                 {...field}
                                 value={field.value || ""}
                               />
                             </FormControl>
-                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              Use Application Password, not regular login password
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              This must be an Application Password, not your regular WordPress login password.
                             </div>
                             <FormMessage />
                           </FormItem>
@@ -393,28 +293,28 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                     </div>
                   </div>
 
-                  <div className="text-center text-xs text-gray-500 py-1">OR</div>
+                  <div className="text-center text-xs sm:text-sm text-gray-500">OR</div>
 
-                  <div className="border rounded-lg p-2 sm:p-3 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
-                    <h4 className="font-medium mb-2 text-green-800 dark:text-green-200 text-xs sm:text-sm">
-                      WP Remote Manager Plugin (Recommended)
+                  <div className="border rounded-lg p-3 sm:p-4 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+                    <h4 className="font-medium mb-2 sm:mb-3 text-green-800 dark:text-green-200 text-sm sm:text-base">
+                      WP Remote Manager Plugin Connection (Recommended)
                     </h4>
                     <FormField
                       control={form.control}
                       name="wrmApiKey"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs sm:text-sm">API Key</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">WP Remote Manager API Key</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter WP Remote Manager API key"
-                              className="text-xs sm:text-sm h-8 sm:h-9"
+                              placeholder="Enter WP Remote Manager plugin API key"
+                              className="text-sm sm:text-base w-full min-w-0"
                               {...field}
                               value={field.value || ""}
                             />
                           </FormControl>
-                          <FormDescription className="text-[10px] sm:text-xs mt-1">
-                            Complete WordPress management features
+                          <FormDescription className="text-xs sm:text-sm">
+                            Provides complete WordPress management features including updates, security scans, and maintenance mode
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -423,25 +323,25 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
                   </div>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-2 sm:p-3">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1 text-xs sm:text-sm">
-                    Setup Instructions:
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2 text-sm sm:text-base">
+                    WP Remote Manager Setup (Recommended):
                   </h4>
-                  <ol className="text-[10px] sm:text-xs text-blue-800 dark:text-blue-200 space-y-0.5 list-decimal list-inside mb-2">
-                    <li>Install <strong>WP Remote Manager</strong> plugin</li>
-                    <li>Go to <strong>Settings → WP Remote Manager</strong></li>
-                    <li>Generate and copy API key</li>
-                    <li>Paste key above</li>
+                  <ol className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside mb-3">
+                    <li>Install the <strong>WP Remote Manager</strong> plugin on your WordPress site</li>
+                    <li>Go to <strong>Settings → WP Remote Manager</strong> in your WordPress admin</li>
+                    <li>Generate a new API key and copy it</li>
+                    <li>Paste the API key in the field above for enhanced management features</li>
                   </ol>
-                  <div className="p-1.5 sm:p-2 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded">
-                    <p className="text-[10px] sm:text-xs text-green-800 dark:text-green-200">
-                      <strong>Alternative:</strong> Use Application Passwords in <strong>Users → Profile</strong>
+                  <div className="mt-3 p-2 sm:p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded">
+                    <p className="text-xs sm:text-sm text-green-800 dark:text-green-200">
+                      <strong>Alternative:</strong> Use WordPress Application Passwords for basic monitoring. Create them in <strong>Users → Profile → Application Passwords</strong> section.
                     </p>
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="settings" className="space-y-2 sm:space-y-3 mt-3">
+              <TabsContent value="settings" className="space-y-3 sm:space-y-4 mt-4">
                 <FormField
                   control={form.control}
                   name="wpVersion"
@@ -498,41 +398,28 @@ export default function AddWebsiteDialog({ open, onOpenChange }: AddWebsiteDialo
         </div>
         
         {/* Fixed footer buttons outside of scrollable area */}
-        <div className="flex-shrink-0 border-t bg-background px-3 sm:px-4 py-2 sm:py-3">
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
+        <div className="flex-shrink-0 border-t bg-background px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
               disabled={createWebsiteMutation.isPending}
-              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+              className="w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={createWebsiteMutation.isPending}
-              onClick={form.handleSubmit(onSubmit, handleSubmitError)}
-              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
-              data-testid="button-submit-website"
+              onClick={form.handleSubmit(onSubmit)}
+              className="w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
             >
-              {createWebsiteMutation.isPending ? "Adding..." : "Add Website"}
+              {createWebsiteMutation.isPending ? "Adding Website..." : "Add Website"}
             </Button>
           </div>
         </div>
       </DialogContent>
-      
-      {/* Add Client Dialog */}
-      <AddClientDialog 
-        open={isAddClientDialogOpen} 
-        onOpenChange={(open) => {
-          setIsAddClientDialogOpen(open);
-          if (!open) {
-            // Refresh clients when dialog is closed
-            queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-          }
-        }} 
-      />
     </Dialog>
   );
 }

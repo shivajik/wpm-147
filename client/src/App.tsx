@@ -30,7 +30,6 @@ import WebsitePerformance from "@/pages/website-performance";
 import Subscription from "@/pages/subscription";
 import SubscriptionPreview from "@/pages/subscription-preview";
 import ViewReport from "@/pages/view-report";
-import SeoReportPage from "@/pages/seo-report";
 
 // Lazy load heavy components for performance
 import { 
@@ -127,9 +126,6 @@ function Router() {
           <Route path="/subscription" component={Subscription} />
         </>
       )}
-      {/* SEO reports should be accessible in both authenticated and unauthenticated modes */}
-      <Route path="/seo-report/:id" component={SeoReportPage} />
-      <Route path="/reports/:token" component={SeoReportPage} />
       <Route component={NotFound} />
     </Switch>
   );

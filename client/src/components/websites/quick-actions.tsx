@@ -186,8 +186,8 @@ export function QuickActions({ websiteId, websiteName, websiteUrl }: QuickAction
       description: 'Generate reports',
       color: 'text-pink-600',
       bgColor: 'bg-pink-50 hover:bg-pink-100',
-      href: `/reports`,
-      isAction: false,
+      onClick: () => handleAction('Generate Client Report', `/api/websites/${websiteId}/client-report`),
+      isAction: true,
     },
     {
       id: 'white-label',
