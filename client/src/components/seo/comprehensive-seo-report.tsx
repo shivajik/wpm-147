@@ -867,7 +867,7 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                         The webpage has a favicon.
                       </span>
                       <span className="text-xs text-blue-600 dark:text-blue-400 break-all">
-                        https://ksoftsolution.com/wp-content/uploads/2017/01/cropped-logo_seosight-280x280.png
+                        {technicalData.favicon || `${technicalData.url || websiteUrl}/favicon.ico`}
                       </span>
                     </div>
                     <Info className="h-4 w-4 text-gray-400 cursor-help" />
@@ -2007,26 +2007,28 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                   <span className="text-white text-xs font-bold">f</span>
                                 </div>
                                 <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Facebook</h5>
-                                <Badge variant="outline" className="text-xs">3</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.socialMedia?.facebook?.length || 0}</Badge>
                               </div>
                               <div className="space-y-1 pl-6">
-                                {[
-                                  'https://www.facebook.com/ksoftsolutionaurangabad/',
-                                  'https://www.facebook.com/ksoftsolutionaurangabad/',
-                                  'https://www.facebook.com/ksoftsolutionaurangabad/'
-                                ].map((link, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
-                                    <ExternalLink className="h-3 w-3 text-blue-500 flex-shrink-0" />
-                                    <a 
-                                      href={link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
-                                    >
-                                      {link}
-                                    </a>
+                                {technicalData.socialMedia?.facebook?.length > 0 ? (
+                                  technicalData.socialMedia.facebook.map((link: string, index: number) => (
+                                    <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                      <ExternalLink className="h-3 w-3 text-blue-500 flex-shrink-0" />
+                                      <a 
+                                        href={link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                      >
+                                        {link}
+                                      </a>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-center p-3 text-xs text-gray-500">
+                                    <span>No Facebook links detected</span>
                                   </div>
-                                ))}
+                                )}
                               </div>
                             </div>
 
@@ -2037,26 +2039,28 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                   <span className="text-white text-xs font-bold">𝕏</span>
                                 </div>
                                 <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Twitter</h5>
-                                <Badge variant="outline" className="text-xs">3</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.socialMedia?.twitter?.length || 0}</Badge>
                               </div>
                               <div className="space-y-1 pl-6">
-                                {[
-                                  'http://twitter.com/ksoftsolution',
-                                  'http://twitter.com/ksoftsolution',
-                                  'https://twitter.com/ksoftsolution'
-                                ].map((link, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
-                                    <ExternalLink className="h-3 w-3 text-sky-500 flex-shrink-0" />
-                                    <a 
-                                      href={link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
-                                    >
-                                      {link}
-                                    </a>
+                                {technicalData.socialMedia?.twitter?.length > 0 ? (
+                                  technicalData.socialMedia.twitter.map((link: string, index: number) => (
+                                    <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                      <ExternalLink className="h-3 w-3 text-sky-500 flex-shrink-0" />
+                                      <a 
+                                        href={link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                      >
+                                        {link}
+                                      </a>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-center p-3 text-xs text-gray-500">
+                                    <span>No Twitter links detected</span>
                                   </div>
-                                ))}
+                                )}
                               </div>
                             </div>
 
@@ -2067,26 +2071,28 @@ export function ComprehensiveSeoReport({ report, websiteName, websiteUrl }: Comp
                                   <span className="text-white text-xs font-bold">📷</span>
                                 </div>
                                 <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300">Instagram</h5>
-                                <Badge variant="outline" className="text-xs">3</Badge>
+                                <Badge variant="outline" className="text-xs">{technicalData.socialMedia?.instagram?.length || 0}</Badge>
                               </div>
                               <div className="space-y-1 pl-6">
-                                {[
-                                  'https://www.instagram.com/ksoftsolution/',
-                                  'https://www.instagram.com/ksoftsolution/',
-                                  'https://www.instagram.com/ksoftsolution/'
-                                ].map((link, index) => (
-                                  <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
-                                    <ExternalLink className="h-3 w-3 text-pink-500 flex-shrink-0" />
-                                    <a 
-                                      href={link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
-                                    >
-                                      {link}
-                                    </a>
+                                {technicalData.socialMedia?.instagram?.length > 0 ? (
+                                  technicalData.socialMedia.instagram.map((link: string, index: number) => (
+                                    <div key={index} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border">
+                                      <ExternalLink className="h-3 w-3 text-pink-500 flex-shrink-0" />
+                                      <a 
+                                        href={link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                      >
+                                        {link}
+                                      </a>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-center p-3 text-xs text-gray-500">
+                                    <span>No Instagram links detected</span>
                                   </div>
-                                ))}
+                                )}
                               </div>
                             </div>
                           </div>
