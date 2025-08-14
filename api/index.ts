@@ -7122,6 +7122,99 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // =================================================================
+    // SUBSCRIPTION ENDPOINTS
+    // =================================================================
+
+    // Get all subscription plans
+    if (path === '/api/subscription-plans' && req.method === 'GET') {
+      try {
+        const plans = await db
+          .select()
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.isActive, true))
+          .orderBy(subscriptionPlans.monthlyPrice);
+
+        return res.status(200).json(plans);
+      } catch (error) {
+        console.error('Error fetching subscription plans:', error);
+        return res.status(500).json({ 
+          message: 'Failed to fetch subscription plans',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    // Get user subscription details
+    if (path === '/api/user/subscription' && req.method === 'GET') {
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const [userData] = await db
+          .select({
+            subscriptionPlan: users.subscriptionPlan,
+            subscriptionStatus: users.subscriptionStatus,
+            subscriptionEndsAt: users.subscriptionEndsAt
+          })
+          .from(users)
+          .where(eq(users.id, user.id));
+
+        if (!userData) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json({
+          subscriptionPlan: userData.subscriptionPlan || 'free',
+          subscriptionStatus: userData.subscriptionStatus || 'active',
+          subscriptionEndsAt: userData.subscriptionEndsAt || null
+        });
+      } catch (error) {
+        console.error('Error fetching user subscription:', error);
+        return res.status(500).json({ 
+          message: 'Failed to fetch user subscription',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    // Update user subscription
+    if (path === '/api/user/subscription' && req.method === 'PUT') {
+      const user = authenticateToken(req);
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      try {
+        const { subscriptionPlan, subscriptionStatus, subscriptionEndsAt } = req.body;
+
+        const [updatedUser] = await db
+          .update(users)
+          .set({
+            subscriptionPlan,
+            subscriptionStatus,
+            subscriptionEndsAt: subscriptionEndsAt ? new Date(subscriptionEndsAt) : null,
+            updatedAt: new Date()
+          })
+          .where(eq(users.id, user.id))
+          .returning({
+            subscriptionPlan: users.subscriptionPlan,
+            subscriptionStatus: users.subscriptionStatus,
+            subscriptionEndsAt: users.subscriptionEndsAt
+          });
+
+        return res.status(200).json(updatedUser);
+      } catch (error) {
+        console.error('Error updating user subscription:', error);
+        return res.status(500).json({ 
+          message: 'Failed to update user subscription',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
     // Default response - Enhanced debugging
     console.log(`[API] Endpoint not found: ${req.method} ${path}`);
     console.log(`[API] Available sync patterns tested:`, {
@@ -7170,7 +7263,10 @@ export default async function handler(req: any, res: any) {
         'GET /api/websites/:id/wrm/updates',
         'GET /api/websites/:id/wrm-plugins',
         'GET /api/websites/:id/wrm-themes',
-        'GET /api/websites/:id/wrm-users'
+        'GET /api/websites/:id/wrm-users',
+        'GET /api/subscription-plans',
+        'GET /api/user/subscription',
+        'PUT /api/user/subscription'
       ],
       timestamp: new Date().toISOString()
     });
