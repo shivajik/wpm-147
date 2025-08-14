@@ -64,7 +64,7 @@ class VercelSeoAnalyzer {
       // Images analysis
       const images = $('img');
       const totalImages = images.length;
-      const withAlt = images.filter((_, el) => $(el).attr('alt')).length;
+      const withAlt = images.filter((_, el) => Boolean($(el).attr('alt'))).length;
       const missingAlt = totalImages - withAlt;
 
       // Links analysis
@@ -260,7 +260,7 @@ class VercelSeoAnalyzer {
   }
 
   private generateDetailedFindings(data: any): any[] {
-    const findings = [];
+    const findings: any[] = [];
 
     if (!data.title) {
       findings.push({
@@ -302,7 +302,7 @@ class VercelSeoAnalyzer {
   }
 
   private generateRecommendations(findings: any[]): string[] {
-    const recommendations = [];
+    const recommendations: string[] = [];
     
     findings.forEach(finding => {
       if (finding.impact === 'critical') {
@@ -654,16 +654,20 @@ const seoReports = pgTable('seo_reports', {
   backlinksScore: integer('backlinks_score').notNull(),
   userExperienceScore: integer('user_experience_score').notNull(),
   onPageSeoScore: integer('on_page_seo_score').notNull(),
-  reportData: json('report_data').notNull().default('{}'),
-  recommendations: json('recommendations').notNull().default('[]'),
+  reportData: jsonb('report_data').notNull().default('{}'),
+  recommendations: jsonb('recommendations').notNull().default('[]'),
   criticalIssues: integer('critical_issues').default(0),
   warnings: integer('warnings').default(0),
   notices: integer('notices').default(0),
-  reportType: text('report_type').default('automated'),
+  reportType: varchar('report_type', { length: 20 }).default('automated'),
+  detailedFindings: jsonb('detailed_findings').default('{}'),
+  shareToken: varchar('share_token', { length: 255 }),
+  isShareable: boolean('is_shareable').default(false),
   generatedAt: timestamp('generated_at').defaultNow(),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
   scanDuration: integer('scan_duration'),
-  scanStatus: text('scan_status').default('completed'),
+  scanStatus: varchar('scan_status', { length: 20 }).default('completed'),
   errorMessage: text('error_message'),
 });
 
@@ -2803,7 +2807,7 @@ export default async function handler(req: any, res: any) {
     if (path.match(/^\/api\/seo-reports\/\d+$/) && req.method === 'GET') {
       // Check for share token first (public access)
       const shareToken = url.searchParams.get('token');
-      let user = null;
+      let user: { id: number; email: string } | null = null;
       
       if (!shareToken) {
         // No share token provided, require authentication
@@ -2833,7 +2837,10 @@ export default async function handler(req: any, res: any) {
             ))
             .limit(1);
         } else {
-          // Authenticated access
+          // Authenticated access - user is guaranteed to be non-null here due to earlier check
+          if (!user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+          }
           reportResult = await db.select()
             .from(seoReports)
             .innerJoin(websites, eq(seoReports.websiteId, websites.id))
@@ -3082,32 +3089,32 @@ export default async function handler(req: any, res: any) {
 
         return res.status(200).json({
           id: report.id,
-          websiteId: report.website_id,
+          websiteId: report.websiteId,
           websiteName: website.name,
           websiteUrl: website.url,
-          overallScore: report.overall_score,
-          technicalScore: report.technical_score,
-          contentScore: report.content_score,
-          userExperienceScore: report.user_experience_score,
-          backlinksScore: report.backlinks_score,
-          onPageSeoScore: report.on_page_seo_score,
-          reportData: typeof report.report_data === 'string' 
-            ? JSON.parse(report.report_data) 
-            : report.report_data,
+          overallScore: report.overallScore,
+          technicalScore: report.technicalScore,
+          contentScore: report.contentScore,
+          userExperienceScore: report.userExperienceScore,
+          backlinksScore: report.backlinksScore,
+          onPageSeoScore: report.onPageSeoScore,
+          reportData: typeof report.reportData === 'string' 
+            ? JSON.parse(report.reportData) 
+            : report.reportData,
           recommendations: typeof report.recommendations === 'string'
             ? JSON.parse(report.recommendations)
             : report.recommendations,
-          detailedFindings: typeof report.detailed_findings === 'string'
-            ? JSON.parse(report.detailed_findings || '{}')
-            : (report.detailed_findings || {}),
-          criticalIssues: report.critical_issues,
+          detailedFindings: typeof report.detailedFindings === 'string'
+            ? JSON.parse(report.detailedFindings || '{}')
+            : (report.detailedFindings || {}),
+          criticalIssues: report.criticalIssues,
           warnings: report.warnings,
           notices: report.notices,
-          scanDuration: report.scan_duration,
-          scanStatus: report.scan_status,
-          generatedAt: report.generated_at,
-          isShareable: report.is_shareable,
-          shareToken: report.share_token
+          scanDuration: report.scanDuration,
+          scanStatus: report.scanStatus,
+          generatedAt: report.generatedAt,
+          isShareable: report.isShareable,
+          shareToken: report.shareToken
         });
 
       } catch (error) {
